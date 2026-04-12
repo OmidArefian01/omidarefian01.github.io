@@ -6,7 +6,7 @@
   <title>Omid Arefian | Robotics & Control</title>
   <meta
     name="description"
-    content="Omid Arefian - Mechanical Engineering master's student at Politecnico di Milano working on robotics, optimal control, motion planning, and autonomous systems."
+    content="Omid Arefian - Mechanical Engineering master's student at Politecnico di Milano working on robotics, optimal control, motion planning, reinforcement learning, and autonomous systems."
   />
 
   <style>
@@ -49,7 +49,8 @@
       min-height: 100vh;
     }
 
-    img {
+    img,
+    video {
       display: block;
       max-width: 100%;
     }
@@ -246,12 +247,6 @@
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 22px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
       gap: 22px;
     }
 
@@ -516,7 +511,6 @@
     @media (max-width: 980px) {
       .hero,
       .grid-2,
-      .grid-3,
       .project-grid {
         grid-template-columns: 1fr;
       }
@@ -595,14 +589,14 @@
       </div>
 
       <div class="panel hero-panel">
-        <div class="eyebrow">Robotics · Optimal Control · Autonomous Systems</div>
+        <div class="eyebrow">Robotics · Optimal Control · Reinforcement Learning · Autonomous Systems</div>
 
         <h1>Omid <span>Arefian</span></h1>
 
         <p class="lead">
           I am a Mechanical Engineering master's student in Mechatronics and Robotics at
           Politecnico di Milano, with strong interests in robotics, motion planning,
-          control, optimal control, and intelligent autonomous systems.
+          optimal control, reinforcement learning, and intelligent autonomous systems.
         </p>
 
         <div class="pill-row">
@@ -735,22 +729,35 @@
           </div>
         </article>
 
+        <article class="card project-card">
+          <div class="project-media">
+            <img
+              src="assets/project_logo.png"
+              alt="Custom reinforcement learning project environment with multiple boxes"
+            />
+            <div class="project-overlay">
+              <a class="read-more-btn" href="project-rl.html">Read More</a>
+            </div>
+          </div>
+
+          <div class="project-content">
+            <span class="project-tag">Reinforcement Learning · PPO</span>
+            <h3>Custom PPO Environment for Multi-Box Coordination</h3>
+            <p>
+              Developed a custom reinforcement-learning environment in which an agent
+              coordinates two boxes at a time, avoids collisions, and learns motion
+              strategies through reward shaping, architecture comparison, and PPO training.
+            </p>
+            <a class="project-link-inline" href="project-rl.html">Open project page ↗</a>
+          </div>
+        </article>
+
         <article class="card">
           <span class="project-tag">MATLAB · ROS 2 · Gazebo</span>
           <h3>Turtlebot3 Path-Following Controller</h3>
           <p>
             Integrated ROS 2 with MATLAB and designed linear and nonlinear controllers,
             including PID and MPC, for accurate path tracking in cluttered environments.
-          </p>
-        </article>
-
-        <article class="card">
-          <span class="project-tag">Reinforcement Learning</span>
-          <h3>Custom PPO Environment & Agent</h3>
-          <p>
-            Developed a custom reinforcement-learning environment where an agent
-            coordinated multiple boxes, avoided collisions, and aligned them using
-            optimal linear and angular velocity commands.
           </p>
         </article>
 
