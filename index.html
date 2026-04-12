@@ -258,6 +258,8 @@
       box-shadow: var(--shadow-soft);
       padding: 26px;
       transition: 0.28s ease;
+      display: flex;
+      flex-direction: column;
     }
 
     .card:hover {
@@ -284,8 +286,70 @@
       margin-top: 8px;
     }
 
+    /* --- NEW PROJECT IMAGE & HOVER STYLES --- */
+    .project-card-image {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .project-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .project-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(29, 42, 59, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover .project-card-image img {
+      transform: scale(1.05);
+    }
+
+    .card:hover .project-overlay {
+      opacity: 1;
+    }
+
+    .btn-read-more {
+      padding: 10px 24px;
+      background-color: var(--surface-solid);
+      color: var(--text);
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transform: translateY(15px);
+      transition: transform 0.3s ease, background 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .card:hover .btn-read-more {
+      transform: translateY(0);
+    }
+
+    .btn-read-more:hover {
+      background-color: #eef3fb;
+    }
+    /* -------------------------------------- */
+
     .edu-card {
       display: flex;
+      flex-direction: row;
       gap: 18px;
       align-items: flex-start;
     }
@@ -600,21 +664,28 @@
       </div>
 
       <div class="project-grid">
-        <article class="card">
-          <span class="project-tag">Advanced Nonlinear Control</span>
-          <h3>Optimal Obstacle-Avoiding Trajectory Design</h3>
-          <p>
-            Modeled a vehicle in a 2D environment and computed optimal trajectories using direct and indirect methods. Then designed MPC and LQR controllers for the resulting control problem.
-          </p>
-          </article>
-
+        <article class="card" style="padding: 18px;">
+          <div class="project-card-image">
+            <img src="assets/pmp-preview.jpg" alt="Optimal Trajectory Plot" /> <div class="project-overlay">
+              <a href="project-pmp.html" target="_blank" class="btn-read-more">Read More</a>
+            </div>
+          </div>
+          
+          <div>
+            <span class="project-tag">Advanced Nonlinear Control</span>
+            <h3>Optimal Obstacle-Avoiding Trajectory Design</h3>
+            <p>
+              Modeled a vehicle in a 2D environment and computed optimal trajectories using direct and indirect methods. Then designed MPC and LQR controllers for the resulting control problem.
+            </p>
+          </div>
+        </article>
         <article class="card">
           <span class="project-tag">MATLAB · ROS 2 · Gazebo</span>
           <h3>Turtlebot3 Path-Following Controller</h3>
           <p>
             Integrated ROS 2 with MATLAB and designed linear and nonlinear controllers, including PID and MPC, for accurate path tracking in cluttered environments.
           </p>
-          </article>
+        </article>
 
         <article class="card">
           <span class="project-tag">Reinforcement Learning</span>
@@ -622,7 +693,7 @@
           <p>
             Developed a custom reinforcement-learning environment where an agent coordinated multiple boxes, avoided collisions, and aligned them using optimal linear and angular velocity commands.
           </p>
-          </article>
+        </article>
 
         <article class="card">
           <span class="project-tag">System Identification</span>
@@ -630,7 +701,7 @@
           <p>
             Performed FRF-based analysis, modal parameter estimation, coherence evaluation, and model reduction using MATLAB and experimental measurements.
           </p>
-          </article>
+        </article>
       </div>
     </section>
 
