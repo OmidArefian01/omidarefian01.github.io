@@ -6,14 +6,14 @@
   <title>Omid Arefian | Robotics & Control</title>
   <meta
     name="description"
-    content="Omid Arefian - Mechanical Engineering student at Politecnico di Milano working on robotics, control, motion planning, and autonomous systems."
+    content="Omid Arefian - Mechanical Engineering master's student at Politecnico di Milano working on robotics, optimal control, motion planning, and autonomous systems."
   />
 
   <style>
     :root {
       --bg: #f6f8fc;
       --bg-soft: #eef3fb;
-      --surface: rgba(255, 255, 255, 0.82);
+      --surface: rgba(255, 255, 255, 0.84);
       --surface-solid: #ffffff;
       --text: #1d2a3b;
       --muted: #66748a;
@@ -69,7 +69,7 @@
       top: 0;
       z-index: 1000;
       backdrop-filter: blur(14px);
-      background: rgba(246, 248, 252, 0.78);
+      background: rgba(246, 248, 252, 0.80);
       border-bottom: 1px solid rgba(35, 54, 90, 0.08);
     }
 
@@ -154,7 +154,7 @@
       border: 1px solid rgba(95, 124, 168, 0.14);
       color: var(--accent-dark);
       font-size: 0.88rem;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 16px;
     }
 
@@ -347,7 +347,7 @@
 
     .project-media {
       position: relative;
-      height: 230px;
+      height: 240px;
       overflow: hidden;
       border-bottom: 1px solid rgba(35, 54, 90, 0.08);
       background: #dfe7f5;
@@ -368,8 +368,8 @@
       justify-content: center;
       background: linear-gradient(
         180deg,
-        rgba(29, 42, 59, 0.12) 0%,
-        rgba(29, 42, 59, 0.56) 100%
+        rgba(29, 42, 59, 0.10) 0%,
+        rgba(29, 42, 59, 0.60) 100%
       );
       opacity: 0;
       transition: opacity 0.3s ease;
@@ -574,6 +574,7 @@
   <nav class="navbar">
     <div class="nav-inner">
       <a href="#" class="brand">OMID AREFIAN</a>
+
       <div class="nav-links">
         <a href="#about">About</a>
         <a href="#education">Education</a>
@@ -594,14 +595,14 @@
       </div>
 
       <div class="panel hero-panel">
-        <div class="eyebrow">Robotics · Control · Autonomous Systems</div>
+        <div class="eyebrow">Robotics · Optimal Control · Autonomous Systems</div>
 
         <h1>Omid <span>Arefian</span></h1>
 
         <p class="lead">
           I am a Mechanical Engineering master's student in Mechatronics and Robotics at
           Politecnico di Milano, with strong interests in robotics, motion planning,
-          control, and intelligent autonomous systems.
+          control, optimal control, and intelligent autonomous systems.
         </p>
 
         <div class="pill-row">
@@ -612,7 +613,7 @@
 
         <div class="button-row">
           <a class="btn" href="#projects">Explore Projects</a>
-          <a class="btn" href="assets/OmidArefian_CV.pdf" target="_blank">Download CV</a>
+          <a class="btn" href="assets/OmidArefian_CV.pdf" target="_blank" rel="noopener">Download CV</a>
           <a class="btn" href="mailto:Omid.arefian@mail.polimi.it">Contact Me</a>
         </div>
       </div>
@@ -623,7 +624,7 @@
         <h2>About Me</h2>
         <p>
           A short overview of my academic background, technical interests, and the kind
-          of problems I enjoy working on.
+          of engineering problems I enjoy solving.
         </p>
       </div>
 
@@ -666,7 +667,7 @@
       </div>
 
       <div class="grid-2">
-        <a class="card edu-card" href="https://www.polimi.it/" target="_blank">
+        <a class="card edu-card" href="https://www.polimi.it/" target="_blank" rel="noopener">
           <div class="logo-box">
             <img src="assets/polimi-logo.png" alt="Politecnico di Milano logo" />
           </div>
@@ -678,14 +679,13 @@
               Mechatronics & Robotics track
             </p>
             <p style="margin-top: 10px;">
-              Currently studying robotics, control, and advanced engineering methods in
-              Milan.
+              Currently studying robotics, control, and advanced engineering methods in Milan.
             </p>
             <span class="school-link">Visit official website ↗</span>
           </div>
         </a>
 
-        <a class="card edu-card" href="https://en.sbu.ac.ir/" target="_blank">
+        <a class="card edu-card" href="https://en.sbu.ac.ir/" target="_blank" rel="noopener">
           <div class="logo-box">
             <img src="assets/sbu-logo.png" alt="Shahid Beheshti University logo" />
           </div>
@@ -706,15 +706,17 @@
     <section id="projects" class="reveal">
       <div class="section-heading">
         <h2>Selected Projects</h2>
-        <p>Projects in robotics, control, reinforcement learning, and system modeling.</p>
+        <p>
+          Projects in robotics, optimal control, reinforcement learning, and system modeling.
+        </p>
       </div>
 
       <div class="project-grid">
         <article class="card project-card">
           <div class="project-media">
             <img
-              src="assets/pmp-trajectory.jpg"
-              alt="Optimal obstacle-avoiding trajectory project preview"
+              src="assets/pmp-result.png"
+              alt="Trajectory comparison for the optimal obstacle-avoiding trajectory project"
             />
             <div class="project-overlay">
               <a class="read-more-btn" href="project-pmp.html">Read More</a>
@@ -725,10 +727,9 @@
             <span class="project-tag">Advanced Nonlinear Control</span>
             <h3>Optimal Obstacle-Avoiding Trajectory Design</h3>
             <p>
-              Solved a nonlinear optimal control problem for a vehicle moving in a 2D
-              space with an obstacle represented by a Gaussian barrier. The project focused
-              on finding the optimal trajectory using Pontryagin's Minimum Principle and an
-              iterative state-costate procedure.
+              Formulated and solved a nonlinear optimal control problem for a vehicle in a
+              2D plane with obstacle avoidance. The project compares indirect and direct
+              solution strategies and discusses LQR tracking around the nominal trajectory.
             </p>
             <a class="project-link-inline" href="project-pmp.html">Open project page ↗</a>
           </div>
@@ -775,6 +776,7 @@
           <span class="interest-item">Motion Planning</span>
           <span class="interest-item">Navigation</span>
           <span class="interest-item">Model Predictive Control</span>
+          <span class="interest-item">Optimal Control</span>
           <span class="interest-item">Adaptive Control</span>
           <span class="interest-item">Robotics</span>
           <span class="interest-item">Autonomous Systems</span>
@@ -825,8 +827,8 @@
       <div class="card">
         <div class="contact-row">
           <a class="contact-chip" href="mailto:Omid.arefian@mail.polimi.it">Email</a>
-          <a class="contact-chip" href="https://github.com/OmidArefian01" target="_blank">GitHub</a>
-          <a class="contact-chip" href="assets/OmidArefian_CV.pdf" target="_blank">CV</a>
+          <a class="contact-chip" href="https://github.com/OmidArefian01" target="_blank" rel="noopener">GitHub</a>
+          <a class="contact-chip" href="assets/OmidArefian_CV.pdf" target="_blank" rel="noopener">CV</a>
         </div>
       </div>
     </section>
