@@ -4,8 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Omid Arefian | Robotics & Control</title>
-  <meta name="description" content="Omid Arefian - Mechanical Engineering student at Politecnico di Milano working on robotics, control, motion planning, and autonomous systems." />
-  
+  <meta
+    name="description"
+    content="Omid Arefian - Mechanical Engineering student at Politecnico di Milano working on robotics, control, motion planning, and autonomous systems."
+  />
+
   <style>
     :root {
       --bg: #f6f8fc;
@@ -37,9 +40,10 @@
 
     body {
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top left, rgba(95, 124, 168, 0.12), transparent 26%), 
-                  radial-gradient(circle at top right, rgba(95, 124, 168, 0.08), transparent 22%), 
-                  linear-gradient(180deg, #f9fbff 0%, #f3f7fd 55%, #edf2fb 100%);
+      background:
+        radial-gradient(circle at top left, rgba(95, 124, 168, 0.12), transparent 26%),
+        radial-gradient(circle at top right, rgba(95, 124, 168, 0.08), transparent 22%),
+        linear-gradient(180deg, #f9fbff 0%, #f3f7fd 55%, #edf2fb 100%);
       color: var(--text);
       line-height: 1.7;
       min-height: 100vh;
@@ -258,8 +262,6 @@
       box-shadow: var(--shadow-soft);
       padding: 26px;
       transition: 0.28s ease;
-      display: flex;
-      flex-direction: column;
     }
 
     .card:hover {
@@ -272,7 +274,8 @@
       margin-bottom: 10px;
     }
 
-    .card p, .card li {
+    .card p,
+    .card li {
       color: var(--muted);
       font-size: 0.98rem;
     }
@@ -286,70 +289,8 @@
       margin-top: 8px;
     }
 
-    /* --- NEW PROJECT IMAGE & HOVER STYLES --- */
-    .project-card-image {
-      position: relative;
-      width: 100%;
-      height: 200px;
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 18px;
-    }
-
-    .project-card-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.4s ease;
-    }
-
-    .project-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(29, 42, 59, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .card:hover .project-card-image img {
-      transform: scale(1.05);
-    }
-
-    .card:hover .project-overlay {
-      opacity: 1;
-    }
-
-    .btn-read-more {
-      padding: 10px 24px;
-      background-color: var(--surface-solid);
-      color: var(--text);
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      text-decoration: none;
-      transform: translateY(15px);
-      transition: transform 0.3s ease, background 0.2s;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .card:hover .btn-read-more {
-      transform: translateY(0);
-    }
-
-    .btn-read-more:hover {
-      background-color: #eef3fb;
-    }
-    /* -------------------------------------- */
-
     .edu-card {
       display: flex;
-      flex-direction: row;
       gap: 18px;
       align-items: flex-start;
     }
@@ -399,6 +340,75 @@
       gap: 22px;
     }
 
+    .project-card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .project-media {
+      position: relative;
+      height: 230px;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(35, 54, 90, 0.08);
+      background: #dfe7f5;
+    }
+
+    .project-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.45s ease;
+    }
+
+    .project-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(
+        180deg,
+        rgba(29, 42, 59, 0.12) 0%,
+        rgba(29, 42, 59, 0.56) 100%
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .project-card:hover .project-overlay,
+    .project-media:focus-within .project-overlay {
+      opacity: 1;
+    }
+
+    .project-card:hover .project-media img,
+    .project-media:focus-within img {
+      transform: scale(1.04);
+    }
+
+    .read-more-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      color: var(--text);
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+      transition: transform 0.22s ease, background 0.22s ease;
+    }
+
+    .read-more-btn:hover {
+      transform: translateY(-2px);
+      background: #ffffff;
+    }
+
+    .project-content {
+      padding: 24px 26px 26px;
+    }
+
     .project-tag {
       display: inline-block;
       margin-bottom: 10px;
@@ -408,6 +418,13 @@
       border: 1px solid rgba(95, 124, 168, 0.14);
       color: var(--accent-dark);
       font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .project-link-inline {
+      display: inline-block;
+      margin-top: 14px;
+      color: var(--accent-dark);
       font-weight: 700;
     }
 
@@ -497,14 +514,29 @@
     }
 
     @media (max-width: 980px) {
-      .hero, .grid-2, .grid-3, .project-grid {
+      .hero,
+      .grid-2,
+      .grid-3,
+      .project-grid {
         grid-template-columns: 1fr;
       }
+
       .hero {
         padding-top: 52px;
       }
-      .hero-panel, .photo-panel, .card {
+
+      .hero-panel,
+      .photo-panel,
+      .card {
         padding: 24px;
+      }
+
+      .project-card {
+        padding: 0;
+      }
+
+      .project-content {
+        padding: 22px 24px 24px;
       }
     }
 
@@ -514,24 +546,31 @@
         align-items: flex-start;
         padding: 14px 0;
       }
+
       .hero h1 {
         font-size: 2.55rem;
       }
+
       .btn {
         width: 100%;
       }
+
       .edu-card {
         flex-direction: column;
       }
+
       .logo-box {
         width: 64px;
         height: 64px;
+      }
+
+      .project-media {
+        height: 210px;
       }
     }
   </style>
 </head>
 <body>
-
   <nav class="navbar">
     <div class="nav-inner">
       <a href="#" class="brand">OMID AREFIAN</a>
@@ -547,7 +586,6 @@
   </nav>
 
   <main class="container">
-
     <section class="hero">
       <div class="panel photo-panel">
         <div class="photo-frame">
@@ -557,11 +595,13 @@
 
       <div class="panel hero-panel">
         <div class="eyebrow">Robotics · Control · Autonomous Systems</div>
-        
+
         <h1>Omid <span>Arefian</span></h1>
-        
+
         <p class="lead">
-          I am a Mechanical Engineering master’s student in Mechatronics and Robotics at Politecnico di Milano, with strong interests in robotics, motion planning, control, and intelligent autonomous systems.
+          I am a Mechanical Engineering master's student in Mechatronics and Robotics at
+          Politecnico di Milano, with strong interests in robotics, motion planning,
+          control, and intelligent autonomous systems.
         </p>
 
         <div class="pill-row">
@@ -572,9 +612,7 @@
 
         <div class="button-row">
           <a class="btn" href="#projects">Explore Projects</a>
-          
           <a class="btn" href="assets/OmidArefian_CV.pdf" target="_blank">Download CV</a>
-          
           <a class="btn" href="mailto:Omid.arefian@mail.polimi.it">Contact Me</a>
         </div>
       </div>
@@ -584,7 +622,8 @@
       <div class="section-heading">
         <h2>About Me</h2>
         <p>
-          A short overview of my academic background, technical interests, and the kind of problems I enjoy working on.
+          A short overview of my academic background, technical interests, and the kind
+          of problems I enjoy working on.
         </p>
       </div>
 
@@ -592,12 +631,18 @@
         <div class="card">
           <h3>Profile</h3>
           <p>
-            I am currently pursuing an M.Sc. in Mechanical Engineering in the Mechatronics and Robotics track at Politecnico di Milano. My work is centered on robotics, control, autonomous systems, motion planning, and the development of algorithms that connect theory to practical applications.
+            I am currently pursuing an M.Sc. in Mechanical Engineering in the
+            Mechatronics and Robotics track at Politecnico di Milano. My work is centered
+            on robotics, control, autonomous systems, motion planning, and the
+            development of algorithms that connect theory to practical applications.
           </p>
           <p style="margin-top: 14px;">
-            Through academic and project work, I have gained experience in nonlinear control, reinforcement learning, robot path following, system identification, and experimental modeling.
+            Through academic and project work, I have gained experience in nonlinear
+            control, reinforcement learning, robot path following, system identification,
+            and experimental modeling.
           </p>
         </div>
+
         <div class="card">
           <h3>Skills & Tools</h3>
           <div class="interest-wrap" style="margin-top: 12px;">
@@ -617,9 +662,7 @@
     <section id="education" class="reveal">
       <div class="section-heading">
         <h2>Education</h2>
-        <p>
-          Academic background with links to the official university websites.
-        </p>
+        <p>Academic background with links to the official university websites.</p>
       </div>
 
       <div class="grid-2">
@@ -630,9 +673,13 @@
           <div>
             <span class="mini-tag">2024 – Present</span>
             <h3>Politecnico di Milano</h3>
-            <p><strong>M.Sc. in Mechanical Engineering</strong><br />Mechatronics & Robotics track</p>
+            <p>
+              <strong>M.Sc. in Mechanical Engineering</strong><br />
+              Mechatronics & Robotics track
+            </p>
             <p style="margin-top: 10px;">
-              Currently studying robotics, control, and advanced engineering methods in Milan.
+              Currently studying robotics, control, and advanced engineering methods in
+              Milan.
             </p>
             <span class="school-link">Visit official website ↗</span>
           </div>
@@ -647,7 +694,8 @@
             <h3>Shahid Beheshti University</h3>
             <p><strong>B.Sc. in Mechanical Engineering</strong></p>
             <p style="margin-top: 10px;">
-              Built a strong foundation in mechanical engineering, analysis, and applied problem solving.
+              Built a strong foundation in mechanical engineering, analysis, and applied
+              problem solving.
             </p>
             <span class="school-link">Visit official website ↗</span>
           </div>
@@ -658,32 +706,40 @@
     <section id="projects" class="reveal">
       <div class="section-heading">
         <h2>Selected Projects</h2>
-        <p>
-          Projects in robotics, control, reinforcement learning, and system modeling.
-        </p>
+        <p>Projects in robotics, control, reinforcement learning, and system modeling.</p>
       </div>
 
       <div class="project-grid">
-        <article class="card" style="padding: 18px;">
-          <div class="project-card-image">
-            <img src="assets/pmp-preview.jpg" alt="Optimal Trajectory Plot" /> <div class="project-overlay">
-              <a href="project-pmp.html" target="_blank" class="btn-read-more">Read More</a>
+        <article class="card project-card">
+          <div class="project-media">
+            <img
+              src="assets/pmp-trajectory.jpg"
+              alt="Optimal obstacle-avoiding trajectory project preview"
+            />
+            <div class="project-overlay">
+              <a class="read-more-btn" href="project-pmp.html">Read More</a>
             </div>
           </div>
-          
-          <div>
+
+          <div class="project-content">
             <span class="project-tag">Advanced Nonlinear Control</span>
             <h3>Optimal Obstacle-Avoiding Trajectory Design</h3>
             <p>
-              Modeled a vehicle in a 2D environment and computed optimal trajectories using direct and indirect methods. Then designed MPC and LQR controllers for the resulting control problem.
+              Solved a nonlinear optimal control problem for a vehicle moving in a 2D
+              space with an obstacle represented by a Gaussian barrier. The project focused
+              on finding the optimal trajectory using Pontryagin's Minimum Principle and an
+              iterative state-costate procedure.
             </p>
+            <a class="project-link-inline" href="project-pmp.html">Open project page ↗</a>
           </div>
         </article>
+
         <article class="card">
           <span class="project-tag">MATLAB · ROS 2 · Gazebo</span>
           <h3>Turtlebot3 Path-Following Controller</h3>
           <p>
-            Integrated ROS 2 with MATLAB and designed linear and nonlinear controllers, including PID and MPC, for accurate path tracking in cluttered environments.
+            Integrated ROS 2 with MATLAB and designed linear and nonlinear controllers,
+            including PID and MPC, for accurate path tracking in cluttered environments.
           </p>
         </article>
 
@@ -691,7 +747,9 @@
           <span class="project-tag">Reinforcement Learning</span>
           <h3>Custom PPO Environment & Agent</h3>
           <p>
-            Developed a custom reinforcement-learning environment where an agent coordinated multiple boxes, avoided collisions, and aligned them using optimal linear and angular velocity commands.
+            Developed a custom reinforcement-learning environment where an agent
+            coordinated multiple boxes, avoided collisions, and aligned them using
+            optimal linear and angular velocity commands.
           </p>
         </article>
 
@@ -699,7 +757,8 @@
           <span class="project-tag">System Identification</span>
           <h3>Steel Plate & Wheel Experimental Modeling</h3>
           <p>
-            Performed FRF-based analysis, modal parameter estimation, coherence evaluation, and model reduction using MATLAB and experimental measurements.
+            Performed FRF-based analysis, modal parameter estimation, coherence
+            evaluation, and model reduction using MATLAB and experimental measurements.
           </p>
         </article>
       </div>
@@ -708,9 +767,7 @@
     <section id="interests" class="reveal">
       <div class="section-heading">
         <h2>Research Interests</h2>
-        <p>
-          Topics that reflect the direction of my academic and technical work.
-        </p>
+        <p>Topics that reflect the direction of my academic and technical work.</p>
       </div>
 
       <div class="card">
@@ -730,19 +787,19 @@
     <section id="experience" class="reveal">
       <div class="section-heading">
         <h2>Work Experience</h2>
-        <p>
-          Research and industrial experiences that complemented my academic training.
-        </p>
+        <p>Research and industrial experiences that complemented my academic training.</p>
       </div>
 
       <div class="card">
         <div class="timeline">
-          
           <div class="timeline-item">
             <span class="timeline-date">Jun 2023 – Feb 2024</span>
             <h3>Research Assistant · Shahid Beheshti University</h3>
             <p>
-              Supported research activities in the Energy Engineering Laboratory, assisted undergraduate students, prepared conference posters, collaborated with graduate researchers, and gained experience with research workflows and photovoltaic technologies.
+              Supported research activities in the Energy Engineering Laboratory, assisted
+              undergraduate students, prepared conference posters, collaborated with
+              graduate researchers, and gained experience with research workflows and
+              photovoltaic technologies.
             </p>
           </div>
 
@@ -750,10 +807,11 @@
             <span class="timeline-date">Jun 2022 – Sep 2022</span>
             <h3>Summer Intern · Khorasan Steel Complex</h3>
             <p>
-              Worked with the repair line support team for the rebar rolling mill, assisted with inspections and maintenance, and gained hands-on exposure to industrial workflows, machinery operation, and troubleshooting practices.
+              Worked with the repair line support team for the rebar rolling mill, assisted
+              with inspections and maintenance, and gained hands-on exposure to industrial
+              workflows, machinery operation, and troubleshooting practices.
             </p>
           </div>
-
         </div>
       </div>
     </section>
@@ -761,9 +819,7 @@
     <section id="contact" class="reveal">
       <div class="section-heading">
         <h2>Contact</h2>
-        <p>
-          Feel free to reach out for research, academic, or collaboration opportunities.
-        </p>
+        <p>Feel free to reach out for research, academic, or collaboration opportunities.</p>
       </div>
 
       <div class="card">
@@ -771,31 +827,29 @@
           <a class="contact-chip" href="mailto:Omid.arefian@mail.polimi.it">Email</a>
           <a class="contact-chip" href="https://github.com/OmidArefian01" target="_blank">GitHub</a>
           <a class="contact-chip" href="assets/OmidArefian_CV.pdf" target="_blank">CV</a>
-          </div>
+        </div>
       </div>
     </section>
 
     <footer>
       © 2026 Omid Arefian · Personal academic portfolio
     </footer>
-
   </main>
 
   <script>
-    const revealItems = document.querySelectorAll('.reveal');
+    const revealItems = document.querySelectorAll(".reveal");
 
     const revealOnScroll = () => {
       revealItems.forEach((item) => {
         const rect = item.getBoundingClientRect();
         if (rect.top < window.innerHeight - 80) {
-          item.classList.add('show');
+          item.classList.add("show");
         }
       });
     };
 
-    revealOnScroll(); 
-    window.addEventListener('scroll', revealOnScroll);
+    revealOnScroll();
+    window.addEventListener("scroll", revealOnScroll);
   </script>
-
 </body>
 </html>
