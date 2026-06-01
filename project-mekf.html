@@ -64,6 +64,7 @@
       margin: 0 auto;
     }
 
+    /* ── TOPBAR ── */
     .topbar {
       position: sticky;
       top: 0;
@@ -116,6 +117,7 @@
       background: #e8eef9;
     }
 
+    /* ── HERO ── */
     .hero {
       padding: 56px 0 26px;
     }
@@ -204,6 +206,7 @@
       font-weight: 600;
     }
 
+    /* ── LAYOUT ── */
     section {
       padding: 18px 0;
     }
@@ -235,6 +238,7 @@
       gap: 22px;
     }
 
+    /* ── CARDS ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--line);
@@ -263,8 +267,8 @@
       margin-top: 8px;
     }
 
-    .equation-box,
-    .code-box {
+    /* ── EQUATION BOX ── */
+    .equation-box {
       background: var(--surface-2);
       border: 1px solid rgba(95, 124, 168, 0.12);
       border-radius: 18px;
@@ -278,6 +282,7 @@
       margin-top: 14px;
     }
 
+    /* ── MINI NOTE ── */
     .mini-note {
       margin-top: 14px;
       padding: 14px 16px;
@@ -287,6 +292,7 @@
       color: var(--muted);
     }
 
+    /* ── METHOD CARD ── */
     .method-card {
       position: relative;
       overflow: hidden;
@@ -304,13 +310,13 @@
       font-weight: 700;
     }
 
+    /* ── MEDIA CARD ── */
     .media-card {
       overflow: hidden;
       padding: 0;
     }
 
-    .media-card img,
-    .media-card video {
+    .media-card img {
       width: 100%;
       height: auto;
       background: #dde6f6;
@@ -320,6 +326,7 @@
       padding: 22px 24px 24px;
     }
 
+    /* ── PARAM GRID ── */
     .param-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -346,6 +353,7 @@
       font-size: 0.95rem;
     }
 
+    /* ── ANCHOR NAV ── */
     .anchor-nav {
       display: flex;
       flex-wrap: wrap;
@@ -369,6 +377,7 @@
       background: #e9f0fb;
     }
 
+    /* ── RESULTS TABLE ── */
     .results-table-wrap {
       overflow-x: auto;
       margin-top: 14px;
@@ -403,7 +412,18 @@
       background: #f7faff;
     }
 
-    /* SunCubes highlight banner */
+    /* highlight good rows */
+    .row-good td:nth-child(2) {
+      color: #3a7d44;
+      font-weight: 700;
+    }
+
+    .row-warn td:nth-child(2) {
+      color: #b07d2a;
+      font-weight: 700;
+    }
+
+    /* ── SUNCUBES BANNER ── */
     .suncubes-banner {
       background: linear-gradient(135deg, #eef3fb 0%, #e4edf8 100%);
       border: 1px solid rgba(95, 124, 168, 0.22);
@@ -446,6 +466,7 @@
       text-underline-offset: 3px;
     }
 
+    /* ── FOOTER ── */
     footer {
       padding: 36px 0 50px;
       text-align: center;
@@ -453,6 +474,7 @@
       font-size: 0.94rem;
     }
 
+    /* ── RESPONSIVE ── */
     @media (max-width: 980px) {
       .grid-2,
       .grid-3 {
@@ -514,13 +536,13 @@
         <div class="hero-media">
           <img
             src="assets/SITL_1.png"
-            alt="PX4 SITL simulation with drone connected to QGroundControl for MEKF validation"
+            alt="PX4 SITL drone flying in Gazebo with QGroundControl connected showing live map and telemetry"
           />
           <div class="hero-badge">UAV State Estimation · PX4 SITL</div>
         </div>
 
         <div class="hero-content">
-          <div class="eyebrow">MEKF · IMU Integration · GPS/Baro/Mag Fusion · Sensor Bias Estimation</div>
+          <div class="eyebrow">MEKF · IMU Integration · GPS / Baro / Mag Fusion · Sensor Bias Estimation</div>
           <h1>Design of a Multiplicative EKF for UAV State Estimation</h1>
 
           <p class="lead">
@@ -568,7 +590,7 @@
           <h3>Motivation</h3>
           <p>
             Commercial autopilots such as PX4 provide high-quality onboard state estimates, but
-            these estimates are not suitable as a research baseline because the internal filter
+            these are not suitable as a standalone research estimator because the internal filter
             details are opaque and the output mixes sensor fusion with control feedback. This
             project implements an independent MEKF that consumes only raw sensor streams,
             propagates the drone state from inertial measurements, and corrects it with GPS,
@@ -584,16 +606,17 @@
           <h3>State Vector</h3>
           <p>
             The filter maintains a 20-dimensional nominal state and a 19-dimensional error
-            state (the quaternion contributes 3 DOF via the multiplicative error δθ, not 4):
+            state. The quaternion contributes only 3 DOF via the multiplicative error δθ,
+            not 4, preserving the unit-norm constraint without explicit re-normalization:
           </p>
           <div class="equation-box">Nominal state  x ∈ ℝ²⁰:
-  p  ∈ ℝ³   position (NED)
-  v  ∈ ℝ³   velocity (NED)
-  q  ∈ ℝ⁴   attitude quaternion
-  b_g ∈ ℝ³  gyroscope bias
-  b_a ∈ ℝ³  accelerometer bias
-  b_m ∈ ℝ³  magnetometer bias
-  b_b ∈ ℝ¹  barometer bias
+  p   ∈ ℝ³   position (NED)
+  v   ∈ ℝ³   velocity (NED)
+  q   ∈ ℝ⁴   attitude quaternion
+  b_g ∈ ℝ³   gyroscope bias
+  b_a ∈ ℝ³   accelerometer bias
+  b_m ∈ ℝ³   magnetometer bias
+  b_b ∈ ℝ¹   barometer bias
 
 Error state  δx ∈ ℝ¹⁹:
   δθ replaces δq  (3-DOF multiplicative)</div>
@@ -618,8 +641,8 @@ Error state  δx ∈ ℝ¹⁹:
           <h3>IMU Prediction</h3>
           <p>
             At every new IMU sample the bias-corrected gyroscope propagates the quaternion
-            and the bias-corrected accelerometer — rotated into the NED navigation frame and
-            augmented with gravity — propagates velocity and position.
+            multiplicatively and the bias-corrected accelerometer — rotated into the NED
+            navigation frame and augmented with gravity — propagates velocity and position.
           </p>
           <div class="equation-box">ω̂ = ω_m − b̂_g
 f̂ = f_m − b̂_a
@@ -636,9 +659,9 @@ q̂⁻ = q̂⁺ ⊗ δq(ω̂Δt)</div>
           <h3>GPS + Baro Update</h3>
           <p>
             Whenever a new GPS or barometer measurement arrives the filter runs a standard
-            EKF correction step. GPS provides a 3D position anchor and a 2D horizontal
-            velocity constraint; the barometer provides a scalar vertical correction
-            that also estimates the pressure-altitude offset.
+            EKF correction. GPS provides a 3D position anchor and a 2D horizontal velocity
+            constraint; the barometer provides a scalar vertical correction that simultaneously
+            estimates the pressure-altitude offset.
           </p>
           <div class="equation-box">y_k = z_k − h(x̂⁻_k)
 S_k = H_k P⁻_k H_kᵀ + R_k
@@ -651,32 +674,33 @@ x̂⁺_k = x̂⁻_k ⊞ δx̂_k</div>
           <span class="method-label">Medium Rate · ~50 Hz</span>
           <h3>Magnetometer Update</h3>
           <p>
-            The magnetometer corrects yaw and magnetometer bias. A reference field is built
-            from the initial measurement; during filtering the predicted body-frame field is
-            compared against this reference via a normalized horizontal-vector update and a
-            separate z-channel update.
+            The magnetometer corrects yaw and magnetometer bias via a normalized
+            horizontal-vector update and a separate z-channel update. A norm gate and a
+            heading gate reject distorted measurements before they can corrupt attitude.
           </p>
           <div class="equation-box">m̂_b = R_nb(q̂)ᵀ m_n^ref + b̂_m
 
-h_m,xy(x) = [m̂_b,x  m̂_b,y] / ‖m̂_b,xy‖
-h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
+h_m,xy = [m̂_b,x  m̂_b,y] / ‖m̂_b,xy‖
+h_m,z  = m̂_b,z / ‖m_n^ref‖</div>
         </div>
       </div>
 
+      <!-- SITL_2 image — setup shot -->
       <div style="margin-top: 22px;">
         <div class="card media-card">
           <img
             src="assets/SITL_2.png"
-            alt="QGroundControl connected to PX4 SITL showing drone telemetry and flight data"
+            alt="Gazebo Sim with x500 drone model loaded, entity tree showing park and coast_waves environment"
           />
           <div class="media-content">
-            <h3>PX4 SITL + QGroundControl Setup</h3>
+            <h3>PX4 SITL Simulation Environment</h3>
             <p>
-              The validation environment uses PX4 Software-In-The-Loop (SITL), which runs the
-              full PX4 flight stack in simulation and exposes all MAVLink telemetry streams over
-              UDP. QGroundControl connects to the same instance for monitoring, while the Python
-              MEKF reads the raw sensor streams simultaneously via <code>pymavlink</code>.
-              PX4's onboard EKF2 estimates are logged only for comparison purposes.
+              The validation environment uses PX4 Software-In-The-Loop running the full PX4
+              flight stack inside Gazebo Sim. The x500 quadrotor model is loaded into a
+              realistic outdoor scene (Baylands park environment). All MAVLink telemetry streams
+              are exposed over UDP: the Python MEKF reads raw sensor streams via
+              <code>pymavlink</code> while QGroundControl connects simultaneously for flight
+              monitoring. PX4's onboard EKF2 estimates are logged only for comparison purposes.
             </p>
           </div>
         </div>
@@ -698,15 +722,16 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
           <h3>Coordinate Frames</h3>
           <p>
             All position and velocity states are represented in the local
-            <strong>NED (North-East-Down)</strong> navigation frame. The origin is set at the
-            first valid GPS fix. The <strong>body frame</strong> is attached to the drone; IMU
-            and magnetometer measurements arrive in this frame. The attitude quaternion
+            <strong>NED (North-East-Down)</strong> navigation frame, with the origin set at
+            the first valid GPS fix. The <strong>body frame</strong> is attached to the drone;
+            IMU and magnetometer measurements arrive in this frame. The attitude quaternion
             R<sub>nb</sub>(q) rotates body-frame vectors into the navigation frame:
           </p>
           <div class="equation-box">u_n = R_nb(q) · u_b</div>
           <div class="mini-note">
             In NED, altitude is the negative of the down coordinate p_D. GPS
-            latitude/longitude/altitude are converted into local NED on arrival.
+            latitude/longitude/altitude are converted into local NED on arrival using
+            the first valid GPS sample as origin.
           </div>
         </div>
 
@@ -715,7 +740,7 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
           <div class="param-grid">
             <div class="param-item">
               <strong>HIGHRES_IMU</strong>
-              <span>Gyro, accelerometer, magnetometer — primary prediction + mag update source</span>
+              <span>Gyro, accelerometer, magnetometer — primary prediction and mag update source</span>
             </div>
             <div class="param-item">
               <strong>GPS_RAW_INT</strong>
@@ -750,8 +775,8 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
           <p>
             At each IMU step the estimated biases are subtracted, the corrected specific
             force is rotated into NED and added to gravity, and the resulting acceleration
-            drives simple Euler integration of position and velocity. The quaternion is
-            updated multiplicatively using the gyroscope-derived rotation increment:
+            drives Euler integration of position and velocity. The quaternion is updated
+            multiplicatively using the gyroscope-derived rotation increment:
           </p>
           <div class="equation-box">â_n,k = R_nb(q̂_k)(f_m,k − b̂_a,k) + g_n
 
@@ -759,8 +784,8 @@ p̂⁻_k+1 = p̂⁺_k + v̂⁺_k Δt + ½ â_n,k Δt²
 v̂⁻_k+1 = v̂⁺_k + â_n,k Δt
 q̂⁻_k+1 = q̂⁺_k ⊗ δq(ω̂_k Δt)</div>
           <div class="mini-note">
-            Biases are modeled as random walks and propagated with zero dynamics —
-            only the covariance of each bias grows with the corresponding process noise.
+            Biases are modeled as random walks propagated with zero dynamics — only their
+            covariance entries grow with the corresponding process noise during prediction.
           </div>
         </div>
 
@@ -768,15 +793,15 @@ q̂⁻_k+1 = q̂⁺_k ⊗ δq(ω̂_k Δt)</div>
           <h3>Covariance Propagation</h3>
           <p>
             The 19×19 error-state covariance is propagated through the linearized
-            error-state transition matrix F<sub>k</sub>, which is computed numerically
-            using boxplus and boxminus operations on the manifold:
+            error-state transition matrix F<sub>k</sub>, computed numerically using
+            boxplus and boxminus operations on the SO(3) manifold:
           </p>
           <div class="equation-box">P⁻_k+1 = F_k P⁺_k F_kᵀ + Q_k</div>
           <p style="margin-top: 14px;">
             Q<sub>k</sub> is the discrete process-noise covariance, tuned to reflect IMU
-            noise spectral density and bias instability. The use of the error-state
-            formulation keeps the quaternion constraint (‖q‖ = 1) satisfied at every step
-            without explicit re-normalization in the covariance equations.
+            noise spectral density and bias instability. The error-state formulation keeps
+            the quaternion unit-norm constraint satisfied at every step without explicit
+            re-normalization in the covariance equations.
           </p>
         </div>
       </div>
@@ -818,7 +843,7 @@ h_gps,v(x) = [v_N  v_E]ᵀ</div>
           <p>
             A scalar correction for the vertical channel. The barometer bias b<sub>b</sub>
             absorbs any constant pressure-to-altitude offset, preventing the vertical
-            position state from being corrupted by a systematic sensor error:
+            position state from being corrupted by systematic sensor error:
           </p>
           <div class="equation-box">z_b = p_D + b_b + n_b
 h_b(x) = p_D + b_b
@@ -828,8 +853,8 @@ y_b = z_b − (p̂_D + b̂_b)</div>
         <div class="card">
           <h3>Magnetometer Updates</h3>
           <p>
-            Two separate magnetometer channels constrain yaw and the magnetometer bias.
-            A norm gate and a heading gate reject measurements with suspected disturbances:
+            Two channels constrain yaw and magnetometer bias. A norm gate and heading gate
+            reject measurements with suspected magnetic disturbances:
           </p>
           <div class="equation-box">m̂_b = R_nb(q̂)ᵀ m_n^ref + b̂_m
 
@@ -840,50 +865,8 @@ Z-channel:
 h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
           <div class="mini-note">
             Gating on both the magnetic norm and the heading error prevents large yaw jumps
-            from magnetic disturbances near metallic structures or electrical equipment.
+            caused by magnetic disturbances near metallic structures or electrical equipment.
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── INITIALIZATION ── -->
-    <section>
-      <div class="section-title">
-        <h2>Initialization Procedure</h2>
-        <p>
-          A stationary initialization phase estimates the initial attitude and velocity before
-          the first IMU propagation step.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>Startup Sequence</h3>
-        <ul>
-          <li>
-            Collect a buffer of initial IMU samples and average the accelerometer readings
-            to estimate gravity direction → initial roll and pitch.
-          </li>
-          <li>
-            Average the magnetometer readings and apply tilt compensation to the horizontal
-            projection → initial yaw estimate → initial quaternion q₀.
-          </li>
-          <li>
-            Wait for the first valid GPS fix; set the local NED origin and initialize
-            position from GPS-derived NED coordinates.
-          </li>
-          <li>
-            If GPS horizontal velocity is available, initialize velocity from ground speed
-            and course-over-ground.
-          </li>
-          <li>
-            Initialize the barometer bias so that the first barometer prediction is
-            consistent with the GPS-derived initial altitude.
-          </li>
-        </ul>
-        <div class="mini-note">
-          This initialization assumes the vehicle is approximately stationary at startup —
-          the accelerometer mainly measures gravity and the gyroscope is not rotating — which
-          is satisfied during a typical pre-flight ground check.
         </div>
       </div>
     </section>
@@ -893,18 +876,76 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
       <div class="section-title">
         <h2>Results</h2>
         <p>
-          The MEKF was validated in PX4 SITL across a full flight maneuver sequence.
-          The estimator output is compared against PX4's onboard EKF2 estimates.
+          The MEKF was validated in PX4 SITL across a full 80-second flight maneuver sequence
+          covering takeoff, aggressive lateral and vertical motion, and landing. The estimator
+          output is compared against PX4's onboard EKF2 estimates across attitude, velocity,
+          and position.
         </p>
       </div>
 
+      <!-- Attitude plot -->
+      <div class="card media-card" style="margin-bottom: 22px;">
+        <img
+          src="assets/mekf_attitude.png"
+          alt="Attitude comparison: roll, pitch, and yaw between the MEKF estimator and PX4/SITL reference"
+        />
+        <div class="media-content">
+          <h3>Attitude Comparison — Roll, Pitch, Yaw</h3>
+          <p>
+            The MEKF attitude (blue solid line) tracks the PX4/SITL reference (orange dashed)
+            very closely for roll and pitch throughout the entire flight. The yaw channel shows
+            a slowly varying offset during the most aggressive maneuvers between 20–50 s, which
+            is expected given that the only yaw correction comes from the magnetometer — a
+            single-axis sensor susceptible to temporary disturbances. The filter recovers
+            correctly once the maneuver ends.
+          </p>
+        </div>
+      </div>
+
+      <!-- Velocity plot -->
+      <div class="card media-card" style="margin-bottom: 22px;">
+        <img
+          src="assets/mekf_velocity.png"
+          alt="Velocity comparison: vx, vy, and vz between the MEKF estimator and PX4/SITL reference"
+        />
+        <div class="media-content">
+          <h3>Velocity Comparison — v_x, v_y, v_z</h3>
+          <p>
+            Horizontal velocity estimates (v_x and v_y) match the PX4 reference almost exactly
+            across the full flight envelope, including peak velocities above 4 m/s. The vertical
+            velocity v_z shows slightly more noise than the PX4 reference due to the barometer
+            update rate and the absence of a dedicated vertical velocity sensor, but the overall
+            trend and magnitude are well captured throughout.
+          </p>
+        </div>
+      </div>
+
+      <!-- Position plot -->
+      <div class="card media-card" style="margin-bottom: 22px;">
+        <img
+          src="assets/mekf_position.png"
+          alt="Position comparison: x, y, and z between the MEKF estimator and PX4/SITL reference"
+        />
+        <div class="media-content">
+          <h3>Position Comparison — x, y, z</h3>
+          <p>
+            Position estimates in all three axes remain tightly coupled to the PX4 reference
+            throughout the flight, including during the largest displacements of roughly 40 m
+            in the x-direction and −15 m in altitude. The close agreement demonstrates that
+            the GPS position and velocity updates, combined with barometer altitude correction,
+            effectively prevent inertial drift over the full 80-second flight duration.
+          </p>
+        </div>
+      </div>
+
+      <!-- RMSE Table -->
       <div class="card">
         <h3>RMSE Summary</h3>
         <p>
-          Root-mean-square errors computed over the full flight log against PX4 reference
-          estimates. Position errors are sub-0.25 m across all axes; roll and pitch errors
-          are below 0.4°; yaw shows larger error as expected given magnetometer-only heading
-          correction.
+          Root-mean-square errors computed over the full flight log against PX4/SITL reference
+          estimates. Position errors are sub-0.23 m across all axes; roll and pitch errors are
+          below 0.4°. Yaw shows the largest error — consistent with magnetometer-only heading
+          correction and the absence of a dual-antenna GPS for direct yaw measurement.
         </p>
         <div class="results-table-wrap">
           <table>
@@ -913,25 +954,73 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
                 <th>Quantity</th>
                 <th>RMSE</th>
                 <th>Unit</th>
+                <th>Assessment</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td>Position x</td><td>0.1404</td><td>m</td></tr>
-              <tr><td>Position y</td><td>0.2265</td><td>m</td></tr>
-              <tr><td>Position z</td><td>0.1895</td><td>m</td></tr>
-              <tr><td>Velocity v_x</td><td>0.0702</td><td>m/s</td></tr>
-              <tr><td>Velocity v_y</td><td>0.1000</td><td>m/s</td></tr>
-              <tr><td>Velocity v_z</td><td>0.1015</td><td>m/s</td></tr>
-              <tr><td>Roll</td><td>0.3825</td><td>deg</td></tr>
-              <tr><td>Pitch</td><td>0.2445</td><td>deg</td></tr>
-              <tr><td>Yaw</td><td>6.7576</td><td>deg</td></tr>
+              <tr class="row-good">
+                <td>Position x</td>
+                <td>0.1404</td>
+                <td>m</td>
+                <td>Excellent — sub-15 cm</td>
+              </tr>
+              <tr class="row-good">
+                <td>Position y</td>
+                <td>0.2265</td>
+                <td>m</td>
+                <td>Good — sub-23 cm</td>
+              </tr>
+              <tr class="row-good">
+                <td>Position z</td>
+                <td>0.1895</td>
+                <td>m</td>
+                <td>Good — sub-19 cm</td>
+              </tr>
+              <tr class="row-good">
+                <td>Velocity v_x</td>
+                <td>0.0702</td>
+                <td>m/s</td>
+                <td>Excellent</td>
+              </tr>
+              <tr class="row-good">
+                <td>Velocity v_y</td>
+                <td>0.1000</td>
+                <td>m/s</td>
+                <td>Excellent</td>
+              </tr>
+              <tr class="row-good">
+                <td>Velocity v_z</td>
+                <td>0.1015</td>
+                <td>m/s</td>
+                <td>Good</td>
+              </tr>
+              <tr class="row-good">
+                <td>Roll</td>
+                <td>0.3825</td>
+                <td>deg</td>
+                <td>Excellent</td>
+              </tr>
+              <tr class="row-good">
+                <td>Pitch</td>
+                <td>0.2445</td>
+                <td>deg</td>
+                <td>Excellent</td>
+              </tr>
+              <tr class="row-warn">
+                <td>Yaw</td>
+                <td>6.7576</td>
+                <td>deg</td>
+                <td>Magnetometer limited</td>
+              </tr>
             </tbody>
           </table>
         </div>
         <div class="mini-note">
-          The yaw RMSE of 6.76° reflects the challenge of heading estimation with a single
-          magnetometer in a simulation environment. The filter tracks yaw trends correctly
-          but accumulates a slowly varying offset during aggressive maneuvers.
+          The yaw RMSE of 6.76° reflects the inherent limitation of single-magnetometer
+          heading estimation in simulation. The filter tracks yaw trends correctly but
+          accumulates a slowly varying offset during aggressive maneuvers. A dual-antenna
+          GPS heading source would reduce this significantly and is planned for the
+          real-hardware extension.
         </div>
       </div>
     </section>
@@ -941,8 +1030,8 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
       <div class="section-title">
         <h2>Extension to a Real Drone</h2>
         <p>
-          The SITL-validated estimator is now being adapted for deployment on a physical
-          drone in collaboration with SunCubes.
+          The SITL-validated estimator is now being adapted for deployment on physical
+          hardware in collaboration with SunCubes.
         </p>
       </div>
 
@@ -969,9 +1058,9 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
           <h3>Key Differences: SITL → Real Hardware</h3>
           <ul>
             <li>
-              <strong>IMU noise:</strong> Simulation noise models are clean Gaussian; real
-              MEMS IMUs have vibration aliasing, temperature-dependent bias drift, and
-              correlated noise that must be characterized from static logs.
+              <strong>IMU noise:</strong> Real MEMS IMUs have vibration aliasing,
+              temperature-dependent bias drift, and correlated noise requiring characterization
+              from static and hover logs.
             </li>
             <li>
               <strong>GPS quality:</strong> Real GPS is subject to multipath, HDOP variation,
@@ -979,7 +1068,7 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
             </li>
             <li>
               <strong>Magnetometer disturbances:</strong> Motor currents and ESC switching
-              create magnetic interference that is far stronger than in simulation.
+              create magnetic interference far stronger than in simulation.
             </li>
             <li>
               <strong>Timing:</strong> Real MAVLink streams arrive with variable latency;
@@ -998,21 +1087,20 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
               Adaptive measurement gating based on GPS fix quality and HDOP.
             </li>
             <li>
-              Vibration pre-filtering on the accelerometer channel using an onboard low-pass
-              filter tuned to rotor harmonics.
+              Vibration pre-filtering on the accelerometer channel tuned to rotor harmonics.
             </li>
             <li>
               Soft magnetic calibration to reduce motor-current-induced heading errors.
             </li>
             <li>
-              Real-time performance profiling to ensure the filter runs within the available
-              compute budget on the companion computer.
+              Dual-antenna GPS heading source to replace magnetometer-only yaw estimation
+              and eliminate the dominant RMSE term.
             </li>
           </ul>
           <div class="mini-note">
-            The SITL validation baseline provides a clean reference for regression testing:
-            any change that degrades SITL RMSE below the values in the table above is
-            rejected before being tested on hardware.
+            The SITL validation baseline provides a clean regression reference: any change
+            that degrades SITL RMSE below the values in the table above is rejected before
+            being tested on hardware.
           </div>
         </div>
       </div>
