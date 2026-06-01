@@ -697,7 +697,7 @@
             <span class="note-icon">ℹ</span>
             <p>
               Reach condition: \(d \leq r_{\mathrm{goal}} = 0.05\) m.
-              Align condition: \(|e_\psi| \leq 3°\). The variable gain
+              Align condition: \(\lvert e_\psi \rvert \leq 3°\). The variable gain
               \(k_{\mathrm{thrust}} = \mathrm{sat}(d/d_{\max}, 0, 1)\) gives smooth
               deceleration without a separate speed scheduler.
             </p>
@@ -718,7 +718,7 @@
             \]
             \[
               \omega_{\mathrm{track}} = v_{\mathrm{track}} \cdot \kappa, \qquad
-              v_{\mathrm{track}} = \frac{v_{\max}}{1 + k_{\mathrm{slow}}\,|\omega_{\mathrm{track}}|}
+              v_{\mathrm{track}} = \frac{v_{\max}}{1 + k_{\mathrm{slow}}\,\lvert\omega_{\mathrm{track}}\rvert}
             \]
           </div>
           <p>
