@@ -568,7 +568,6 @@
   <nav class="navbar">
     <div class="nav-inner">
       <a href="#" class="brand">OMID AREFIAN</a>
-
       <div class="nav-links">
         <a href="#about">About</a>
         <a href="#education">Education</a>
@@ -581,6 +580,8 @@
   </nav>
 
   <main class="container">
+
+    <!-- ── HERO ── -->
     <section class="hero">
       <div class="panel photo-panel">
         <div class="photo-frame">
@@ -590,21 +591,17 @@
 
       <div class="panel hero-panel">
         <div class="eyebrow">Robotics · Optimal Control · Reinforcement Learning · Autonomous Systems</div>
-
         <h1>Omid <span>Arefian</span></h1>
-
         <p class="lead">
           I am a Mechanical Engineering master's student in Mechatronics and Robotics at
           Politecnico di Milano, with strong interests in robotics, motion planning,
           optimal control, reinforcement learning, and intelligent autonomous systems.
         </p>
-
         <div class="pill-row">
           <span class="pill">Politecnico di Milano</span>
           <span class="pill">M.Sc. Mechatronics & Robotics</span>
           <span class="pill">Milan, Italy</span>
         </div>
-
         <div class="button-row">
           <a class="btn" href="#projects">Explore Projects</a>
           <a class="btn" href="assets/OmidArefian_CV.pdf" target="_blank" rel="noopener">Download CV</a>
@@ -613,31 +610,26 @@
       </div>
     </section>
 
+    <!-- ── ABOUT ── -->
     <section id="about" class="reveal">
       <div class="section-heading">
         <h2>About Me</h2>
-        <p>
-          A short overview of my academic background, technical interests, and the kind
-          of engineering problems I enjoy solving.
-        </p>
+        <p>A short overview of my academic background, technical interests, and the kind of engineering problems I enjoy solving.</p>
       </div>
-
       <div class="grid-2">
         <div class="card">
           <h3>Profile</h3>
           <p>
-            I am currently pursuing an M.Sc. in Mechanical Engineering in the
-            Mechatronics and Robotics track at Politecnico di Milano. My work is centered
-            on robotics, control, autonomous systems, motion planning, and the
-            development of algorithms that connect theory to practical applications.
+            I am currently pursuing an M.Sc. in Mechanical Engineering in the Mechatronics and
+            Robotics track at Politecnico di Milano. My work is centered on robotics, control,
+            autonomous systems, motion planning, and the development of algorithms that connect
+            theory to practical applications.
           </p>
           <p style="margin-top: 14px;">
-            Through academic and project work, I have gained experience in nonlinear
-            control, reinforcement learning, robot path following, system identification,
-            and experimental modeling.
+            Through academic and project work, I have gained experience in nonlinear control,
+            reinforcement learning, robot path following, system identification, and experimental modeling.
           </p>
         </div>
-
         <div class="card">
           <h3>Skills & Tools</h3>
           <div class="interest-wrap" style="margin-top: 12px;">
@@ -654,12 +646,12 @@
       </div>
     </section>
 
+    <!-- ── EDUCATION ── -->
     <section id="education" class="reveal">
       <div class="section-heading">
         <h2>Education</h2>
         <p>Academic background with links to the official university websites.</p>
       </div>
-
       <div class="grid-2">
         <a class="card edu-card" href="https://www.polimi.it/" target="_blank" rel="noopener">
           <div class="logo-box">
@@ -668,13 +660,8 @@
           <div>
             <span class="mini-tag">2024 – Present</span>
             <h3>Politecnico di Milano</h3>
-            <p>
-              <strong>M.Sc. in Mechanical Engineering</strong><br />
-              Mechatronics & Robotics track
-            </p>
-            <p style="margin-top: 10px;">
-              Currently studying robotics, control, and advanced engineering methods in Milan.
-            </p>
+            <p><strong>M.Sc. in Mechanical Engineering</strong><br />Mechatronics & Robotics track</p>
+            <p style="margin-top: 10px;">Currently studying robotics, control, and advanced engineering methods in Milan.</p>
             <span class="school-link">Visit official website ↗</span>
           </div>
         </a>
@@ -687,97 +674,101 @@
             <span class="mini-tag">2019 – 2024</span>
             <h3>Shahid Beheshti University</h3>
             <p><strong>B.Sc. in Mechanical Engineering</strong></p>
-            <p style="margin-top: 10px;">
-              Built a strong foundation in mechanical engineering, analysis, and applied
-              problem solving.
-            </p>
+            <p style="margin-top: 10px;">Built a strong foundation in mechanical engineering, analysis, and applied problem solving.</p>
             <span class="school-link">Visit official website ↗</span>
           </div>
         </a>
       </div>
     </section>
 
+    <!-- ── PROJECTS ── -->
     <section id="projects" class="reveal">
       <div class="section-heading">
         <h2>Selected Projects</h2>
-        <p>
-          Projects in robotics, optimal control, reinforcement learning, and system modeling.
-        </p>
+        <p>Projects in robotics, optimal control, reinforcement learning, and system modeling.</p>
       </div>
 
       <div class="project-grid">
+
+        <!-- Project 1: PMP -->
         <article class="card project-card">
           <div class="project-media">
-            <img
-              src="assets/pmp-result.png"
-              alt="Trajectory comparison for the optimal obstacle-avoiding trajectory project"
-            />
+            <img src="assets/pmp-result.png" alt="Trajectory comparison for the optimal obstacle-avoiding trajectory project" />
             <div class="project-overlay">
               <a class="read-more-btn" href="project-pmp.html">Read More</a>
             </div>
           </div>
-
           <div class="project-content">
             <span class="project-tag">Advanced Nonlinear Control</span>
             <h3>Optimal Obstacle-Avoiding Trajectory Design</h3>
             <p>
-              Formulated and solved a nonlinear optimal control problem for a vehicle in a
-              2D plane with obstacle avoidance. The project compares indirect and direct
-              solution strategies and discusses LQR tracking around the nominal trajectory.
+              Formulated and solved a nonlinear optimal control problem for a vehicle in a 2D plane
+              with obstacle avoidance. The project compares indirect and direct solution strategies
+              and discusses LQR tracking around the nominal trajectory.
             </p>
             <a class="project-link-inline" href="project-pmp.html">Open project page ↗</a>
           </div>
         </article>
 
+        <!-- Project 2: RL -->
         <article class="card project-card">
           <div class="project-media">
-            <img
-              src="assets/project_logo.png"
-              alt="Custom reinforcement learning project environment with multiple boxes"
-            />
+            <img src="assets/project_logo.png" alt="Custom reinforcement learning project environment with multiple boxes" />
             <div class="project-overlay">
               <a class="read-more-btn" href="project-rl.html">Read More</a>
             </div>
           </div>
-
           <div class="project-content">
             <span class="project-tag">Reinforcement Learning · PPO</span>
             <h3>Custom PPO Environment for Multi-Box Coordination</h3>
             <p>
-              Developed a custom reinforcement-learning environment in which an agent
-              coordinates two boxes at a time, avoids collisions, and learns motion
-              strategies through reward shaping, architecture comparison, and PPO training.
+              Developed a custom reinforcement-learning environment in which an agent coordinates
+              two boxes at a time, avoids collisions, and learns motion strategies through reward
+              shaping, architecture comparison, and PPO training.
             </p>
             <a class="project-link-inline" href="project-rl.html">Open project page ↗</a>
           </div>
         </article>
 
-        <article class="card">
-          <span class="project-tag">MATLAB · ROS 2 · Gazebo</span>
-          <h3>Turtlebot3 Path-Following Controller</h3>
-          <p>
-            Integrated ROS 2 with MATLAB and designed linear and nonlinear controllers,
-            including PID and MPC, for accurate path tracking in cluttered environments.
-          </p>
+        <!-- Project 3: TurtleBot3 — NEW -->
+        <article class="card project-card">
+          <div class="project-media">
+            <img src="assets/tbot1.png" alt="TurtleBot3 navigating through a mapped house environment in Gazebo" />
+            <div class="project-overlay">
+              <a class="read-more-btn" href="project-tbot.html">Read More</a>
+            </div>
+          </div>
+          <div class="project-content">
+            <span class="project-tag">MATLAB · ROS 2 · Gazebo</span>
+            <h3>TurtleBot3 Path-Following Controller</h3>
+            <p>
+              Integrated ROS 2 with MATLAB and designed feedback controllers for accurate path
+              tracking in cluttered environments. The full pipeline covers SLAM mapping, A* planning,
+              AMCL localization, and a pure-pursuit safety layer with laser-scan-based obstacle avoidance.
+            </p>
+            <a class="project-link-inline" href="project-tbot.html">Open project page ↗</a>
+          </div>
         </article>
 
+        <!-- Project 4: System ID (no dedicated page) -->
         <article class="card">
           <span class="project-tag">System Identification</span>
           <h3>Steel Plate & Wheel Experimental Modeling</h3>
           <p>
-            Performed FRF-based analysis, modal parameter estimation, coherence
-            evaluation, and model reduction using MATLAB and experimental measurements.
+            Performed FRF-based analysis, modal parameter estimation, coherence evaluation, and
+            model reduction using MATLAB and experimental measurements.
           </p>
         </article>
+
       </div>
     </section>
 
+    <!-- ── INTERESTS ── -->
     <section id="interests" class="reveal">
       <div class="section-heading">
         <h2>Research Interests</h2>
         <p>Topics that reflect the direction of my academic and technical work.</p>
       </div>
-
       <div class="card">
         <div class="interest-wrap">
           <span class="interest-item">Motion Planning</span>
@@ -793,44 +784,42 @@
       </div>
     </section>
 
+    <!-- ── EXPERIENCE ── -->
     <section id="experience" class="reveal">
       <div class="section-heading">
         <h2>Work Experience</h2>
         <p>Research and industrial experiences that complemented my academic training.</p>
       </div>
-
       <div class="card">
         <div class="timeline">
           <div class="timeline-item">
             <span class="timeline-date">Jun 2023 – Feb 2024</span>
             <h3>Research Assistant · Shahid Beheshti University</h3>
             <p>
-              Supported research activities in the Energy Engineering Laboratory, assisted
-              undergraduate students, prepared conference posters, collaborated with
-              graduate researchers, and gained experience with research workflows and
-              photovoltaic technologies.
+              Supported research activities in the Energy Engineering Laboratory, assisted undergraduate
+              students, prepared conference posters, collaborated with graduate researchers, and gained
+              experience with research workflows and photovoltaic technologies.
             </p>
           </div>
-
           <div class="timeline-item">
             <span class="timeline-date">Jun 2022 – Sep 2022</span>
             <h3>Summer Intern · Khorasan Steel Complex</h3>
             <p>
-              Worked with the repair line support team for the rebar rolling mill, assisted
-              with inspections and maintenance, and gained hands-on exposure to industrial
-              workflows, machinery operation, and troubleshooting practices.
+              Worked with the repair line support team for the rebar rolling mill, assisted with
+              inspections and maintenance, and gained hands-on exposure to industrial workflows,
+              machinery operation, and troubleshooting practices.
             </p>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- ── CONTACT ── -->
     <section id="contact" class="reveal">
       <div class="section-heading">
         <h2>Contact</h2>
         <p>Feel free to reach out for research, academic, or collaboration opportunities.</p>
       </div>
-
       <div class="card">
         <div class="contact-row">
           <a class="contact-chip" href="mailto:Omid.arefian@mail.polimi.it">Email</a>
@@ -840,23 +829,17 @@
       </div>
     </section>
 
-    <footer>
-      © 2026 Omid Arefian · Personal academic portfolio
-    </footer>
+    <footer>© 2026 Omid Arefian · Personal academic portfolio</footer>
   </main>
 
   <script>
     const revealItems = document.querySelectorAll(".reveal");
-
     const revealOnScroll = () => {
       revealItems.forEach((item) => {
         const rect = item.getBoundingClientRect();
-        if (rect.top < window.innerHeight - 80) {
-          item.classList.add("show");
-        }
+        if (rect.top < window.innerHeight - 80) item.classList.add("show");
       });
     };
-
     revealOnScroll();
     window.addEventListener("scroll", revealOnScroll);
   </script>
