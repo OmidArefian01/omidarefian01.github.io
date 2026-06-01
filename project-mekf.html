@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEKF for UAV State Estimation | Omid Arefian</title>
+  <meta
+    name="description"
+    content="Design and validation of a Multiplicative Extended Kalman Filter for UAV pose estimation using PX4 SITL, MAVLink, IMU, GPS, barometer and magnetometer fusion."
+  />
+
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --surface: rgba(255, 255, 255, 0.86);
+      --surface-2: #f8fbff;
+      --text: #1d2a3b;
+      --muted: #66748a;
+      --line: rgba(35, 54, 90, 0.10);
+      --accent: #5f7ca8;
+      --accent-dark: #48678f;
+      --shadow: 0 20px 60px rgba(41, 72, 126, 0.10);
+      --shadow-soft: 0 14px 34px rgba(41, 72, 126, 0.08);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --max-width: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(95, 124, 168, 0.12), transparent 26%),
+        radial-gradient(circle at top right, rgba(95, 124, 168, 0.08), transparent 22%),
+        linear-gradient(180deg, #f9fbff 0%, #f3f7fd 55%, #edf2fb 100%);
+      color: var(--text);
+      line-height: 1.75;
+      min-height: 100vh;
+    }
+
+    img,
+    video {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .container {
+      width: min(var(--max-width), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(14px);
+      background: rgba(246, 248, 252, 0.78);
+      border-bottom: 1px solid rgba(35, 54, 90, 0.08);
+    }
+
+    .topbar-inner {
+      width: min(var(--max-width), calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      font-size: 0.96rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--text);
+    }
+
+    .topbar-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .top-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 14px;
+      background: #eef3fb;
+      border: 1px solid rgba(95, 124, 168, 0.16);
+      color: var(--text);
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(95, 124, 168, 0.08);
+      transition: 0.25s ease;
+    }
+
+    .top-btn:hover {
+      transform: translateY(-2px);
+      background: #e8eef9;
+    }
+
+    .hero {
+      padding: 56px 0 26px;
+    }
+
+    .hero-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-media {
+      position: relative;
+      height: 420px;
+      overflow: hidden;
+      background: #dfe7f5;
+      border-bottom: 1px solid rgba(35, 54, 90, 0.08);
+    }
+
+    .hero-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-badge {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.10);
+    }
+
+    .hero-content {
+      padding: 34px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: #eef3fb;
+      border: 1px solid rgba(95, 124, 168, 0.14);
+      color: var(--accent-dark);
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.7vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: -0.05em;
+      margin-bottom: 16px;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 1.08rem;
+      max-width: 880px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .chip {
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: #f3f6fc;
+      border: 1px solid rgba(95, 124, 168, 0.12);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    section {
+      padding: 18px 0;
+    }
+
+    .section-title {
+      margin-bottom: 16px;
+    }
+
+    .section-title h2 {
+      font-size: clamp(1.55rem, 3vw, 2.2rem);
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+    }
+
+    .section-title p {
+      color: var(--muted);
+      max-width: 820px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 26px;
+    }
+
+    .card h3 {
+      font-size: 1.12rem;
+      margin-bottom: 10px;
+    }
+
+    .card p,
+    .card li {
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .card ul {
+      padding-left: 18px;
+      margin-top: 12px;
+    }
+
+    .card li + li {
+      margin-top: 8px;
+    }
+
+    .equation-box,
+    .code-box {
+      background: var(--surface-2);
+      border: 1px solid rgba(95, 124, 168, 0.12);
+      border-radius: 18px;
+      padding: 18px;
+      overflow-x: auto;
+      color: #304156;
+      font-size: 0.94rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-top: 14px;
+    }
+
+    .mini-note {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #f3f7fd;
+      border: 1px solid rgba(95, 124, 168, 0.12);
+      color: var(--muted);
+    }
+
+    .method-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .method-label {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eef3fb;
+      border: 1px solid rgba(95, 124, 168, 0.14);
+      color: var(--accent-dark);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .media-card {
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .media-card img,
+    .media-card video {
+      width: 100%;
+      height: auto;
+      background: #dde6f6;
+    }
+
+    .media-content {
+      padding: 22px 24px 24px;
+    }
+
+    .param-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .param-item {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #f7faff;
+      border: 1px solid rgba(95, 124, 168, 0.12);
+    }
+
+    .param-item strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
+
+    .param-item span {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .anchor-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .anchor-link {
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: #eef3fb;
+      border: 1px solid rgba(95, 124, 168, 0.14);
+      color: var(--accent-dark);
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: 0.22s ease;
+    }
+
+    .anchor-link:hover {
+      transform: translateY(-2px);
+      background: #e9f0fb;
+    }
+
+    .results-table-wrap {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    thead th {
+      background: #eef3fb;
+      color: var(--accent-dark);
+      font-weight: 700;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 2px solid rgba(95, 124, 168, 0.18);
+    }
+
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid rgba(35, 54, 90, 0.07);
+      color: var(--muted);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover td {
+      background: #f7faff;
+    }
+
+    /* SunCubes highlight banner */
+    .suncubes-banner {
+      background: linear-gradient(135deg, #eef3fb 0%, #e4edf8 100%);
+      border: 1px solid rgba(95, 124, 168, 0.22);
+      border-radius: var(--radius-lg);
+      padding: 26px 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .suncubes-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid rgba(95, 124, 168, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.5rem;
+    }
+
+    .suncubes-body h3 {
+      font-size: 1.08rem;
+      margin-bottom: 6px;
+    }
+
+    .suncubes-body p {
+      color: var(--muted);
+      font-size: 0.97rem;
+      margin: 0;
+    }
+
+    .suncubes-body a {
+      color: var(--accent-dark);
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    footer {
+      padding: 36px 0 50px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 980px) {
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-media {
+        height: 300px;
+      }
+
+      .hero-content,
+      .card {
+        padding: 22px;
+      }
+
+      .media-content {
+        padding: 20px 22px 22px;
+      }
+
+      .param-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .suncubes-banner {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px 0;
+      }
+
+      .hero-media {
+        height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">OMID AREFIAN</a>
+      <div class="topbar-links">
+        <a href="index.html#projects" class="top-btn">← Back to Projects</a>
+        <a href="#results" class="top-btn">Jump to Results</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ── HERO ── -->
+    <section class="hero">
+      <div class="hero-card">
+        <div class="hero-media">
+          <img
+            src="assets/SITL_1.png"
+            alt="PX4 SITL simulation with drone connected to QGroundControl for MEKF validation"
+          />
+          <div class="hero-badge">UAV State Estimation · PX4 SITL</div>
+        </div>
+
+        <div class="hero-content">
+          <div class="eyebrow">MEKF · IMU Integration · GPS/Baro/Mag Fusion · Sensor Bias Estimation</div>
+          <h1>Design of a Multiplicative EKF for UAV State Estimation</h1>
+
+          <p class="lead">
+            An independent Multiplicative Extended Kalman Filter (MEKF) designed to reconstruct
+            the full pose of a drone — position, velocity, attitude, and sensor biases — from raw
+            IMU, GPS, barometer, and magnetometer data. The filter runs entirely independently of
+            the onboard autopilot and is validated against PX4 SITL estimates in Python.
+          </p>
+
+          <div class="chip-row">
+            <span class="chip">Python</span>
+            <span class="chip">PX4 SITL</span>
+            <span class="chip">MAVLink</span>
+            <span class="chip">MEKF</span>
+            <span class="chip">Sensor Fusion</span>
+            <span class="chip">NED Frame</span>
+            <span class="chip">Quaternion Attitude</span>
+          </div>
+
+          <div class="anchor-nav">
+            <a class="anchor-link" href="#overview">Overview</a>
+            <a class="anchor-link" href="#architecture">Architecture</a>
+            <a class="anchor-link" href="#sensors">Sensor Streams</a>
+            <a class="anchor-link" href="#propagation">Propagation</a>
+            <a class="anchor-link" href="#updates">Measurement Updates</a>
+            <a class="anchor-link" href="#results">Results</a>
+            <a class="anchor-link" href="#suncubes">Real Drone Extension</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── OVERVIEW ── -->
+    <section id="overview">
+      <div class="section-title">
+        <h2>Project Overview</h2>
+        <p>
+          The goal is to build a physically meaningful, fully independent drone state estimator
+          that does not rely on the autopilot's internal filter output.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Motivation</h3>
+          <p>
+            Commercial autopilots such as PX4 provide high-quality onboard state estimates, but
+            these estimates are not suitable as a research baseline because the internal filter
+            details are opaque and the output mixes sensor fusion with control feedback. This
+            project implements an independent MEKF that consumes only raw sensor streams,
+            propagates the drone state from inertial measurements, and corrects it with GPS,
+            barometer, and magnetometer updates.
+          </p>
+          <p style="margin-top: 12px;">
+            The PX4 estimates are logged in parallel and used only as a comparison reference
+            for RMSE evaluation — they do not feed into the filter in any way.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>State Vector</h3>
+          <p>
+            The filter maintains a 20-dimensional nominal state and a 19-dimensional error
+            state (the quaternion contributes 3 DOF via the multiplicative error δθ, not 4):
+          </p>
+          <div class="equation-box">Nominal state  x ∈ ℝ²⁰:
+  p  ∈ ℝ³   position (NED)
+  v  ∈ ℝ³   velocity (NED)
+  q  ∈ ℝ⁴   attitude quaternion
+  b_g ∈ ℝ³  gyroscope bias
+  b_a ∈ ℝ³  accelerometer bias
+  b_m ∈ ℝ³  magnetometer bias
+  b_b ∈ ℝ¹  barometer bias
+
+Error state  δx ∈ ℝ¹⁹:
+  δθ replaces δq  (3-DOF multiplicative)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ARCHITECTURE ── -->
+    <section id="architecture">
+      <div class="section-title">
+        <h2>Estimator Architecture</h2>
+        <p>
+          The MEKF follows the standard predict–correct cycle, with the IMU driving
+          high-rate prediction and GPS, barometer, and magnetometer providing low- to
+          medium-rate corrections.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card method-card">
+          <span class="method-label">High Rate · ~200 Hz</span>
+          <h3>IMU Prediction</h3>
+          <p>
+            At every new IMU sample the bias-corrected gyroscope propagates the quaternion
+            and the bias-corrected accelerometer — rotated into the NED navigation frame and
+            augmented with gravity — propagates velocity and position.
+          </p>
+          <div class="equation-box">ω̂ = ω_m − b̂_g
+f̂ = f_m − b̂_a
+
+â_n = R_nb(q̂) f̂ + g_n
+
+p̂⁻ = p̂⁺ + v̂⁺Δt + ½â_nΔt²
+v̂⁻ = v̂⁺ + â_nΔt
+q̂⁻ = q̂⁺ ⊗ δq(ω̂Δt)</div>
+        </div>
+
+        <div class="card method-card">
+          <span class="method-label">Low Rate · ~5 Hz</span>
+          <h3>GPS + Baro Update</h3>
+          <p>
+            Whenever a new GPS or barometer measurement arrives the filter runs a standard
+            EKF correction step. GPS provides a 3D position anchor and a 2D horizontal
+            velocity constraint; the barometer provides a scalar vertical correction
+            that also estimates the pressure-altitude offset.
+          </p>
+          <div class="equation-box">y_k = z_k − h(x̂⁻_k)
+S_k = H_k P⁻_k H_kᵀ + R_k
+K_k = P⁻_k H_kᵀ S_k⁻¹
+δx̂_k = K_k y_k
+x̂⁺_k = x̂⁻_k ⊞ δx̂_k</div>
+        </div>
+
+        <div class="card method-card">
+          <span class="method-label">Medium Rate · ~50 Hz</span>
+          <h3>Magnetometer Update</h3>
+          <p>
+            The magnetometer corrects yaw and magnetometer bias. A reference field is built
+            from the initial measurement; during filtering the predicted body-frame field is
+            compared against this reference via a normalized horizontal-vector update and a
+            separate z-channel update.
+          </p>
+          <div class="equation-box">m̂_b = R_nb(q̂)ᵀ m_n^ref + b̂_m
+
+h_m,xy(x) = [m̂_b,x  m̂_b,y] / ‖m̂_b,xy‖
+h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 22px;">
+        <div class="card media-card">
+          <img
+            src="assets/SITL_2.png"
+            alt="QGroundControl connected to PX4 SITL showing drone telemetry and flight data"
+          />
+          <div class="media-content">
+            <h3>PX4 SITL + QGroundControl Setup</h3>
+            <p>
+              The validation environment uses PX4 Software-In-The-Loop (SITL), which runs the
+              full PX4 flight stack in simulation and exposes all MAVLink telemetry streams over
+              UDP. QGroundControl connects to the same instance for monitoring, while the Python
+              MEKF reads the raw sensor streams simultaneously via <code>pymavlink</code>.
+              PX4's onboard EKF2 estimates are logged only for comparison purposes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SENSOR STREAMS ── -->
+    <section id="sensors">
+      <div class="section-title">
+        <h2>Coordinate Frames and Sensor Streams</h2>
+        <p>
+          The filter uses two coordinate frames and five MAVLink data streams divided into
+          estimation inputs and comparison-only references.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Coordinate Frames</h3>
+          <p>
+            All position and velocity states are represented in the local
+            <strong>NED (North-East-Down)</strong> navigation frame. The origin is set at the
+            first valid GPS fix. The <strong>body frame</strong> is attached to the drone; IMU
+            and magnetometer measurements arrive in this frame. The attitude quaternion
+            R<sub>nb</sub>(q) rotates body-frame vectors into the navigation frame:
+          </p>
+          <div class="equation-box">u_n = R_nb(q) · u_b</div>
+          <div class="mini-note">
+            In NED, altitude is the negative of the down coordinate p_D. GPS
+            latitude/longitude/altitude are converted into local NED on arrival.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>MAVLink Streams Used</h3>
+          <div class="param-grid">
+            <div class="param-item">
+              <strong>HIGHRES_IMU</strong>
+              <span>Gyro, accelerometer, magnetometer — primary prediction + mag update source</span>
+            </div>
+            <div class="param-item">
+              <strong>GPS_RAW_INT</strong>
+              <span>Latitude, longitude, altitude, ground speed, course-over-ground</span>
+            </div>
+            <div class="param-item">
+              <strong>SCALED_PRESSURE</strong>
+              <span>Absolute pressure → relative altitude → vertical correction</span>
+            </div>
+            <div class="param-item">
+              <strong>LOCAL_POSITION_NED · ATTITUDE</strong>
+              <span>PX4 internal estimates — comparison only, never fed into the MEKF</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PROPAGATION ── -->
+    <section id="propagation">
+      <div class="section-title">
+        <h2>State Propagation Model</h2>
+        <p>
+          The prediction step integrates the full nonlinear dynamics at IMU rate, then
+          propagates the error-state covariance through the linearized transition Jacobian.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Nominal State Propagation</h3>
+          <p>
+            At each IMU step the estimated biases are subtracted, the corrected specific
+            force is rotated into NED and added to gravity, and the resulting acceleration
+            drives simple Euler integration of position and velocity. The quaternion is
+            updated multiplicatively using the gyroscope-derived rotation increment:
+          </p>
+          <div class="equation-box">â_n,k = R_nb(q̂_k)(f_m,k − b̂_a,k) + g_n
+
+p̂⁻_k+1 = p̂⁺_k + v̂⁺_k Δt + ½ â_n,k Δt²
+v̂⁻_k+1 = v̂⁺_k + â_n,k Δt
+q̂⁻_k+1 = q̂⁺_k ⊗ δq(ω̂_k Δt)</div>
+          <div class="mini-note">
+            Biases are modeled as random walks and propagated with zero dynamics —
+            only the covariance of each bias grows with the corresponding process noise.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Covariance Propagation</h3>
+          <p>
+            The 19×19 error-state covariance is propagated through the linearized
+            error-state transition matrix F<sub>k</sub>, which is computed numerically
+            using boxplus and boxminus operations on the manifold:
+          </p>
+          <div class="equation-box">P⁻_k+1 = F_k P⁺_k F_kᵀ + Q_k</div>
+          <p style="margin-top: 14px;">
+            Q<sub>k</sub> is the discrete process-noise covariance, tuned to reflect IMU
+            noise spectral density and bias instability. The use of the error-state
+            formulation keeps the quaternion constraint (‖q‖ = 1) satisfied at every step
+            without explicit re-normalization in the covariance equations.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MEASUREMENT UPDATES ── -->
+    <section id="updates">
+      <div class="section-title">
+        <h2>Measurement Updates and Sensor Fusion</h2>
+        <p>
+          Five separate update channels handle GPS position, GPS velocity, barometer
+          altitude, magnetometer horizontal vector, and magnetometer z-component.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>GPS Position Update</h3>
+          <p>The GPS position update directly observes the position state:</p>
+          <div class="equation-box">z_gps,p = [p_N^gps  p_E^gps  p_D^gps]ᵀ
+h_gps,p(x) = [p_N  p_E  p_D]ᵀ
+y_gps,p = z_gps,p − p̂</div>
+        </div>
+
+        <div class="card">
+          <h3>GPS Horizontal Velocity Update</h3>
+          <p>
+            When ground speed and course-over-ground are available, horizontal velocity
+            components are constructed and used as an additional correction. A gate rejects
+            measurements with excessive velocity innovation:
+          </p>
+          <div class="equation-box">v_N^gps = s^gps · cos(χ^gps)
+v_E^gps = s^gps · sin(χ^gps)
+h_gps,v(x) = [v_N  v_E]ᵀ</div>
+        </div>
+
+        <div class="card">
+          <h3>Barometer Update</h3>
+          <p>
+            A scalar correction for the vertical channel. The barometer bias b<sub>b</sub>
+            absorbs any constant pressure-to-altitude offset, preventing the vertical
+            position state from being corrupted by a systematic sensor error:
+          </p>
+          <div class="equation-box">z_b = p_D + b_b + n_b
+h_b(x) = p_D + b_b
+y_b = z_b − (p̂_D + b̂_b)</div>
+        </div>
+
+        <div class="card">
+          <h3>Magnetometer Updates</h3>
+          <p>
+            Two separate magnetometer channels constrain yaw and the magnetometer bias.
+            A norm gate and a heading gate reject measurements with suspected disturbances:
+          </p>
+          <div class="equation-box">m̂_b = R_nb(q̂)ᵀ m_n^ref + b̂_m
+
+Horizontal:
+h_m,xy(x) = [m̂_b,x  m̂_b,y] / ‖m̂_b,xy‖
+
+Z-channel:
+h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
+          <div class="mini-note">
+            Gating on both the magnetic norm and the heading error prevents large yaw jumps
+            from magnetic disturbances near metallic structures or electrical equipment.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── INITIALIZATION ── -->
+    <section>
+      <div class="section-title">
+        <h2>Initialization Procedure</h2>
+        <p>
+          A stationary initialization phase estimates the initial attitude and velocity before
+          the first IMU propagation step.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Startup Sequence</h3>
+        <ul>
+          <li>
+            Collect a buffer of initial IMU samples and average the accelerometer readings
+            to estimate gravity direction → initial roll and pitch.
+          </li>
+          <li>
+            Average the magnetometer readings and apply tilt compensation to the horizontal
+            projection → initial yaw estimate → initial quaternion q₀.
+          </li>
+          <li>
+            Wait for the first valid GPS fix; set the local NED origin and initialize
+            position from GPS-derived NED coordinates.
+          </li>
+          <li>
+            If GPS horizontal velocity is available, initialize velocity from ground speed
+            and course-over-ground.
+          </li>
+          <li>
+            Initialize the barometer bias so that the first barometer prediction is
+            consistent with the GPS-derived initial altitude.
+          </li>
+        </ul>
+        <div class="mini-note">
+          This initialization assumes the vehicle is approximately stationary at startup —
+          the accelerometer mainly measures gravity and the gyroscope is not rotating — which
+          is satisfied during a typical pre-flight ground check.
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RESULTS ── -->
+    <section id="results">
+      <div class="section-title">
+        <h2>Results</h2>
+        <p>
+          The MEKF was validated in PX4 SITL across a full flight maneuver sequence.
+          The estimator output is compared against PX4's onboard EKF2 estimates.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>RMSE Summary</h3>
+        <p>
+          Root-mean-square errors computed over the full flight log against PX4 reference
+          estimates. Position errors are sub-0.25 m across all axes; roll and pitch errors
+          are below 0.4°; yaw shows larger error as expected given magnetometer-only heading
+          correction.
+        </p>
+        <div class="results-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Quantity</th>
+                <th>RMSE</th>
+                <th>Unit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Position x</td><td>0.1404</td><td>m</td></tr>
+              <tr><td>Position y</td><td>0.2265</td><td>m</td></tr>
+              <tr><td>Position z</td><td>0.1895</td><td>m</td></tr>
+              <tr><td>Velocity v_x</td><td>0.0702</td><td>m/s</td></tr>
+              <tr><td>Velocity v_y</td><td>0.1000</td><td>m/s</td></tr>
+              <tr><td>Velocity v_z</td><td>0.1015</td><td>m/s</td></tr>
+              <tr><td>Roll</td><td>0.3825</td><td>deg</td></tr>
+              <tr><td>Pitch</td><td>0.2445</td><td>deg</td></tr>
+              <tr><td>Yaw</td><td>6.7576</td><td>deg</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mini-note">
+          The yaw RMSE of 6.76° reflects the challenge of heading estimation with a single
+          magnetometer in a simulation environment. The filter tracks yaw trends correctly
+          but accumulates a slowly varying offset during aggressive maneuvers.
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SUNCUBES ── -->
+    <section id="suncubes">
+      <div class="section-title">
+        <h2>Extension to a Real Drone</h2>
+        <p>
+          The SITL-validated estimator is now being adapted for deployment on a physical
+          drone in collaboration with SunCubes.
+        </p>
+      </div>
+
+      <div style="margin-bottom: 22px;">
+        <div class="suncubes-banner">
+          <div class="suncubes-icon">🛸</div>
+          <div class="suncubes-body">
+            <h3>In Progress · SunCubes Company</h3>
+            <p>
+              The MEKF is currently being extended and redesigned for real hardware deployment
+              at <a href="http://suncubes.space/" target="_blank" rel="noopener">SunCubes</a>,
+              a drone technology company. The transition from SITL to a physical drone introduces
+              new challenges: real sensor noise characteristics, vibration-induced IMU corruption,
+              actual GPS multipath, magnetic interference from motors, and latency in the MAVLink
+              communication link — all of which require retuning and structural changes to the
+              filter. This ongoing work is being carried out on SunCubes hardware running PX4.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Key Differences: SITL → Real Hardware</h3>
+          <ul>
+            <li>
+              <strong>IMU noise:</strong> Simulation noise models are clean Gaussian; real
+              MEMS IMUs have vibration aliasing, temperature-dependent bias drift, and
+              correlated noise that must be characterized from static logs.
+            </li>
+            <li>
+              <strong>GPS quality:</strong> Real GPS is subject to multipath, HDOP variation,
+              and latency jitter that make position and velocity gating more critical.
+            </li>
+            <li>
+              <strong>Magnetometer disturbances:</strong> Motor currents and ESC switching
+              create magnetic interference that is far stronger than in simulation.
+            </li>
+            <li>
+              <strong>Timing:</strong> Real MAVLink streams arrive with variable latency;
+              timestamp alignment between sensors needs explicit handling.
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Planned Improvements</h3>
+          <ul>
+            <li>
+              Empirical noise covariance identification from static and hover flight logs.
+            </li>
+            <li>
+              Adaptive measurement gating based on GPS fix quality and HDOP.
+            </li>
+            <li>
+              Vibration pre-filtering on the accelerometer channel using an onboard low-pass
+              filter tuned to rotor harmonics.
+            </li>
+            <li>
+              Soft magnetic calibration to reduce motor-current-induced heading errors.
+            </li>
+            <li>
+              Real-time performance profiling to ensure the filter runs within the available
+              compute budget on the companion computer.
+            </li>
+          </ul>
+          <div class="mini-note">
+            The SITL validation baseline provides a clean reference for regression testing:
+            any change that degrades SITL RMSE below the values in the table above is
+            rejected before being tested on hardware.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      © 2026 Omid Arefian · UAV State Estimation · PX4 SITL · SunCubes Collaboration
+    </footer>
+
+  </main>
+</body>
+</html>
