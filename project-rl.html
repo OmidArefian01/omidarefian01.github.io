@@ -6,77 +6,133 @@
   <title>Custom PPO Environment for Multi-Box Coordination | Omid Arefian</title>
   <meta
     name="description"
-    content="Project page for Omid Arefian's reinforcement learning project on a custom PPO environment for multi-box coordination, reward shaping, and policy training."
+    content="Reinforcement learning project: custom PPO environment for multi-box coordination, reward shaping, entropy tuning, and neural-network architecture comparison."
   />
 
+  <!-- Google Fonts — identical to index -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'none'
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+      startup: { typeset: true }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+
   <style>
+    /* ─────────────────────────────────────────
+       TOKENS — identical to index.html
+    ───────────────────────────────────────── */
     :root {
-      --bg: #f6f8fc;
-      --surface: rgba(255, 255, 255, 0.86);
-      --surface-2: #f8fbff;
-      --text: #1d2a3b;
-      --muted: #66748a;
-      --line: rgba(35, 54, 90, 0.10);
-      --accent: #5f7ca8;
-      --accent-dark: #48678f;
-      --shadow: 0 20px 60px rgba(41, 72, 126, 0.10);
-      --shadow-soft: 0 14px 34px rgba(41, 72, 126, 0.08);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --max-width: 1120px;
+      --navy:        #0d1b2a;
+      --navy-mid:    #1a2e42;
+      --navy-light:  #243a52;
+      --slate:       #3d5a73;
+      --steel:       #6b8fa8;
+      --fog:         #c8d8e4;
+      --ice:         #e8f0f6;
+      --white:       #ffffff;
+      --off-white:   #f7f9fb;
+      --text:        #0d1b2a;
+      --text-soft:   #445668;
+      --text-muted:  #6b8fa8;
+      --accent:      #1d6fa4;
+      --accent-light:#2587c5;
+      --accent-pale: #ddeef8;
+      --green:       #1a7a5e;
+      --green-pale:  #d4ede7;
+      --line:        #dde6ee;
+      --card-bg:     #ffffff;
+      --card-border: #e2ebf2;
+      --shadow-sm:   0 1px 4px rgba(13,27,42,0.06), 0 4px 12px rgba(13,27,42,0.06);
+      --shadow-md:   0 2px 8px rgba(13,27,42,0.07), 0 8px 24px rgba(13,27,42,0.09);
+      --shadow-lg:   0 4px 16px rgba(13,27,42,0.08), 0 16px 48px rgba(13,27,42,0.12);
+      --radius-sm:   6px;
+      --radius-md:   10px;
+      --radius-lg:   16px;
+      --radius-xl:   22px;
+      --max-width:   1160px;
+      --font-body:   'DM Sans', system-ui, -apple-system, sans-serif;
+      --font-display:'DM Serif Display', Georgia, serif;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
 
     body {
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(95, 124, 168, 0.12), transparent 26%),
-        radial-gradient(circle at top right, rgba(95, 124, 168, 0.08), transparent 22%),
-        linear-gradient(180deg, #f9fbff 0%, #f3f7fd 55%, #edf2fb 100%);
+      font-family: var(--font-body);
+      font-weight: 400;
+      background-color: var(--off-white);
       color: var(--text);
-      line-height: 1.75;
+      line-height: 1.65;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    img,
-    video {
-      display: block;
-      max-width: 100%;
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
+    img, video { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
 
     .container {
-      width: min(var(--max-width), calc(100% - 32px));
+      width: min(var(--max-width), calc(100% - 40px));
       margin: 0 auto;
     }
 
-    .topbar {
+    .section-gap { padding: 72px 0 0; }
+
+    /* ── SECTION HEADERS ── */
+    .label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.7rem, 3vw, 2.4rem);
+      line-height: 1.15;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .section-sub {
+      font-size: 0.97rem;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
       position: sticky;
       top: 0;
-      z-index: 1000;
-      backdrop-filter: blur(14px);
-      background: rgba(246, 248, 252, 0.78);
-      border-bottom: 1px solid rgba(35, 54, 90, 0.08);
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
     }
 
-    .topbar-inner {
-      width: min(var(--max-width), calc(100% - 32px));
+    .nav-inner {
+      width: min(var(--max-width), calc(100% - 40px));
       margin: 0 auto;
-      min-height: 72px;
+      height: 68px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -84,63 +140,65 @@
     }
 
     .brand {
-      font-size: 0.96rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      color: var(--navy);
     }
 
-    .topbar-links {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+    .nav-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-    .top-btn {
+    .btn-secondary {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 0 16px;
-      border-radius: 14px;
-      background: #eef3fb;
-      border: 1px solid rgba(95, 124, 168, 0.16);
-      color: var(--text);
-      font-weight: 700;
-      box-shadow: 0 8px 18px rgba(95, 124, 168, 0.08);
-      transition: 0.25s ease;
+      gap: 6px;
+      height: 40px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      background: var(--white);
+      color: var(--navy);
+      font-size: 0.86rem;
+      font-weight: 600;
+      border: 1.5px solid var(--card-border);
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
+    .btn-secondary:hover { border-color: var(--steel); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 
-    .top-btn:hover {
-      transform: translateY(-2px);
-      background: #e8eef9;
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      background: var(--navy);
+      color: var(--white);
+      font-size: 0.86rem;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.2s;
     }
+    .btn-primary:hover { background: var(--navy-mid); transform: translateY(-1px); }
 
-    .hero {
-      padding: 56px 0 26px;
-    }
+    /* ── HERO ── */
+    .hero { padding: 56px 0 0; }
 
-    .hero-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .hero-media {
+    .hero-img-wrap {
       position: relative;
-      height: 420px;
+      width: 100%;
+      height: 440px;
+      border-radius: var(--radius-xl);
       overflow: hidden;
-      background: #dfe7f5;
-      border-bottom: 1px solid rgba(35, 54, 90, 0.08);
+      background: var(--ice);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
-    .hero-media img {
+    .hero-img-wrap img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      background: #eef3fb;
+      background: var(--ice);
     }
 
     .hero-badge {
@@ -149,493 +207,621 @@
       top: 20px;
       display: inline-flex;
       align-items: center;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(255, 255, 255, 0.78);
-      color: var(--text);
-      font-size: 0.88rem;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(255,255,255,0.7);
+      color: var(--navy);
+      font-size: 0.82rem;
       font-weight: 700;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.10);
+      box-shadow: var(--shadow-sm);
+      letter-spacing: 0.01em;
     }
 
-    .hero-content {
-      padding: 34px;
-    }
+    .hero-text { padding: 36px 0 0; }
 
-    .eyebrow {
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: #eef3fb;
-      border: 1px solid rgba(95, 124, 168, 0.14);
-      color: var(--accent-dark);
-      font-size: 0.88rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-    }
-
-    h1 {
-      font-size: clamp(2.2rem, 4.7vw, 4rem);
-      line-height: 1.05;
-      letter-spacing: -0.05em;
-      margin-bottom: 16px;
-    }
-
-    .lead {
-      color: var(--muted);
-      font-size: 1.08rem;
-      max-width: 900px;
-    }
-
-    .chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    .chip {
-      padding: 9px 13px;
-      border-radius: 999px;
-      background: #f3f6fc;
-      border: 1px solid rgba(95, 124, 168, 0.12);
-      color: var(--text);
-      font-size: 0.9rem;
+    .hero-overline {
+      font-size: 0.78rem;
       font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
     }
 
-    .anchor-nav {
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4.5vw, 3.4rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: var(--navy);
+      margin-bottom: 18px;
+    }
+
+    .hero-lead {
+      font-size: 1.02rem;
+      color: var(--text-soft);
+      line-height: 1.72;
+      max-width: 820px;
+      margin-bottom: 24px;
+    }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+    .tag {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--navy-mid);
+      background: var(--ice);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      padding: 5px 11px;
+    }
+
+    .anchor-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 18px;
+      gap: 8px;
+      padding-bottom: 56px;
+      border-bottom: 1px solid var(--line);
     }
 
-    .anchor-link {
-      padding: 9px 13px;
-      border-radius: 999px;
-      background: #eef3fb;
-      border: 1px solid rgba(95, 124, 168, 0.14);
-      color: var(--accent-dark);
-      font-size: 0.9rem;
-      font-weight: 700;
-      transition: 0.22s ease;
+    .anchor-btn {
+      display: inline-flex;
+      align-items: center;
+      height: 36px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--text-soft);
+      font-size: 0.83rem;
+      font-weight: 500;
+      border: 1.5px solid var(--card-border);
+      transition: border-color 0.2s, color 0.2s;
     }
+    .anchor-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-    .anchor-link:hover {
-      transform: translateY(-2px);
-      background: #e9f0fb;
-    }
+    /* ── GRIDS ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
-    section {
-      padding: 18px 0;
-    }
-
-    .section-title {
-      margin-bottom: 16px;
-    }
-
-    .section-title h2 {
-      font-size: clamp(1.55rem, 3vw, 2.2rem);
-      letter-spacing: -0.04em;
-      margin-bottom: 8px;
-    }
-
-    .section-title p {
-      color: var(--muted);
-      max-width: 840px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 22px;
-    }
-
+    /* ── CARDS ── */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--line);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-soft);
-      padding: 26px;
+      padding: 26px 28px;
+      box-shadow: var(--shadow-sm);
     }
 
-    .card h3 {
-      font-size: 1.12rem;
-      margin-bottom: 10px;
+    .card-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-pale);
+      border-radius: var(--radius-sm);
+      padding: 3px 8px;
+      display: inline-block;
+      margin-bottom: 12px;
     }
 
-    .card p,
-    .card li {
-      color: var(--muted);
-      font-size: 0.98rem;
+    .card h3 { font-size: 1.02rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; line-height: 1.4; }
+    .card p, .card li { font-size: 0.93rem; color: var(--text-soft); line-height: 1.7; }
+    .card p + p { margin-top: 10px; }
+    .card ul { padding-left: 18px; margin-top: 10px; }
+    .card li + li { margin-top: 8px; }
+
+    /* ── EQUATION BLOCK ── */
+    .eq-block {
+      background: var(--off-white);
+      border: 1px solid var(--card-border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin: 14px 0;
+      overflow-x: auto;
+      line-height: 1.9;
     }
 
-    .card ul {
-      padding-left: 18px;
-      margin-top: 12px;
+    /* ── NOTE ── */
+    .note {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: var(--accent-pale);
+      border: 1px solid rgba(29,111,164,0.18);
+      border-radius: var(--radius-md);
+      padding: 13px 16px;
+      margin-top: 14px;
     }
+    .note-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+    .note p { font-size: 0.88rem; color: var(--navy-mid); line-height: 1.6; margin: 0 !important; }
 
-    .card li + li {
-      margin-top: 8px;
-    }
-
+    /* ── MEDIA CARD ── */
     .media-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      padding: 0;
+      box-shadow: var(--shadow-sm);
     }
-
-    .media-card img,
-    .media-card video {
+    .media-card img, .media-card video {
       width: 100%;
       height: auto;
-      background: #dde6f6;
+      display: block;
+      border-bottom: 1px solid var(--card-border);
     }
+    .media-caption { padding: 20px 24px 22px; }
+    .media-caption h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 7px; }
+    .media-caption p { font-size: 0.9rem; color: var(--text-soft); line-height: 1.68; }
 
-    .media-content {
-      padding: 22px 24px 24px;
+    /* ── FILE LIST ── */
+    .file-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .file-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: var(--radius-md);
+      background: var(--white);
+      border: 1.5px solid var(--card-border);
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--navy);
+      transition: border-color 0.2s, transform 0.2s;
     }
+    .file-chip:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
 
-    .mini-note {
-      margin-top: 14px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: #f3f7fd;
-      border: 1px solid rgba(95, 124, 168, 0.12);
-      color: var(--muted);
+    /* ── FOOTER ── */
+    .site-footer { padding: 36px 0 40px; text-align: center; font-size: 0.84rem; color: var(--text-muted); border-top: 1px solid var(--line); margin-top: 80px; }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .hero-img-wrap { height: 300px; }
     }
-
-    .equation-box {
-      background: var(--surface-2);
-      border: 1px solid rgba(95, 124, 168, 0.12);
-      border-radius: 18px;
-      padding: 18px;
-      overflow-x: auto;
-      color: #304156;
-      font-size: 0.94rem;
-      line-height: 1.7;
-      white-space: pre-wrap;
-      word-break: break-word;
-      margin-top: 14px;
-    }
-
-    footer {
-      padding: 36px 0 50px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.94rem;
-    }
-
-    @media (max-width: 980px) {
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-media {
-        height: 300px;
-      }
-
-      .hero-content,
-      .card {
-        padding: 22px;
-      }
-
-      .media-content {
-        padding: 20px 22px 22px;
-      }
-    }
-
     @media (max-width: 640px) {
-      .topbar-inner {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 14px 0;
-      }
-
-      .hero-media {
-        height: 220px;
-      }
+      .hero-img-wrap { height: 220px; }
+      .nav-actions .btn-primary { display: none; }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a href="index.html" class="brand">OMID AREFIAN</a>
 
-      <div class="topbar-links">
-        <a href="index.html#projects" class="top-btn">← Back to Projects</a>
-        <a href="#results" class="top-btn">Jump to Results</a>
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="brand">Omid Arefian</a>
+      <div class="nav-actions">
+        <a href="index.html#projects" class="btn-secondary">← All Projects</a>
+        <a href="#results" class="btn-primary">Jump to Results</a>
       </div>
     </div>
-  </header>
+  </nav>
 
   <main class="container">
+
+    <!-- ── HERO ── -->
     <section class="hero">
-      <div class="hero-card">
-        <div class="hero-media">
-          <img
-            src="assets/project_logo.png"
-            alt="Project logo showing the grid-based reinforcement learning environment"
-          />
-          <div class="hero-badge">Reinforcement Learning Project</div>
+      <div class="hero-img-wrap">
+        <img
+          src="assets/project_logo.png"
+          alt="Grid-based reinforcement learning environment showing box positions and motion directions"
+        />
+        <div class="hero-badge">Reinforcement Learning · PPO</div>
+      </div>
+
+      <div class="hero-text">
+        <p class="hero-overline">Custom Environment · PPO · Reward Shaping · Policy Training</p>
+        <h1 class="hero-title">Custom PPO Environment for<br />Multi-Box Coordination</h1>
+        <p class="hero-lead">
+          A custom reinforcement-learning environment in which an agent coordinates two boxes
+          at a time inside a structured workspace. The task combines motion decisions, spatial
+          arrangement, and collision-aware behaviour, while the policy is trained with PPO and
+          evaluated through training curves, architecture comparisons, and reward-surface analysis.
+        </p>
+
+        <div class="tag-row">
+          <span class="tag">PPO</span>
+          <span class="tag">MATLAB</span>
+          <span class="tag">Custom Reward Design</span>
+          <span class="tag">Multi-Object Coordination</span>
+          <span class="tag">Entropy Regularisation</span>
+          <span class="tag">Policy Gradient</span>
+          <span class="tag">Neural Network Architecture</span>
         </div>
 
-        <div class="hero-content">
-          <div class="eyebrow">Custom Environment · PPO · Reward Shaping · Policy Training</div>
-          <h1>Custom PPO Environment for Multi-Box Coordination</h1>
-
-          <p class="lead">
-            This project focuses on a custom reinforcement-learning environment in which an
-            agent coordinates two boxes at a time inside a structured workspace. The task
-            combines motion decisions, spatial arrangement, and collision-aware behavior,
-            while the policy is trained with PPO and evaluated through training curves,
-            architecture comparison, and reward-surface analysis.
-          </p>
-
-          <div class="chip-row">
-            <span class="chip">PPO</span>
-            <span class="chip">MATLAB</span>
-            <span class="chip">Custom Reward Design</span>
-            <span class="chip">Multi-Object Coordination</span>
-            <span class="chip">Autonomous Decision Making</span>
-          </div>
-
-          <div class="anchor-nav">
-            <a class="anchor-link" href="#overview">Overview</a>
-            <a class="anchor-link" href="#environment">Environment</a>
-            <a class="anchor-link" href="#parameters">Parameters</a>
-            <a class="anchor-link" href="#training">Training</a>
-            <a class="anchor-link" href="#results">Results</a>
-            <a class="anchor-link" href="#video">Video</a>
-            <a class="anchor-link" href="#discussion">Discussion</a>
-          </div>
+        <div class="anchor-row">
+          <a class="anchor-btn" href="#overview">Overview</a>
+          <a class="anchor-btn" href="#environment">Environment</a>
+          <a class="anchor-btn" href="#ppo">PPO Algorithm</a>
+          <a class="anchor-btn" href="#parameters">Parameters</a>
+          <a class="anchor-btn" href="#training">Training</a>
+          <a class="anchor-btn" href="#results">Results</a>
+          <a class="anchor-btn" href="#video">Video</a>
+          <a class="anchor-btn" href="#discussion">Discussion</a>
         </div>
       </div>
     </section>
 
-    <section id="overview">
-      <div class="section-title">
-        <h2>Project Overview</h2>
-        <p>
-          The aim of this project is to learn a control policy that manages multiple boxes
-          in a constrained environment while improving organization quality and avoiding
-          undesired configurations.
-        </p>
-      </div>
+    <!-- ── OVERVIEW ── -->
+    <section id="overview" class="section-gap reveal">
+      <p class="label">Overview</p>
+      <h2 class="section-title">Project Overview</h2>
+      <p class="section-sub">
+        The aim is to learn a control policy that manages multiple boxes in a constrained
+        environment while improving organisation quality and avoiding undesired configurations.
+      </p>
 
       <div class="grid-2">
         <div class="card">
           <h3>Objective</h3>
           <p>
-            The agent observes the system configuration and selects actions that improve
-            box alignment and separation while respecting the geometry of the workspace.
-            The reward function encourages structured motion and penalizes poor placement,
-            overlap, and ineffective coordination.
+            The agent observes the system configuration and selects actions that improve box
+            alignment and separation while respecting the geometry of the workspace. The reward
+            function encourages structured motion and penalises poor placement, overlap, and
+            ineffective coordination.
           </p>
+          <p>
+            The goal is to discover a policy \(\pi_\theta(a \mid s)\) that maximises the
+            expected cumulative discounted return:
+          </p>
+          <div class="eq-block">
+            \[
+              J(\theta) = \mathbb{E}_{\pi_\theta}
+                \left[ \sum_{t=0}^{T} \gamma^t\, r_t \right]
+            \]
+          </div>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              Here \(\gamma \in (0,1)\) is the discount factor and \(r_t\) is the reward at
+              time step \(t\). The discount reduces the weight of future rewards, encouraging
+              the policy to favour prompt, efficient coordination.
+            </p>
+          </div>
         </div>
 
         <div class="card">
           <h3>Why PPO</h3>
           <p>
-            PPO was chosen because it offers stable policy updates, works well with
-            continuous control, and allows systematic tuning through entropy, clipping,
-            discounting, and network architecture choices.
+            PPO was chosen because it offers stable policy updates through a clipped surrogate
+            objective, works well with continuous and discrete control, and allows systematic
+            tuning through entropy regularisation, clipping ratio, discounting, and network
+            architecture choices.
           </p>
+          <p>
+            Compared to vanilla policy gradient, PPO prevents destructively large updates by
+            constraining the policy ratio \(r_t(\theta)\):
+          </p>
+          <div class="eq-block">
+            \[
+              r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\mathrm{old}}}(a_t \mid s_t)}
+            \]
+            \[
+              \mathcal{L}^{\mathrm{CLIP}}(\theta)
+                = \mathbb{E}_t\!\left[
+                    \min\!\left(r_t(\theta)\,\hat{A}_t,\;
+                    \mathrm{clip}\!\left(r_t(\theta), 1{-}\varepsilon, 1{+}\varepsilon\right)\hat{A}_t
+                    \right)
+                  \right]
+            \]
+          </div>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              \(\hat{A}_t\) is the advantage estimate at step \(t\) and \(\varepsilon\) is the
+              clipping threshold (typically 0.1–0.2). The \(\min\) prevents the policy from
+              benefiting from excessively large updates in either direction.
+            </p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="environment">
-      <div class="section-title">
-        <h2>Environment and Task Setup</h2>
-        <p>
-          The figure below illustrates the structured grid layout, box positions, and the
-          motion interpretation used in the custom environment.
-        </p>
-      </div>
+    <!-- ── ENVIRONMENT ── -->
+    <section id="environment" class="section-gap reveal">
+      <p class="label">Environment</p>
+      <h2 class="section-title">Environment and Task Setup</h2>
+      <p class="section-sub">
+        The custom environment models a structured workspace where an agent must coordinate
+        the motion of two boxes simultaneously.
+      </p>
 
-      <div class="card media-card">
+      <div class="media-card" style="margin-bottom:22px;">
         <img
           src="assets/project_logo.png"
           alt="Grid-based reinforcement learning environment with box positions and motion directions"
         />
-        <div class="media-content">
+        <div class="media-caption">
           <h3>Custom Workspace Layout</h3>
           <p>
-            The workspace is discretized into cells and used to model coordinated box
-            handling. The environment includes spatial structure, directional motion, and
-            conveyor-like behavior, making the policy learn both local action quality and
-            global organization.
+            The workspace is discretised into cells and used to model coordinated box handling.
+            The environment includes spatial structure, directional motion, and conveyor-like
+            behaviour, requiring the policy to learn both local action quality and global
+            organisation simultaneously.
           </p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>State Space</h3>
+          <p>
+            The state \(\mathbf{s}_t\) encodes the positions and configurations of the two
+            boxes within the workspace grid at each time step. The agent observes this full
+            state and selects a discrete action from the available motion set.
+          </p>
+          <p>
+            The state space dimensionality grows with the grid size, making generalisation
+            across workspace configurations a non-trivial learning challenge.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Reward Design</h3>
+          <p>
+            The reward function \(r(\mathbf{s}_t, a_t)\) combines several terms:
+          </p>
+          <ul>
+            <li><strong>Alignment bonus:</strong> positive reward for improving box separation and ordering.</li>
+            <li><strong>Collision penalty:</strong> negative reward for invalid placements or overlapping configurations.</li>
+            <li><strong>Progress term:</strong> shaped reward that guides the agent toward the target arrangement incrementally.</li>
+          </ul>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              Reward shaping is critical here — a sparse terminal reward alone makes the
+              credit-assignment problem too difficult for PPO to solve reliably within a
+              reasonable number of episodes.
+            </p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="parameters">
-      <div class="section-title">
-        <h2>Parameters</h2>
-        <p>
-          These are the main space and learning parameters used in the experiments.
-        </p>
-      </div>
+    <!-- ── PPO ALGORITHM ── -->
+    <section id="ppo" class="section-gap reveal">
+      <p class="label">Algorithm</p>
+      <h2 class="section-title">PPO Training Algorithm</h2>
+      <p class="section-sub">
+        The full PPO objective augments the clipped surrogate loss with a value-function
+        term and an entropy bonus to encourage exploration.
+      </p>
 
-      <div class="card media-card">
+      <div class="grid-2">
+        <div class="card">
+          <h3>Full Objective</h3>
+          <p>
+            The combined loss that PPO minimises at each update step is:
+          </p>
+          <div class="eq-block">
+            \[
+              \mathcal{L}(\theta)
+                = \mathcal{L}^{\mathrm{CLIP}}(\theta)
+                - c_1\,\mathcal{L}^{\mathrm{VF}}(\theta)
+                + c_2\,\mathcal{H}\!\left[\pi_\theta(\cdot \mid s_t)\right]
+            \]
+          </div>
+          <p style="margin-top:12px;">
+            where \(\mathcal{L}^{\mathrm{VF}}\) is the value-function squared-error loss
+            and \(\mathcal{H}\) is the policy entropy. The coefficients \(c_1\) and \(c_2\)
+            control the relative weight of each term.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Advantage Estimation</h3>
+          <p>
+            The advantage \(\hat{A}_t\) is estimated using Generalised Advantage Estimation
+            (GAE), which balances bias and variance through a \(\lambda\) parameter:
+          </p>
+          <div class="eq-block">
+            \[
+              \delta_t = r_t + \gamma\,V(s_{t+1}) - V(s_t)
+            \]
+            \[
+              \hat{A}_t = \sum_{k=0}^{T-t} (\gamma\lambda)^k\,\delta_{t+k}
+            \]
+          </div>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              With \(\lambda = 0\) this reduces to the one-step TD error; with \(\lambda = 1\)
+              it becomes the full Monte-Carlo return. Values between 0.9 and 0.97 are
+              typically used in practice.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PARAMETERS ── -->
+    <section id="parameters" class="section-gap reveal">
+      <p class="label">Setup</p>
+      <h2 class="section-title">Environment &amp; Learning Parameters</h2>
+      <p class="section-sub">
+        The main space and learning parameters used across all experiments.
+      </p>
+
+      <div class="media-card">
         <img
           src="assets/parameters.png"
           alt="Table of space parameters and learning parameters used in the reinforcement learning project"
         />
-        <div class="media-content">
-          <h3>Environment and Learning Parameters</h3>
+        <div class="media-caption">
+          <h3>Parameter Table</h3>
           <p>
-            The setup defines motion bounds, time discretization, PPO hyperparameters,
-            entropy regularization, and discounting choices. These values determine how
-            aggressively the policy explores and how smoothly the training converges.
+            The setup defines motion bounds, time discretisation, PPO hyperparameters,
+            entropy regularisation coefficient, and discounting choices. These values determine
+            how aggressively the policy explores and how smoothly the training converges.
           </p>
         </div>
       </div>
     </section>
 
-    <section id="training">
-      <div class="section-title">
-        <h2>Training Progress</h2>
-        <p>
-          The next figures show how the episode reward and the moving-average reward evolve
-          during training for different entropy settings.
-        </p>
-      </div>
+    <!-- ── TRAINING ── -->
+    <section id="training" class="section-gap reveal">
+      <p class="label">Training</p>
+      <h2 class="section-title">Training Progress</h2>
+      <p class="section-sub">
+        Episode reward and moving-average reward during training for different entropy
+        coefficient settings.
+      </p>
 
       <div class="grid-2">
-        <div class="card media-card">
+        <div class="media-card">
           <img
             src="assets/entropy_03_avg_reward.png"
-            alt="Training progress and average reward for entropy setting 0.03"
+            alt="Training progress and average reward for entropy coefficient 0.03"
           />
-          <div class="media-content">
-            <h3>Entropy Setting 0.03</h3>
+          <div class="media-caption">
+            <h3>Entropy Coefficient \(c_2 = 0.03\)</h3>
             <p>
               This run shows a clear upward trend in the moving-average reward, indicating
-              that the policy improves over time while still exhibiting the expected
-              variability of reinforcement-learning training.
+              that the policy improves steadily over training. The expected episode-to-episode
+              variability is present but the trend is consistent. Lower entropy encourages
+              the policy to commit to actions earlier in training.
             </p>
           </div>
         </div>
 
-        <div class="card media-card">
+        <div class="media-card">
           <img
             src="assets/entropy_05_avg_reward.png"
-            alt="Training progress and average reward for entropy setting 0.05"
+            alt="Training progress and average reward for entropy coefficient 0.05"
           />
-          <div class="media-content">
-            <h3>Entropy Setting 0.05</h3>
+          <div class="media-caption">
+            <h3>Entropy Coefficient \(c_2 = 0.05\)</h3>
             <p>
-              Increasing entropy encourages stronger exploration. In this case, the policy
-              still converges while maintaining broader exploration during learning.
+              Increasing the entropy coefficient encourages stronger exploration across the
+              action space. The policy still converges but exhibits broader exploration during
+              early training, which can help escape local optima in environments with
+              deceptive reward structure.
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="results">
-      <div class="section-title">
-        <h2>Results and Comparisons</h2>
-        <p>
-          The following figures summarize the network comparison and the reward structure
-          used to guide the learning process.
-        </p>
-      </div>
+    <!-- ── RESULTS ── -->
+    <section id="results" class="section-gap reveal">
+      <p class="label">Results</p>
+      <h2 class="section-title">Results &amp; Comparisons</h2>
+      <p class="section-sub">
+        Neural-network architecture comparison and reward surface analysis.
+      </p>
 
-      <div class="grid-2">
-        <div class="card media-card">
+      <div class="grid-2" style="margin-bottom:22px;">
+        <div class="media-card">
           <img
             src="assets/NN_comparison.png"
             alt="Comparison of moving-average reward for different neural-network architectures"
           />
-          <div class="media-content">
+          <div class="media-caption">
             <h3>Network Architecture Comparison</h3>
             <p>
-              Different network sizes were tested to understand how model capacity affects
-              policy quality. The figure compares moving-average reward trends and reports
-              the final results for each architecture.
+              Different network depths and widths were tested to understand how model capacity
+              affects policy quality. The figure compares moving-average reward trends and
+              reports the final achieved reward for each architecture, revealing the trade-off
+              between expressiveness and sample efficiency.
             </p>
           </div>
         </div>
 
-        <div class="card media-card">
+        <div class="media-card">
           <img
             src="assets/reward_dist.png"
-            alt="Three-dimensional visualization of the reward distribution"
+            alt="Three-dimensional visualisation of the reward distribution over the state space"
           />
-          <div class="media-content">
+          <div class="media-caption">
             <h3>Reward Distribution</h3>
             <p>
-              This plot provides geometric intuition about the reward landscape. It helps
-              explain why some regions are attractive for the policy and why the learned
-              behavior is shaped toward specific configurations.
+              This 3D plot provides geometric intuition about the reward landscape. It helps
+              explain why certain regions of the state space are attractive to the policy and
+              why the learned behaviour converges toward specific spatial configurations.
             </p>
           </div>
         </div>
       </div>
 
-      <div class="card" style="margin-top: 22px;">
+      <div class="card">
         <h3>Interpretation</h3>
         <p>
-          Together, the training curves and architecture comparison show that the agent is
-          not only learning but also responding meaningfully to hyperparameter and network
-          design choices. The reward-surface figure complements these results by revealing
-          the structure that the policy is implicitly optimizing over.
+          The training curves and architecture comparison together show that the agent responds
+          meaningfully to hyperparameter and network design choices. Higher-capacity networks
+          achieve better final performance but require more episodes to converge. The
+          reward-surface figure complements these results by revealing the underlying structure
+          that the policy implicitly optimises over.
         </p>
-
-        <div class="mini-note">
-          You can replace this paragraph later with your exact final conclusion, for
-          example which entropy value and which architecture gave the best trade-off
-          between convergence speed and final reward.
-        </div>
-      </div>
-    </section>
-
-    <section id="video">
-      <div class="section-title">
-        <h2>Video Demonstration</h2>
         <p>
-          Add your experiment video here so visitors can see the learned behavior in action.
+          The entropy coefficient \(c_2\) acts as a direct control on the exploration–exploitation
+          balance: lower values accelerate convergence at the cost of potentially settling in
+          local optima, while higher values maintain diversity but slow convergence.
         </p>
-      </div>
-
-      <div class="card media-card">
-        <video controls preload="metadata" poster="assets/project_logo.png">
-          <source src="assets/exp.mov" type="video/quicktime" />
-          Your browser does not support the video tag.
-        </video>
-
-        <div class="media-content">
-          <h3>Simulation / Experiment Video</h3>
+        <div class="note">
+          <span class="note-icon">ℹ</span>
           <p>
-            This video can be used to show how the trained policy moves the boxes over time
-            and how the learned behavior compares with the intended reward design.
+            Replace this paragraph with your exact final conclusion — for example which entropy
+            value and which architecture gave the best trade-off between convergence speed and
+            final reward across all experiments.
           </p>
         </div>
       </div>
     </section>
 
-    <section id="discussion">
-      <div class="section-title">
-        <h2>Discussion</h2>
-        <p>
-          This section explains the meaning of the results rather than only presenting the figures.
-        </p>
+    <!-- ── VIDEO ── -->
+    <section id="video" class="section-gap reveal">
+      <p class="label">Demonstration</p>
+      <h2 class="section-title">Video Demonstration</h2>
+      <p class="section-sub">
+        The trained policy executing the coordination task in real time.
+      </p>
+
+      <div class="media-card">
+        <video controls preload="metadata" poster="assets/project_logo.png">
+          <source src="assets/exp.mov" type="video/quicktime" />
+          Your browser does not support the video tag.
+        </video>
+        <div class="media-caption">
+          <h3>Policy Execution Video</h3>
+          <p>
+            This video shows how the trained policy moves the boxes over time and how the
+            learned behaviour compares with the intended reward design. The agent's spatial
+            reasoning and collision awareness can be observed directly from the motion sequence.
+          </p>
+        </div>
       </div>
+    </section>
+
+    <!-- ── DISCUSSION ── -->
+    <section id="discussion" class="section-gap reveal">
+      <p class="label">Analysis</p>
+      <h2 class="section-title">Discussion</h2>
+      <p class="section-sub">
+        Interpretation of the results and the significance of the design choices.
+      </p>
 
       <div class="grid-2">
         <div class="card">
           <h3>What the Results Show</h3>
           <p>
-            The policy improves steadily through training and becomes increasingly capable
-            of coordinating box motion according to the reward structure. The experiments
-            also show that entropy tuning and network size affect both exploration and
-            final performance.
+            The policy improves steadily through training and becomes increasingly capable of
+            coordinating box motion according to the reward structure. The experiments also show
+            that entropy tuning and network capacity affect both exploration breadth and final
+            performance — two quantities that must be balanced against each other.
+          </p>
+          <p>
+            The reward-surface analysis confirms that the policy is not simply memorising a
+            fixed sequence of actions but has learned to exploit the geometric structure of
+            the reward landscape.
           </p>
         </div>
 
@@ -643,39 +829,69 @@
           <h3>Why the Project Matters</h3>
           <p>
             This project connects reinforcement learning to a structured engineering task
-            involving spatial reasoning, control decisions, and performance-driven reward
-            design. It highlights how learning-based policies can be engineered, evaluated,
-            and improved through systematic experimentation.
+            involving spatial reasoning, control decisions, and performance-driven reward design.
+            It demonstrates how learning-based policies can be engineered, systematically
+            evaluated, and improved through controlled experimentation with hyperparameters
+            and architecture choices.
+          </p>
+          <p>
+            The framework — custom environment, shaped reward, PPO with entropy tuning, and
+            architecture search — is directly transferable to more complex manipulation and
+            logistics tasks in robotics.
           </p>
         </div>
       </div>
     </section>
 
-    <section id="files">
-      <div class="section-title">
-        <h2>Files and Links</h2>
-        <p>
-          You can keep direct links to the main project material here.
-        </p>
-      </div>
+    <!-- ── FILES ── -->
+    <section id="files" class="section-gap reveal">
+      <p class="label">Downloads</p>
+      <h2 class="section-title">Files &amp; Links</h2>
+      <p class="section-sub">Supporting materials for this project.</p>
 
       <div class="card">
-        <h3>Available Media</h3>
-        <ul>
-          <li><a href="assets/project_logo.png" target="_blank">Project environment figure</a></li>
-          <li><a href="assets/parameters.png" target="_blank">Parameters figure</a></li>
-          <li><a href="assets/entropy_03_avg_reward.png" target="_blank">Entropy 0.03 training figure</a></li>
-          <li><a href="assets/entropy_05_avg_reward.png" target="_blank">Entropy 0.05 training figure</a></li>
-          <li><a href="assets/NN_comparison.png" target="_blank">Network comparison figure</a></li>
-          <li><a href="assets/reward_dist.png" target="_blank">Reward distribution figure</a></li>
-          <li><a href="assets/exp.mov" target="_blank">Experiment video</a></li>
-        </ul>
+        <div class="file-list">
+          <a class="file-chip" href="assets/project_logo.png" target="_blank" rel="noopener">
+            🖼 Environment Figure
+          </a>
+          <a class="file-chip" href="assets/parameters.png" target="_blank" rel="noopener">
+            📊 Parameters Figure
+          </a>
+          <a class="file-chip" href="assets/entropy_03_avg_reward.png" target="_blank" rel="noopener">
+            📈 Entropy 0.03 Training
+          </a>
+          <a class="file-chip" href="assets/entropy_05_avg_reward.png" target="_blank" rel="noopener">
+            📈 Entropy 0.05 Training
+          </a>
+          <a class="file-chip" href="assets/NN_comparison.png" target="_blank" rel="noopener">
+            📊 Network Comparison
+          </a>
+          <a class="file-chip" href="assets/reward_dist.png" target="_blank" rel="noopener">
+            🖼 Reward Distribution
+          </a>
+          <a class="file-chip" href="assets/exp.mov" target="_blank" rel="noopener">
+            🎬 Experiment Video
+          </a>
+        </div>
       </div>
     </section>
 
-    <footer>
-      © 2026 Omid Arefian · Reinforcement Learning Project
-    </footer>
   </main>
+
+  <footer class="site-footer">
+    © 2026 Omid Arefian · Reinforcement Learning · PPO · Custom Environment
+  </footer>
+
+  <script>
+    const items = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); }
+      }),
+      { threshold: 0.07 }
+    );
+    items.forEach(el => io.observe(el));
+  </script>
+
 </body>
 </html>
