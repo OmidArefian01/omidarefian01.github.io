@@ -9,7 +9,7 @@
     content="Design and validation of a Multiplicative Extended Kalman Filter for UAV pose estimation using PX4 SITL, MAVLink, IMU, GPS, barometer and magnetometer fusion."
   />
 
-  <!-- Google Fonts — same as index -->
+  <!-- Google Fonts — identical to index -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -68,15 +68,7 @@
       --font-display:'DM Serif Display', Georgia, serif;
     }
 
-    /* ─────────────────────────────────────────
-       RESET
-    ───────────────────────────────────────── */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; font-size: 16px; }
 
     body {
@@ -92,9 +84,6 @@
     img { display: block; max-width: 100%; }
     a   { text-decoration: none; color: inherit; }
 
-    /* ─────────────────────────────────────────
-       CONTAINER / SPACING
-    ───────────────────────────────────────── */
     .container {
       width: min(var(--max-width), calc(100% - 40px));
       margin: 0 auto;
@@ -102,9 +91,6 @@
 
     .section-gap { padding: 72px 0 0; }
 
-    /* ─────────────────────────────────────────
-       SECTION HEADERS
-    ───────────────────────────────────────── */
     .label {
       display: inline-block;
       font-size: 0.72rem;
@@ -131,9 +117,7 @@
       line-height: 1.6;
     }
 
-    /* ─────────────────────────────────────────
-       NAVBAR
-    ───────────────────────────────────────── */
+    /* ── NAVBAR ── */
     .navbar {
       position: sticky;
       top: 0;
@@ -160,11 +144,7 @@
       color: var(--navy);
     }
 
-    .nav-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .nav-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
     .btn-secondary {
       display: inline-flex;
@@ -180,12 +160,7 @@
       border: 1.5px solid var(--card-border);
       transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
-
-    .btn-secondary:hover {
-      border-color: var(--steel);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
-    }
+    .btn-secondary:hover { border-color: var(--steel); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 
     .btn-primary {
       display: inline-flex;
@@ -200,18 +175,10 @@
       font-weight: 600;
       transition: background 0.2s, transform 0.2s;
     }
+    .btn-primary:hover { background: var(--navy-mid); transform: translateY(-1px); }
 
-    .btn-primary:hover {
-      background: var(--navy-mid);
-      transform: translateY(-1px);
-    }
-
-    /* ─────────────────────────────────────────
-       HERO
-    ───────────────────────────────────────── */
-    .hero {
-      padding: 56px 0 0;
-    }
+    /* ── HERO ── */
+    .hero { padding: 56px 0 0; }
 
     .hero-img-wrap {
       position: relative;
@@ -223,12 +190,7 @@
       box-shadow: var(--shadow-lg);
       border: 1px solid var(--card-border);
     }
-
-    .hero-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .hero-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
 
     .hero-badge {
       position: absolute;
@@ -249,16 +211,13 @@
     }
 
     .hero-dot {
-      width: 7px;
-      height: 7px;
+      width: 7px; height: 7px;
       border-radius: 50%;
       background: var(--green);
       flex-shrink: 0;
     }
 
-    .hero-text {
-      padding: 36px 0 0;
-    }
+    .hero-text { padding: 36px 0 0; }
 
     .hero-overline {
       font-size: 0.78rem;
@@ -286,13 +245,7 @@
       margin-bottom: 24px;
     }
 
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 28px;
-    }
-
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
     .tag {
       font-size: 0.78rem;
       font-weight: 500;
@@ -304,13 +257,10 @@
     }
 
     .anchor-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      display: flex; flex-wrap: wrap; gap: 8px;
       padding-bottom: 56px;
       border-bottom: 1px solid var(--line);
     }
-
     .anchor-btn {
       display: inline-flex;
       align-items: center;
@@ -324,30 +274,13 @@
       border: 1.5px solid var(--card-border);
       transition: border-color 0.2s, color 0.2s;
     }
+    .anchor-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-    .anchor-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    /* ── GRIDS ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
-    /* ─────────────────────────────────────────
-       GRID LAYOUTS
-    ───────────────────────────────────────── */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 22px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    /* ─────────────────────────────────────────
-       CARDS
-    ───────────────────────────────────────── */
+    /* ── CARDS ── */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -369,37 +302,13 @@
       margin-bottom: 12px;
     }
 
-    .card h3 {
-      font-size: 1.02rem;
-      font-weight: 700;
-      color: var(--navy);
-      margin-bottom: 10px;
-      line-height: 1.4;
-    }
+    .card h3 { font-size: 1.02rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; line-height: 1.4; }
+    .card p, .card li { font-size: 0.93rem; color: var(--text-soft); line-height: 1.7; }
+    .card p + p { margin-top: 10px; }
+    .card ul { padding-left: 18px; margin-top: 10px; }
+    .card li + li { margin-top: 8px; }
 
-    .card p,
-    .card li {
-      font-size: 0.93rem;
-      color: var(--text-soft);
-      line-height: 1.7;
-    }
-
-    .card p + p {
-      margin-top: 10px;
-    }
-
-    .card ul {
-      padding-left: 18px;
-      margin-top: 10px;
-    }
-
-    .card li + li {
-      margin-top: 8px;
-    }
-
-    /* ─────────────────────────────────────────
-       EQUATION BLOCK
-    ───────────────────────────────────────── */
+    /* ── EQUATION BLOCK ── */
     .eq-block {
       background: var(--off-white);
       border: 1px solid var(--card-border);
@@ -408,19 +317,10 @@
       padding: 16px 20px;
       margin: 14px 0;
       overflow-x: auto;
-      font-size: 0.97rem;
       line-height: 1.9;
     }
 
-    /* MathJax display override */
-    .eq-block .MathJax,
-    .eq-block mjx-container {
-      font-size: 1.05rem !important;
-    }
-
-    /* ─────────────────────────────────────────
-       INLINE NOTE
-    ───────────────────────────────────────── */
+    /* ── NOTE ── */
     .note {
       display: flex;
       gap: 10px;
@@ -431,23 +331,10 @@
       padding: 13px 16px;
       margin-top: 14px;
     }
+    .note-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+    .note p { font-size: 0.88rem; color: var(--navy-mid); line-height: 1.6; margin: 0 !important; }
 
-    .note-icon {
-      font-size: 0.9rem;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .note p {
-      font-size: 0.88rem;
-      color: var(--navy-mid);
-      line-height: 1.6;
-      margin: 0 !important;
-    }
-
-    /* ─────────────────────────────────────────
-       MEDIA CARD (full-width image + caption)
-    ───────────────────────────────────────── */
+    /* ── MEDIA CARD ── */
     .media-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -455,143 +342,36 @@
       overflow: hidden;
       box-shadow: var(--shadow-sm);
     }
+    .media-card img { width: 100%; height: auto; display: block; border-bottom: 1px solid var(--card-border); }
+    .media-caption { padding: 20px 24px 22px; }
+    .media-caption h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 7px; }
+    .media-caption p { font-size: 0.9rem; color: var(--text-soft); line-height: 1.68; }
 
-    .media-card img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-bottom: 1px solid var(--card-border);
-    }
-
-    .media-caption {
-      padding: 20px 24px 22px;
-    }
-
-    .media-caption h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--navy);
-      margin-bottom: 7px;
-    }
-
-    .media-caption p {
-      font-size: 0.9rem;
-      color: var(--text-soft);
-      line-height: 1.68;
-    }
-
-    /* ─────────────────────────────────────────
-       PARAM GRID (sensor stream list)
-    ───────────────────────────────────────── */
-    .param-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 14px;
-    }
-
+    /* ── PARAM GRID ── */
+    .param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
     .param-item {
       background: var(--off-white);
       border: 1px solid var(--card-border);
       border-radius: var(--radius-md);
       padding: 13px 15px;
     }
+    .param-item strong { display: block; font-size: 0.82rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; font-family: 'Courier New', monospace; }
+    .param-item span { font-size: 0.84rem; color: var(--text-soft); line-height: 1.5; }
 
-    .param-item strong {
-      display: block;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--navy);
-      margin-bottom: 4px;
-      font-family: 'Courier New', monospace;
-      letter-spacing: -0.01em;
-    }
+    /* ── RESULTS TABLE ── */
+    .table-wrap { overflow-x: auto; margin-top: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    thead tr { background: var(--navy); }
+    thead th { color: var(--white); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.04em; padding: 12px 16px; text-align: left; }
+    tbody td { padding: 10px 16px; border-bottom: 1px solid var(--line); color: var(--text-soft); font-size: 0.9rem; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--off-white); }
+    .val-good { color: var(--green); font-weight: 700; }
+    .val-warn { color: #b07030; font-weight: 700; }
+    .badge-good { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 4px; background: var(--green-pale); color: var(--green); }
+    .badge-warn { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 4px; background: #fdf1e0; color: #b07030; }
 
-    .param-item span {
-      font-size: 0.84rem;
-      color: var(--text-soft);
-      line-height: 1.5;
-    }
-
-    /* ─────────────────────────────────────────
-       RESULTS TABLE
-    ───────────────────────────────────────── */
-    .table-wrap {
-      overflow-x: auto;
-      margin-top: 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--card-border);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-    }
-
-    thead tr {
-      background: var(--navy);
-    }
-
-    thead th {
-      color: var(--white);
-      font-weight: 600;
-      font-size: 0.8rem;
-      letter-spacing: 0.04em;
-      padding: 12px 16px;
-      text-align: left;
-    }
-
-    tbody td {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--line);
-      color: var(--text-soft);
-      font-size: 0.9rem;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    tbody tr:hover td {
-      background: var(--off-white);
-    }
-
-    .val-good {
-      color: var(--green);
-      font-weight: 700;
-    }
-
-    .val-warn {
-      color: #b07030;
-      font-weight: 700;
-    }
-
-    .badge-good {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      padding: 2px 8px;
-      border-radius: 4px;
-      background: var(--green-pale);
-      color: var(--green);
-    }
-
-    .badge-warn {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      padding: 2px 8px;
-      border-radius: 4px;
-      background: #fdf1e0;
-      color: #b07030;
-    }
-
-    /* ─────────────────────────────────────────
-       SUNCUBES BANNER
-    ───────────────────────────────────────── */
+    /* ── SUNCUBES BANNER ── */
     .suncubes-banner {
       background: var(--navy);
       border-radius: var(--radius-xl);
@@ -601,78 +381,25 @@
       gap: 24px;
       box-shadow: var(--shadow-lg);
     }
+    .sc-icon { width: 52px; height: 52px; border-radius: var(--radius-md); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.5rem; }
+    .sc-body h3 { font-family: var(--font-display); font-size: 1.25rem; color: var(--white); margin-bottom: 8px; }
+    .sc-body p { font-size: 0.93rem; color: var(--fog); line-height: 1.7; margin: 0; }
+    .sc-body a { color: var(--white); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
-    .sc-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: var(--radius-md);
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 1.5rem;
-    }
+    /* ── FOOTER ── */
+    .site-footer { padding: 36px 0 40px; text-align: center; font-size: 0.84rem; color: var(--text-muted); border-top: 1px solid var(--line); margin-top: 80px; }
 
-    .sc-body h3 {
-      font-family: var(--font-display);
-      font-size: 1.25rem;
-      color: var(--white);
-      margin-bottom: 8px;
-      line-height: 1.3;
-    }
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
 
-    .sc-body p {
-      font-size: 0.93rem;
-      color: var(--fog);
-      line-height: 1.7;
-      margin: 0;
-    }
-
-    .sc-body a {
-      color: var(--white);
-      font-weight: 600;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    /* ─────────────────────────────────────────
-       FOOTER
-    ───────────────────────────────────────── */
-    .site-footer {
-      padding: 36px 0 40px;
-      text-align: center;
-      font-size: 0.84rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--line);
-      margin-top: 80px;
-    }
-
-    /* ─────────────────────────────────────────
-       REVEAL
-    ───────────────────────────────────────── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-
-    .reveal.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ─────────────────────────────────────────
-       RESPONSIVE
-    ───────────────────────────────────────── */
+    /* ── RESPONSIVE ── */
     @media (max-width: 960px) {
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
-      .hero-img-wrap   { height: 300px; }
+      .hero-img-wrap { height: 300px; }
       .suncubes-banner { flex-direction: column; padding: 28px 24px; }
-      .param-grid      { grid-template-columns: 1fr; }
+      .param-grid { grid-template-columns: 1fr; }
     }
-
     @media (max-width: 640px) {
       .hero-img-wrap { height: 220px; }
       .nav-actions .btn-primary { display: none; }
@@ -779,19 +506,19 @@
           </p>
           <div class="eq-block">
             \[
-            \mathbf{x} \in \mathbb{R}^{20}: \quad
-            \mathbf{p} \in \mathbb{R}^3,\;
-            \mathbf{v} \in \mathbb{R}^3,\;
-            \mathbf{q} \in \mathbb{R}^4,\;
-            \mathbf{b}_g \in \mathbb{R}^3,\;
-            \mathbf{b}_a \in \mathbb{R}^3,\;
-            \mathbf{b}_m \in \mathbb{R}^3,\;
-            b_b \in \mathbb{R}
+              \mathbf{x} \in \mathbb{R}^{20}: \quad
+              \mathbf{p} \in \mathbb{R}^3,\;
+              \mathbf{v} \in \mathbb{R}^3,\;
+              \mathbf{q} \in \mathbb{R}^4,\;
+              \mathbf{b}_g \in \mathbb{R}^3,\;
+              \mathbf{b}_a \in \mathbb{R}^3,\;
+              \mathbf{b}_m \in \mathbb{R}^3,\;
+              b_b \in \mathbb{R}
             \]
             \[
-            \delta\mathbf{x} \in \mathbb{R}^{19}: \quad
-            \delta\boldsymbol{\theta} \text{ replaces } \delta\mathbf{q}
-            \quad \text{(3-DOF multiplicative error)}
+              \delta\mathbf{x} \in \mathbb{R}^{19}: \quad
+              \delta\boldsymbol{\theta} \text{ replaces } \delta\mathbf{q}
+              \quad \text{(3-DOF multiplicative error on } \mathbf{SO}(3)\text{)}
             \]
           </div>
         </div>
@@ -813,25 +540,27 @@
           <span class="card-label">High Rate · ≈ 200 Hz</span>
           <h3>IMU Prediction</h3>
           <p>
-            At every IMU sample, bias-corrected gyroscope and accelerometer readings are
-            used to propagate quaternion, velocity, and position:
+            At every IMU sample, bias-corrected gyroscope and accelerometer readings
+            propagate quaternion, velocity, and position:
           </p>
           <div class="eq-block">
             \[
-            \hat{\boldsymbol{\omega}} = \boldsymbol{\omega}_m - \hat{\mathbf{b}}_g, \qquad
-            \hat{\mathbf{f}} = \mathbf{f}_m - \hat{\mathbf{b}}_a
+              \hat{\boldsymbol{\omega}} = \boldsymbol{\omega}_m - \hat{\mathbf{b}}_g, \qquad
+              \hat{\mathbf{f}} = \mathbf{f}_m - \hat{\mathbf{b}}_a
             \]
             \[
-            \hat{\mathbf{a}}_n = R_{nb}(\hat{\mathbf{q}})\,\hat{\mathbf{f}} + \mathbf{g}_n
+              \hat{\mathbf{a}}_n = R_{nb}(\hat{\mathbf{q}})\,\hat{\mathbf{f}} + \mathbf{g}_n
             \]
             \[
-            \hat{\mathbf{p}}^- = \hat{\mathbf{p}}^+ + \hat{\mathbf{v}}^+\Delta t + \tfrac{1}{2}\hat{\mathbf{a}}_n\Delta t^2
+              \hat{\mathbf{p}}^{-} = \hat{\mathbf{p}}^{+} + \hat{\mathbf{v}}^{+}\Delta t
+                + \tfrac{1}{2}\hat{\mathbf{a}}_n \Delta t^2
             \]
             \[
-            \hat{\mathbf{v}}^- = \hat{\mathbf{v}}^+ + \hat{\mathbf{a}}_n\,\Delta t
+              \hat{\mathbf{v}}^{-} = \hat{\mathbf{v}}^{+} + \hat{\mathbf{a}}_n\,\Delta t
             \]
             \[
-            \hat{\mathbf{q}}^- = \hat{\mathbf{q}}^+ \otimes \delta\mathbf{q}(\hat{\boldsymbol{\omega}}\,\Delta t)
+              \hat{\mathbf{q}}^{-} = \hat{\mathbf{q}}^{+}
+                \otimes \delta\mathbf{q}(\hat{\boldsymbol{\omega}}\,\Delta t)
             \]
           </div>
         </div>
@@ -845,19 +574,21 @@
           </p>
           <div class="eq-block">
             \[
-            \mathbf{y}_k = \mathbf{z}_k - \mathbf{h}(\hat{\mathbf{x}}^-_k)
+              \mathbf{y}_k = \mathbf{z}_k - \mathbf{h}(\hat{\mathbf{x}}^{-}_k)
             \]
             \[
-            \mathbf{S}_k = H_k P^-_k H_k^\top + R_k
+              \mathbf{S}_k = H_k P^{-}_k H_k^\top + R_k
             \]
             \[
-            K_k = P^-_k H_k^\top S_k^{-1}
+              K_k = P^{-}_k H_k^\top S_k^{-1}
             \]
             \[
-            \hat{\mathbf{x}}^+_k = \hat{\mathbf{x}}^-_k \boxplus K_k\,\mathbf{y}_k
+              \hat{\mathbf{x}}^{+}_k = \hat{\mathbf{x}}^{-}_k
+                \boxplus K_k\,\mathbf{y}_k
             \]
             \[
-            P^+_k = (I - K_k H_k)\,P^-_k\,(I - K_k H_k)^\top + K_k R_k K_k^\top
+              P^{+}_k = (I - K_k H_k)\,P^{-}_k\,(I - K_k H_k)^\top
+                + K_k R_k K_k^\top
             \]
           </div>
         </div>
@@ -867,18 +598,23 @@
           <h3>Magnetometer Update</h3>
           <p>
             Corrects yaw and magnetometer bias via a normalised horizontal-vector update
-            and a separate z-channel update. A norm gate and heading gate reject distorted
-            measurements before they can corrupt attitude:
+            and a separate z-channel update. Norm and heading gates reject distorted
+            measurements:
           </p>
           <div class="eq-block">
             \[
-            \hat{\mathbf{m}}_b = R_{nb}(\hat{\mathbf{q}})^\top \mathbf{m}_n^{\mathrm{ref}} + \hat{\mathbf{b}}_m
+              \hat{\mathbf{m}}_b
+                = R_{nb}(\hat{\mathbf{q}})^\top \mathbf{m}_n^{\mathrm{ref}}
+                + \hat{\mathbf{b}}_m
             \]
             \[
-            \mathbf{h}_{m,xy}(\mathbf{x}) = \frac{[\hat{m}_{b,x},\; \hat{m}_{b,y}]^\top}{\|\hat{\mathbf{m}}_{b,xy}\|}
+              \mathbf{h}_{m,xy}(\mathbf{x})
+                = \frac{\begin{pmatrix}\hat{m}_{b,x} \\ \hat{m}_{b,y}\end{pmatrix}}
+                       {\sqrt{\hat{m}_{b,x}^2 + \hat{m}_{b,y}^2}}
             \]
             \[
-            h_{m,z}(\mathbf{x}) = \frac{\hat{m}_{b,z}}{\|\mathbf{m}_n^{\mathrm{ref}}\|}
+              h_{m,z}(\mathbf{x})
+                = \frac{\hat{m}_{b,z}}{\lVert\mathbf{m}_n^{\mathrm{ref}}\rVert}
             \]
           </div>
         </div>
@@ -886,21 +622,21 @@
       </div>
 
       <!-- SITL_2 image -->
-      <div style="margin-top: 22px;">
+      <div style="margin-top:22px;">
         <div class="media-card">
           <img
             src="assets/SITL_2.png"
-            alt="Gazebo Sim with x500 drone model, entity tree showing park and coast_waves environment"
+            alt="Gazebo Sim with x500 drone model, entity tree showing park environment"
           />
           <div class="media-caption">
             <h3>PX4 SITL Simulation Environment</h3>
             <p>
-              The validation environment runs the full PX4 flight stack inside Gazebo Sim. The
-              x500 quadrotor is loaded into the Baylands park outdoor scene. All MAVLink streams
-              are exposed over UDP: the Python MEKF reads raw sensor data via
+              The validation environment runs the full PX4 flight stack inside Gazebo Sim.
+              The x500 quadrotor is loaded into the Baylands park outdoor scene. All MAVLink
+              streams are exposed over UDP: the Python MEKF reads raw sensor data via
               <code style="font-family:'Courier New',monospace;font-size:0.88em;color:var(--navy);">pymavlink</code>
-              while QGroundControl connects simultaneously for flight monitoring. PX4's EKF2
-              estimates are logged only for comparison.
+              while QGroundControl connects simultaneously for flight monitoring.
+              PX4's EKF2 estimates are logged only for comparison.
             </p>
           </div>
         </div>
@@ -928,7 +664,7 @@
           </p>
           <div class="eq-block">
             \[
-            \mathbf{u}_n = R_{nb}(\mathbf{q})\,\mathbf{u}_b
+              \mathbf{u}_n = R_{nb}(\mathbf{q})\,\mathbf{u}_b
             \]
           </div>
           <div class="note">
@@ -983,23 +719,32 @@
           </p>
           <div class="eq-block">
             \[
-            \hat{\mathbf{a}}_{n,k} = R_{nb}(\hat{\mathbf{q}}_k)\bigl(\mathbf{f}_{m,k} - \hat{\mathbf{b}}_{a,k}\bigr) + \mathbf{g}_n
+              \hat{\mathbf{a}}_{n,k}
+                = R_{nb}(\hat{\mathbf{q}}_k)
+                  \bigl(\mathbf{f}_{m,k} - \hat{\mathbf{b}}_{a,k}\bigr)
+                  + \mathbf{g}_n
             \]
             \[
-            \hat{\mathbf{p}}^-_{k+1} = \hat{\mathbf{p}}^+_k + \hat{\mathbf{v}}^+_k\,\Delta t + \tfrac{1}{2}\hat{\mathbf{a}}_{n,k}\,\Delta t^2
+              \hat{\mathbf{p}}^{-}_{k+1}
+                = \hat{\mathbf{p}}^{+}_k
+                + \hat{\mathbf{v}}^{+}_k\,\Delta t
+                + \tfrac{1}{2}\hat{\mathbf{a}}_{n,k}\,\Delta t^2
             \]
             \[
-            \hat{\mathbf{v}}^-_{k+1} = \hat{\mathbf{v}}^+_k + \hat{\mathbf{a}}_{n,k}\,\Delta t
+              \hat{\mathbf{v}}^{-}_{k+1}
+                = \hat{\mathbf{v}}^{+}_k + \hat{\mathbf{a}}_{n,k}\,\Delta t
             \]
             \[
-            \hat{\mathbf{q}}^-_{k+1} = \hat{\mathbf{q}}^+_k \otimes \delta\mathbf{q}(\hat{\boldsymbol{\omega}}_k\,\Delta t)
+              \hat{\mathbf{q}}^{-}_{k+1}
+                = \hat{\mathbf{q}}^{+}_k
+                  \otimes \delta\mathbf{q}(\hat{\boldsymbol{\omega}}_k\,\Delta t)
             \]
           </div>
           <div class="note">
             <span class="note-icon">ℹ</span>
             <p>
-              Biases are modelled as random walks with zero nominal dynamics. Only their
-              covariance entries grow with the corresponding process noise during prediction.
+              Biases are modelled as random walks with zero nominal dynamics.
+              Only their covariance entries grow with the corresponding process noise during prediction.
             </p>
           </div>
         </div>
@@ -1014,13 +759,13 @@
           </p>
           <div class="eq-block">
             \[
-            P^-_{k+1} = F_k\,P^+_k\,F_k^\top + Q_k
+              P^{-}_{k+1} = F_k\,P^{+}_k\,F_k^\top + Q_k
             \]
           </div>
           <p style="margin-top:14px;">
             \(Q_k\) is the discrete process-noise covariance, tuned to reflect IMU noise
             spectral density and bias instability. The error-state formulation keeps the
-            quaternion unit-norm constraint \(\|\mathbf{q}\| = 1\) satisfied at every step
+            quaternion unit-norm constraint \(\lVert\mathbf{q}\rVert = 1\) satisfied at every step
             without explicit re-normalisation in the covariance equations.
           </p>
         </div>
@@ -1043,13 +788,13 @@
           <p>GPS position directly observes the position state with a linear measurement model:</p>
           <div class="eq-block">
             \[
-            \mathbf{z}_{gps,p} = \bigl[p_N^{gps},\; p_E^{gps},\; p_D^{gps}\bigr]^\top
+              \mathbf{z}_{gps,p}
+                = \begin{pmatrix} p_N^{gps} \\ p_E^{gps} \\ p_D^{gps} \end{pmatrix}
             \]
             \[
-            \mathbf{h}_{gps,p}(\mathbf{x}) = \bigl[p_N,\; p_E,\; p_D\bigr]^\top
-            \]
-            \[
-            \mathbf{y}_{gps,p} = \mathbf{z}_{gps,p} - \hat{\mathbf{p}}
+              \mathbf{h}_{gps,p}(\mathbf{x})
+                = \begin{pmatrix} p_N \\ p_E \\ p_D \end{pmatrix}, \qquad
+              \mathbf{y}_{gps,p} = \mathbf{z}_{gps,p} - \hat{\mathbf{p}}
             \]
           </div>
         </div>
@@ -1063,11 +808,12 @@
           </p>
           <div class="eq-block">
             \[
-            v_N^{gps} = s^{gps}\cos\chi^{gps}, \qquad
-            v_E^{gps} = s^{gps}\sin\chi^{gps}
+              v_N^{gps} = s^{gps}\cos\chi^{gps}, \qquad
+              v_E^{gps} = s^{gps}\sin\chi^{gps}
             \]
             \[
-            \mathbf{h}_{gps,v}(\mathbf{x}) = \bigl[v_N,\; v_E\bigr]^\top
+              \mathbf{h}_{gps,v}(\mathbf{x})
+                = \begin{pmatrix} v_N \\ v_E \end{pmatrix}
             \]
           </div>
         </div>
@@ -1081,13 +827,11 @@
           </p>
           <div class="eq-block">
             \[
-            z_b = p_D + b_b + n_b
+              z_b = p_D + b_b + n_b, \qquad
+              h_b(\mathbf{x}) = p_D + b_b
             \]
             \[
-            h_b(\mathbf{x}) = p_D + b_b
-            \]
-            \[
-            y_b = z_b - (\hat{p}_D + \hat{b}_b)
+              y_b = z_b - (\hat{p}_D + \hat{b}_b)
             \]
           </div>
         </div>
@@ -1100,13 +844,18 @@
           </p>
           <div class="eq-block">
             \[
-            \hat{\mathbf{m}}_b = R_{nb}(\hat{\mathbf{q}})^\top \mathbf{m}_n^{\mathrm{ref}} + \hat{\mathbf{b}}_m
+              \hat{\mathbf{m}}_b
+                = R_{nb}(\hat{\mathbf{q}})^\top \mathbf{m}_n^{\mathrm{ref}}
+                + \hat{\mathbf{b}}_m
             \]
             \[
-            \mathbf{h}_{m,xy}(\mathbf{x}) = \frac{\bigl[\hat{m}_{b,x},\;\hat{m}_{b,y}\bigr]^\top}{\left\|\hat{\mathbf{m}}_{b,xy}\right\|}
+              \mathbf{h}_{m,xy}(\mathbf{x})
+                = \frac{1}{\sqrt{\hat{m}_{b,x}^2+\hat{m}_{b,y}^2}}
+                  \begin{pmatrix}\hat{m}_{b,x}\\\hat{m}_{b,y}\end{pmatrix}
             \]
             \[
-            h_{m,z}(\mathbf{x}) = \frac{\hat{m}_{b,z}}{\left\|\mathbf{m}_n^{\mathrm{ref}}\right\|}
+              h_{m,z}(\mathbf{x})
+                = \frac{\hat{m}_{b,z}}{\lVert\mathbf{m}_n^{\mathrm{ref}}\rVert}
             \]
           </div>
           <div class="note">
@@ -1156,7 +905,7 @@
           alt="vx, vy, vz comparison between the MEKF and PX4/SITL reference"
         />
         <div class="media-caption">
-          <h3>Velocity Comparison — \(v_x,\, v_y,\, v_z\)</h3>
+          <h3>Velocity Comparison — \(v_x,\; v_y,\; v_z\)</h3>
           <p>
             Horizontal velocity estimates match the PX4 reference almost exactly across the full
             flight envelope, including peak velocities above 4 m/s. Vertical velocity \(v_z\)
@@ -1174,13 +923,13 @@
           alt="x, y, z position comparison between the MEKF and PX4/SITL reference"
         />
         <div class="media-caption">
-          <h3>Position Comparison — \(x,\, y,\, z\)</h3>
+          <h3>Position Comparison — \(x,\; y,\; z\)</h3>
           <p>
             Position in all three axes remains tightly coupled to the PX4 reference throughout
             the flight, including during the largest displacements of roughly 40 m in the
-            \(x\)-direction and −15 m in altitude. The close agreement demonstrates that the
-            GPS position and velocity updates, combined with barometer altitude correction,
-            effectively prevent inertial drift over the full 80-second flight duration.
+            \(x\)-direction and \(-15\) m in altitude. The close agreement demonstrates that
+            GPS and barometer updates effectively prevent inertial drift over the full
+            80-second flight duration.
           </p>
         </div>
       </div>
@@ -1204,60 +953,15 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Position \(x\)</td>
-                <td class="val-good">0.1404</td>
-                <td>m</td>
-                <td><span class="badge-good">Excellent</span> — sub-15 cm</td>
-              </tr>
-              <tr>
-                <td>Position \(y\)</td>
-                <td class="val-good">0.2265</td>
-                <td>m</td>
-                <td><span class="badge-good">Good</span> — sub-23 cm</td>
-              </tr>
-              <tr>
-                <td>Position \(z\)</td>
-                <td class="val-good">0.1895</td>
-                <td>m</td>
-                <td><span class="badge-good">Good</span> — sub-19 cm</td>
-              </tr>
-              <tr>
-                <td>Velocity \(v_x\)</td>
-                <td class="val-good">0.0702</td>
-                <td>m/s</td>
-                <td><span class="badge-good">Excellent</span></td>
-              </tr>
-              <tr>
-                <td>Velocity \(v_y\)</td>
-                <td class="val-good">0.1000</td>
-                <td>m/s</td>
-                <td><span class="badge-good">Excellent</span></td>
-              </tr>
-              <tr>
-                <td>Velocity \(v_z\)</td>
-                <td class="val-good">0.1015</td>
-                <td>m/s</td>
-                <td><span class="badge-good">Good</span></td>
-              </tr>
-              <tr>
-                <td>Roll</td>
-                <td class="val-good">0.3825</td>
-                <td>deg</td>
-                <td><span class="badge-good">Excellent</span></td>
-              </tr>
-              <tr>
-                <td>Pitch</td>
-                <td class="val-good">0.2445</td>
-                <td>deg</td>
-                <td><span class="badge-good">Excellent</span></td>
-              </tr>
-              <tr>
-                <td>Yaw</td>
-                <td class="val-warn">6.7576</td>
-                <td>deg</td>
-                <td><span class="badge-warn">Mag-limited</span></td>
-              </tr>
+              <tr><td>Position \(x\)</td><td class="val-good">0.1404</td><td>m</td><td><span class="badge-good">Excellent</span> — sub-15 cm</td></tr>
+              <tr><td>Position \(y\)</td><td class="val-good">0.2265</td><td>m</td><td><span class="badge-good">Good</span> — sub-23 cm</td></tr>
+              <tr><td>Position \(z\)</td><td class="val-good">0.1895</td><td>m</td><td><span class="badge-good">Good</span> — sub-19 cm</td></tr>
+              <tr><td>Velocity \(v_x\)</td><td class="val-good">0.0702</td><td>m/s</td><td><span class="badge-good">Excellent</span></td></tr>
+              <tr><td>Velocity \(v_y\)</td><td class="val-good">0.1000</td><td>m/s</td><td><span class="badge-good">Excellent</span></td></tr>
+              <tr><td>Velocity \(v_z\)</td><td class="val-good">0.1015</td><td>m/s</td><td><span class="badge-good">Good</span></td></tr>
+              <tr><td>Roll</td><td class="val-good">0.3825</td><td>deg</td><td><span class="badge-good">Excellent</span></td></tr>
+              <tr><td>Pitch</td><td class="val-good">0.2445</td><td>deg</td><td><span class="badge-good">Excellent</span></td></tr>
+              <tr><td>Yaw</td><td class="val-warn">6.7576</td><td>deg</td><td><span class="badge-warn">Mag-limited</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -1265,10 +969,8 @@
           <span class="note-icon">ℹ</span>
           <p>
             The yaw RMSE of 6.76° reflects the inherent limitation of single-magnetometer
-            heading estimation. The filter tracks yaw trends correctly but accumulates a
-            slowly-varying offset during aggressive manoeuvres. A dual-antenna GPS heading
-            source would eliminate this dominant error term and is planned for the
-            real-hardware extension.
+            heading estimation. A dual-antenna GPS heading source would eliminate this dominant
+            error term and is planned for the real-hardware extension.
           </p>
         </div>
       </div>
@@ -1302,23 +1004,10 @@
         <div class="card">
           <h3>Key Challenges: SITL → Real Hardware</h3>
           <ul>
-            <li>
-              <strong>IMU noise:</strong> Real MEMS IMUs exhibit vibration aliasing,
-              temperature-dependent bias drift, and correlated noise requiring characterisation
-              from static and hover logs.
-            </li>
-            <li>
-              <strong>GPS quality:</strong> Multipath, HDOP variation, and latency jitter make
-              position and velocity innovation gating more critical.
-            </li>
-            <li>
-              <strong>Magnetometer disturbances:</strong> Motor currents and ESC switching create
-              magnetic interference far stronger than in simulation.
-            </li>
-            <li>
-              <strong>Timing:</strong> Real MAVLink streams arrive with variable latency;
-              explicit timestamp alignment between sensors is required.
-            </li>
+            <li><strong>IMU noise:</strong> Real MEMS IMUs exhibit vibration aliasing, temperature-dependent bias drift, and correlated noise requiring characterisation from static and hover logs.</li>
+            <li><strong>GPS quality:</strong> Multipath, HDOP variation, and latency jitter make position and velocity innovation gating more critical.</li>
+            <li><strong>Magnetometer disturbances:</strong> Motor currents and ESC switching create magnetic interference far stronger than in simulation.</li>
+            <li><strong>Timing:</strong> Real MAVLink streams arrive with variable latency; explicit timestamp alignment between sensors is required.</li>
           </ul>
         </div>
 
@@ -1329,14 +1018,8 @@
             <li>Adaptive measurement gating based on GPS fix quality and HDOP.</li>
             <li>Vibration pre-filtering on the accelerometer channel, tuned to rotor harmonics.</li>
             <li>Soft magnetic calibration to reduce motor-current-induced heading errors.</li>
-            <li>
-              Dual-antenna GPS heading source to replace magnetometer-only yaw correction and
-              eliminate the dominant RMSE term.
-            </li>
-            <li>
-              Federated Kalman Filter architecture to fuse laser-based range measurements with
-              the MEKF pose-estimation pipeline.
-            </li>
+            <li>Dual-antenna GPS heading source to replace magnetometer-only yaw correction and eliminate the dominant RMSE term.</li>
+            <li>Federated Kalman Filter architecture to fuse laser-based range measurements with the MEKF pose-estimation pipeline.</li>
           </ul>
           <div class="note">
             <span class="note-icon">ℹ</span>
