@@ -750,14 +750,24 @@
           </div>
         </article>
 
-        <!-- Project 4: System ID (no dedicated page) -->
-        <article class="card">
-          <span class="project-tag">System Identification</span>
-          <h3>Steel Plate & Wheel Experimental Modeling</h3>
-          <p>
-            Performed FRF-based analysis, modal parameter estimation, coherence evaluation, and
-            model reduction using MATLAB and experimental measurements.
-          </p>
+        <!-- Project 4: MEKF / UAV State Estimation -->
+        <article class="card project-card">
+          <div class="project-media">
+            <img src="assets/SITL_1.png" alt="PX4 SITL drone connected to QGroundControl for MEKF validation" />
+            <div class="project-overlay">
+              <a class="read-more-btn" href="project-mekf.html">Read More</a>
+            </div>
+          </div>
+          <div class="project-content">
+            <span class="project-tag">Python · PX4 SITL · MAVLink · Kalman Filter</span>
+            <h3>Design of a Multiplicative EKF for UAV State Estimation</h3>
+            <p>
+              Designed and validated an independent MEKF estimating UAV position, velocity,
+              attitude, and sensor biases from raw IMU, GPS, barometer, and magnetometer data.
+              Validated in PX4 SITL; currently being extended for a real drone at SunCubes.
+            </p>
+            <a class="project-link-inline" href="project-mekf.html">Open project page ↗</a>
+          </div>
         </article>
 
       </div>
