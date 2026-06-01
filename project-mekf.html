@@ -3,81 +3,151 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MEKF for UAV State Estimation | Omid Arefian</title>
+  <title>Multiplicative EKF for UAV State Estimation | Omid Arefian</title>
   <meta
     name="description"
     content="Design and validation of a Multiplicative Extended Kalman Filter for UAV pose estimation using PX4 SITL, MAVLink, IMU, GPS, barometer and magnetometer fusion."
   />
 
+  <!-- Google Fonts — same as index -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'none'
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+      startup: { typeset: true }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-cml.js" id="MathJax-script" async></script>
+
   <style>
+    /* ─────────────────────────────────────────
+       TOKENS — identical to index.html
+    ───────────────────────────────────────── */
     :root {
-      --bg: #f6f8fc;
-      --surface: rgba(255, 255, 255, 0.86);
-      --surface-2: #f8fbff;
-      --text: #1d2a3b;
-      --muted: #66748a;
-      --line: rgba(35, 54, 90, 0.10);
-      --accent: #5f7ca8;
-      --accent-dark: #48678f;
-      --shadow: 0 20px 60px rgba(41, 72, 126, 0.10);
-      --shadow-soft: 0 14px 34px rgba(41, 72, 126, 0.08);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --max-width: 1120px;
+      --navy:        #0d1b2a;
+      --navy-mid:    #1a2e42;
+      --navy-light:  #243a52;
+      --slate:       #3d5a73;
+      --steel:       #6b8fa8;
+      --fog:         #c8d8e4;
+      --ice:         #e8f0f6;
+      --white:       #ffffff;
+      --off-white:   #f7f9fb;
+      --text:        #0d1b2a;
+      --text-soft:   #445668;
+      --text-muted:  #6b8fa8;
+      --accent:      #1d6fa4;
+      --accent-light:#2587c5;
+      --accent-pale: #ddeef8;
+      --green:       #1a7a5e;
+      --green-pale:  #d4ede7;
+      --line:        #dde6ee;
+      --card-bg:     #ffffff;
+      --card-border: #e2ebf2;
+      --shadow-sm:   0 1px 4px rgba(13,27,42,0.06), 0 4px 12px rgba(13,27,42,0.06);
+      --shadow-md:   0 2px 8px rgba(13,27,42,0.07), 0 8px 24px rgba(13,27,42,0.09);
+      --shadow-lg:   0 4px 16px rgba(13,27,42,0.08), 0 16px 48px rgba(13,27,42,0.12);
+      --radius-sm:   6px;
+      --radius-md:   10px;
+      --radius-lg:   16px;
+      --radius-xl:   22px;
+      --max-width:   1160px;
+      --font-body:   'DM Sans', system-ui, -apple-system, sans-serif;
+      --font-display:'DM Serif Display', Georgia, serif;
     }
 
-    * {
+    /* ─────────────────────────────────────────
+       RESET
+    ───────────────────────────────────────── */
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; font-size: 16px; }
 
     body {
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(95, 124, 168, 0.12), transparent 26%),
-        radial-gradient(circle at top right, rgba(95, 124, 168, 0.08), transparent 22%),
-        linear-gradient(180deg, #f9fbff 0%, #f3f7fd 55%, #edf2fb 100%);
+      font-family: var(--font-body);
+      font-weight: 400;
+      background-color: var(--off-white);
       color: var(--text);
-      line-height: 1.75;
+      line-height: 1.65;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    img,
-    video {
-      display: block;
-      max-width: 100%;
-    }
+    img { display: block; max-width: 100%; }
+    a   { text-decoration: none; color: inherit; }
 
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-
+    /* ─────────────────────────────────────────
+       CONTAINER / SPACING
+    ───────────────────────────────────────── */
     .container {
-      width: min(var(--max-width), calc(100% - 32px));
+      width: min(var(--max-width), calc(100% - 40px));
       margin: 0 auto;
     }
 
-    /* ── TOPBAR ── */
-    .topbar {
+    .section-gap { padding: 72px 0 0; }
+
+    /* ─────────────────────────────────────────
+       SECTION HEADERS
+    ───────────────────────────────────────── */
+    .label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.7rem, 3vw, 2.4rem);
+      line-height: 1.15;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .section-sub {
+      font-size: 0.97rem;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    /* ─────────────────────────────────────────
+       NAVBAR
+    ───────────────────────────────────────── */
+    .navbar {
       position: sticky;
       top: 0;
-      z-index: 1000;
-      backdrop-filter: blur(14px);
-      background: rgba(246, 248, 252, 0.78);
-      border-bottom: 1px solid rgba(35, 54, 90, 0.08);
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
     }
 
-    .topbar-inner {
-      width: min(var(--max-width), calc(100% - 32px));
+    .nav-inner {
+      width: min(var(--max-width), calc(100% - 40px));
       margin: 0 auto;
-      min-height: 72px;
+      height: 68px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -85,60 +155,76 @@
     }
 
     .brand {
-      font-size: 0.96rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      color: var(--navy);
     }
 
-    .topbar-links {
+    .nav-actions {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
-    .top-btn {
+    .btn-secondary {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 0 16px;
-      border-radius: 14px;
-      background: #eef3fb;
-      border: 1px solid rgba(95, 124, 168, 0.16);
-      color: var(--text);
-      font-weight: 700;
-      box-shadow: 0 8px 18px rgba(95, 124, 168, 0.08);
-      transition: 0.25s ease;
+      gap: 6px;
+      height: 40px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      background: var(--white);
+      color: var(--navy);
+      font-size: 0.86rem;
+      font-weight: 600;
+      border: 1.5px solid var(--card-border);
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
 
-    .top-btn:hover {
-      transform: translateY(-2px);
-      background: #e8eef9;
+    .btn-secondary:hover {
+      border-color: var(--steel);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
     }
 
-    /* ── HERO ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      background: var(--navy);
+      color: var(--white);
+      font-size: 0.86rem;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--navy-mid);
+      transform: translateY(-1px);
+    }
+
+    /* ─────────────────────────────────────────
+       HERO
+    ───────────────────────────────────────── */
     .hero {
-      padding: 56px 0 26px;
+      padding: 56px 0 0;
     }
 
-    .hero-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .hero-media {
+    .hero-img-wrap {
       position: relative;
-      height: 420px;
+      width: 100%;
+      height: 440px;
+      border-radius: var(--radius-xl);
       overflow: hidden;
-      background: #dfe7f5;
-      border-bottom: 1px solid rgba(35, 54, 90, 0.08);
+      background: var(--ice);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--card-border);
     }
 
-    .hero-media img {
+    .hero-img-wrap img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -150,82 +236,103 @@
       top: 20px;
       display: inline-flex;
       align-items: center;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(255, 255, 255, 0.78);
-      color: var(--text);
-      font-size: 0.88rem;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(255,255,255,0.7);
+      color: var(--navy);
+      font-size: 0.82rem;
       font-weight: 700;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.10);
+      box-shadow: var(--shadow-sm);
+      letter-spacing: 0.01em;
     }
 
-    .hero-content {
-      padding: 34px;
+    .hero-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
     }
 
-    .eyebrow {
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: #eef3fb;
-      border: 1px solid rgba(95, 124, 168, 0.14);
-      color: var(--accent-dark);
-      font-size: 0.88rem;
-      font-weight: 700;
-      margin-bottom: 16px;
+    .hero-text {
+      padding: 36px 0 0;
     }
 
-    h1 {
-      font-size: clamp(2.2rem, 4.7vw, 4rem);
-      line-height: 1.05;
-      letter-spacing: -0.05em;
-      margin-bottom: 16px;
+    .hero-overline {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
     }
 
-    .lead {
-      color: var(--muted);
-      font-size: 1.08rem;
-      max-width: 880px;
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4.5vw, 3.4rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: var(--navy);
+      margin-bottom: 18px;
     }
 
-    .chip-row {
+    .hero-lead {
+      font-size: 1.02rem;
+      color: var(--text-soft);
+      line-height: 1.72;
+      max-width: 820px;
+      margin-bottom: 24px;
+    }
+
+    .tag-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 22px;
+      gap: 8px;
+      margin-bottom: 28px;
     }
 
-    .chip {
-      padding: 9px 13px;
-      border-radius: 999px;
-      background: #f3f6fc;
-      border: 1px solid rgba(95, 124, 168, 0.12);
-      color: var(--text);
-      font-size: 0.9rem;
-      font-weight: 600;
+    .tag {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--navy-mid);
+      background: var(--ice);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      padding: 5px 11px;
     }
 
-    /* ── LAYOUT ── */
-    section {
-      padding: 18px 0;
+    .anchor-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-bottom: 56px;
+      border-bottom: 1px solid var(--line);
     }
 
-    .section-title {
-      margin-bottom: 16px;
+    .anchor-btn {
+      display: inline-flex;
+      align-items: center;
+      height: 36px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--text-soft);
+      font-size: 0.83rem;
+      font-weight: 500;
+      border: 1.5px solid var(--card-border);
+      transition: border-color 0.2s, color 0.2s;
     }
 
-    .section-title h2 {
-      font-size: clamp(1.55rem, 3vw, 2.2rem);
-      letter-spacing: -0.04em;
-      margin-bottom: 8px;
+    .anchor-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
-    .section-title p {
-      color: var(--muted);
-      max-width: 820px;
-    }
-
+    /* ─────────────────────────────────────────
+       GRID LAYOUTS
+    ───────────────────────────────────────── */
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -235,173 +342,211 @@
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
+      gap: 20px;
     }
 
-    /* ── CARDS ── */
+    /* ─────────────────────────────────────────
+       CARDS
+    ───────────────────────────────────────── */
     .card {
-      background: var(--surface);
-      border: 1px solid var(--line);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-soft);
-      padding: 26px;
+      padding: 26px 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-pale);
+      border-radius: var(--radius-sm);
+      padding: 3px 8px;
+      display: inline-block;
+      margin-bottom: 12px;
     }
 
     .card h3 {
-      font-size: 1.12rem;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: var(--navy);
       margin-bottom: 10px;
+      line-height: 1.4;
     }
 
     .card p,
     .card li {
-      color: var(--muted);
-      font-size: 0.98rem;
+      font-size: 0.93rem;
+      color: var(--text-soft);
+      line-height: 1.7;
+    }
+
+    .card p + p {
+      margin-top: 10px;
     }
 
     .card ul {
       padding-left: 18px;
-      margin-top: 12px;
+      margin-top: 10px;
     }
 
     .card li + li {
       margin-top: 8px;
     }
 
-    /* ── EQUATION BOX ── */
-    .equation-box {
-      background: var(--surface-2);
-      border: 1px solid rgba(95, 124, 168, 0.12);
-      border-radius: 18px;
-      padding: 18px;
+    /* ─────────────────────────────────────────
+       EQUATION BLOCK
+    ───────────────────────────────────────── */
+    .eq-block {
+      background: var(--off-white);
+      border: 1px solid var(--card-border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin: 14px 0;
       overflow-x: auto;
-      color: #304156;
-      font-size: 0.94rem;
-      line-height: 1.7;
-      white-space: pre-wrap;
-      word-break: break-word;
+      font-size: 0.97rem;
+      line-height: 1.9;
+    }
+
+    /* MathJax display override */
+    .eq-block .MathJax,
+    .eq-block mjx-container {
+      font-size: 1.05rem !important;
+    }
+
+    /* ─────────────────────────────────────────
+       INLINE NOTE
+    ───────────────────────────────────────── */
+    .note {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: var(--accent-pale);
+      border: 1px solid rgba(29,111,164,0.18);
+      border-radius: var(--radius-md);
+      padding: 13px 16px;
       margin-top: 14px;
     }
 
-    /* ── MINI NOTE ── */
-    .mini-note {
-      margin-top: 14px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: #f3f7fd;
-      border: 1px solid rgba(95, 124, 168, 0.12);
-      color: var(--muted);
+    .note-icon {
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 1px;
     }
 
-    /* ── METHOD CARD ── */
-    .method-card {
-      position: relative;
-      overflow: hidden;
+    .note p {
+      font-size: 0.88rem;
+      color: var(--navy-mid);
+      line-height: 1.6;
+      margin: 0 !important;
     }
 
-    .method-label {
-      display: inline-block;
-      margin-bottom: 10px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: #eef3fb;
-      border: 1px solid rgba(95, 124, 168, 0.14);
-      color: var(--accent-dark);
-      font-size: 0.82rem;
-      font-weight: 700;
-    }
-
-    /* ── MEDIA CARD ── */
+    /* ─────────────────────────────────────────
+       MEDIA CARD (full-width image + caption)
+    ───────────────────────────────────────── */
     .media-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      padding: 0;
+      box-shadow: var(--shadow-sm);
     }
 
     .media-card img {
       width: 100%;
       height: auto;
-      background: #dde6f6;
+      display: block;
+      border-bottom: 1px solid var(--card-border);
     }
 
-    .media-content {
-      padding: 22px 24px 24px;
+    .media-caption {
+      padding: 20px 24px 22px;
     }
 
-    /* ── PARAM GRID ── */
+    .media-caption h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 7px;
+    }
+
+    .media-caption p {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      line-height: 1.68;
+    }
+
+    /* ─────────────────────────────────────────
+       PARAM GRID (sensor stream list)
+    ───────────────────────────────────────── */
     .param-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
       margin-top: 14px;
     }
 
     .param-item {
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: #f7faff;
-      border: 1px solid rgba(95, 124, 168, 0.12);
+      background: var(--off-white);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 13px 15px;
     }
 
     .param-item strong {
       display: block;
-      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--navy);
       margin-bottom: 4px;
-      font-size: 0.95rem;
+      font-family: 'Courier New', monospace;
+      letter-spacing: -0.01em;
     }
 
     .param-item span {
-      color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.84rem;
+      color: var(--text-soft);
+      line-height: 1.5;
     }
 
-    /* ── ANCHOR NAV ── */
-    .anchor-nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .anchor-link {
-      padding: 9px 13px;
-      border-radius: 999px;
-      background: #eef3fb;
-      border: 1px solid rgba(95, 124, 168, 0.14);
-      color: var(--accent-dark);
-      font-size: 0.9rem;
-      font-weight: 700;
-      transition: 0.22s ease;
-    }
-
-    .anchor-link:hover {
-      transform: translateY(-2px);
-      background: #e9f0fb;
-    }
-
-    /* ── RESULTS TABLE ── */
-    .results-table-wrap {
+    /* ─────────────────────────────────────────
+       RESULTS TABLE
+    ───────────────────────────────────────── */
+    .table-wrap {
       overflow-x: auto;
-      margin-top: 14px;
+      margin-top: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--card-border);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
+    }
+
+    thead tr {
+      background: var(--navy);
     }
 
     thead th {
-      background: #eef3fb;
-      color: var(--accent-dark);
-      font-weight: 700;
-      padding: 10px 14px;
+      color: var(--white);
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      padding: 12px 16px;
       text-align: left;
-      border-bottom: 2px solid rgba(95, 124, 168, 0.18);
     }
 
     tbody td {
-      padding: 9px 14px;
-      border-bottom: 1px solid rgba(35, 54, 90, 0.07);
-      color: var(--muted);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+      color: var(--text-soft);
+      font-size: 0.9rem;
     }
 
     tbody tr:last-child td {
@@ -409,38 +554,60 @@
     }
 
     tbody tr:hover td {
-      background: #f7faff;
+      background: var(--off-white);
     }
 
-    /* highlight good rows */
-    .row-good td:nth-child(2) {
-      color: #3a7d44;
+    .val-good {
+      color: var(--green);
       font-weight: 700;
     }
 
-    .row-warn td:nth-child(2) {
-      color: #b07d2a;
+    .val-warn {
+      color: #b07030;
       font-weight: 700;
     }
 
-    /* ── SUNCUBES BANNER ── */
+    .badge-good {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--green-pale);
+      color: var(--green);
+    }
+
+    .badge-warn {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #fdf1e0;
+      color: #b07030;
+    }
+
+    /* ─────────────────────────────────────────
+       SUNCUBES BANNER
+    ───────────────────────────────────────── */
     .suncubes-banner {
-      background: linear-gradient(135deg, #eef3fb 0%, #e4edf8 100%);
-      border: 1px solid rgba(95, 124, 168, 0.22);
-      border-radius: var(--radius-lg);
-      padding: 26px 28px;
+      background: var(--navy);
+      border-radius: var(--radius-xl);
+      padding: 36px 40px;
       display: flex;
       align-items: flex-start;
-      gap: 18px;
-      box-shadow: var(--shadow-soft);
+      gap: 24px;
+      box-shadow: var(--shadow-lg);
     }
 
-    .suncubes-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: #fff;
-      border: 1px solid rgba(95, 124, 168, 0.18);
+    .sc-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -448,157 +615,157 @@
       font-size: 1.5rem;
     }
 
-    .suncubes-body h3 {
-      font-size: 1.08rem;
-      margin-bottom: 6px;
+    .sc-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--white);
+      margin-bottom: 8px;
+      line-height: 1.3;
     }
 
-    .suncubes-body p {
-      color: var(--muted);
-      font-size: 0.97rem;
+    .sc-body p {
+      font-size: 0.93rem;
+      color: var(--fog);
+      line-height: 1.7;
       margin: 0;
     }
 
-    .suncubes-body a {
-      color: var(--accent-dark);
-      font-weight: 700;
+    .sc-body a {
+      color: var(--white);
+      font-weight: 600;
       text-decoration: underline;
       text-underline-offset: 3px;
     }
 
-    /* ── FOOTER ── */
-    footer {
-      padding: 36px 0 50px;
+    /* ─────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────── */
+    .site-footer {
+      padding: 36px 0 40px;
       text-align: center;
-      color: var(--muted);
-      font-size: 0.94rem;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--line);
+      margin-top: 80px;
     }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 980px) {
-      .grid-2,
-      .grid-3 {
-        grid-template-columns: 1fr;
-      }
+    /* ─────────────────────────────────────────
+       REVEAL
+    ───────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
 
-      .hero-media {
-        height: 300px;
-      }
+    .reveal.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-      .hero-content,
-      .card {
-        padding: 22px;
-      }
-
-      .media-content {
-        padding: 20px 22px 22px;
-      }
-
-      .param-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .suncubes-banner {
-        flex-direction: column;
-      }
+    /* ─────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────── */
+    @media (max-width: 960px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .hero-img-wrap   { height: 300px; }
+      .suncubes-banner { flex-direction: column; padding: 28px 24px; }
+      .param-grid      { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 640px) {
-      .topbar-inner {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 14px 0;
-      }
-
-      .hero-media {
-        height: 220px;
-      }
+      .hero-img-wrap { height: 220px; }
+      .nav-actions .btn-primary { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a href="index.html" class="brand">OMID AREFIAN</a>
-      <div class="topbar-links">
-        <a href="index.html#projects" class="top-btn">← Back to Projects</a>
-        <a href="#results" class="top-btn">Jump to Results</a>
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="brand">Omid Arefian</a>
+      <div class="nav-actions">
+        <a href="index.html#projects" class="btn-secondary">← All Projects</a>
+        <a href="#results" class="btn-primary">Jump to Results</a>
       </div>
     </div>
-  </header>
+  </nav>
 
   <main class="container">
 
     <!-- ── HERO ── -->
     <section class="hero">
-      <div class="hero-card">
-        <div class="hero-media">
-          <img
-            src="assets/SITL_1.png"
-            alt="PX4 SITL drone flying in Gazebo with QGroundControl connected showing live map and telemetry"
-          />
-          <div class="hero-badge">UAV State Estimation · PX4 SITL</div>
+      <div class="hero-img-wrap">
+        <img
+          src="assets/SITL_1.png"
+          alt="PX4 SITL drone flying in Gazebo alongside QGroundControl showing live map and telemetry"
+        />
+        <div class="hero-badge">
+          <span class="hero-dot"></span>
+          UAV State Estimation · PX4 SITL · Active Project
+        </div>
+      </div>
+
+      <div class="hero-text">
+        <p class="hero-overline">Sensor Fusion · Kalman Filtering · Autonomous UAV Navigation</p>
+        <h1 class="hero-title">Design of a Multiplicative EKF<br />for UAV State Estimation</h1>
+        <p class="hero-lead">
+          An independent Multiplicative Extended Kalman Filter (MEKF) designed to reconstruct
+          the full pose of a drone — position, velocity, attitude, and sensor biases — from raw
+          IMU, GPS, barometer, and magnetometer data. The filter runs entirely independently of
+          the onboard autopilot and is validated against PX4 SITL in Python. Currently being
+          extended for real hardware at <a href="http://suncubes.space/" target="_blank"
+          rel="noopener" style="color:var(--accent);font-weight:600;">SunCubes</a>.
+        </p>
+
+        <div class="tag-row">
+          <span class="tag">Python</span>
+          <span class="tag">PX4 SITL</span>
+          <span class="tag">MAVLink</span>
+          <span class="tag">MEKF</span>
+          <span class="tag">Sensor Fusion</span>
+          <span class="tag">NED Frame</span>
+          <span class="tag">Quaternion Attitude</span>
+          <span class="tag">IMU Integration</span>
         </div>
 
-        <div class="hero-content">
-          <div class="eyebrow">MEKF · IMU Integration · GPS / Baro / Mag Fusion · Sensor Bias Estimation</div>
-          <h1>Design of a Multiplicative EKF for UAV State Estimation</h1>
-
-          <p class="lead">
-            An independent Multiplicative Extended Kalman Filter (MEKF) designed to reconstruct
-            the full pose of a drone — position, velocity, attitude, and sensor biases — from raw
-            IMU, GPS, barometer, and magnetometer data. The filter runs entirely independently of
-            the onboard autopilot and is validated against PX4 SITL estimates in Python.
-          </p>
-
-          <div class="chip-row">
-            <span class="chip">Python</span>
-            <span class="chip">PX4 SITL</span>
-            <span class="chip">MAVLink</span>
-            <span class="chip">MEKF</span>
-            <span class="chip">Sensor Fusion</span>
-            <span class="chip">NED Frame</span>
-            <span class="chip">Quaternion Attitude</span>
-          </div>
-
-          <div class="anchor-nav">
-            <a class="anchor-link" href="#overview">Overview</a>
-            <a class="anchor-link" href="#architecture">Architecture</a>
-            <a class="anchor-link" href="#sensors">Sensor Streams</a>
-            <a class="anchor-link" href="#propagation">Propagation</a>
-            <a class="anchor-link" href="#updates">Measurement Updates</a>
-            <a class="anchor-link" href="#results">Results</a>
-            <a class="anchor-link" href="#suncubes">Real Drone Extension</a>
-          </div>
+        <div class="anchor-row">
+          <a class="anchor-btn" href="#overview">Overview</a>
+          <a class="anchor-btn" href="#architecture">Architecture</a>
+          <a class="anchor-btn" href="#sensors">Sensor Streams</a>
+          <a class="anchor-btn" href="#propagation">Propagation</a>
+          <a class="anchor-btn" href="#updates">Measurement Updates</a>
+          <a class="anchor-btn" href="#results">Results</a>
+          <a class="anchor-btn" href="#suncubes">Real Drone Extension</a>
         </div>
       </div>
     </section>
 
     <!-- ── OVERVIEW ── -->
-    <section id="overview">
-      <div class="section-title">
-        <h2>Project Overview</h2>
-        <p>
-          The goal is to build a physically meaningful, fully independent drone state estimator
-          that does not rely on the autopilot's internal filter output.
-        </p>
-      </div>
+    <section id="overview" class="section-gap reveal">
+      <p class="label">Overview</p>
+      <h2 class="section-title">Project Overview</h2>
+      <p class="section-sub">
+        A fully independent estimator that reconstructs drone pose from raw sensor data,
+        without relying on any autopilot internal output.
+      </p>
 
       <div class="grid-2">
         <div class="card">
           <h3>Motivation</h3>
           <p>
-            Commercial autopilots such as PX4 provide high-quality onboard state estimates, but
-            these are not suitable as a standalone research estimator because the internal filter
+            Commercial autopilots such as PX4 provide high-quality onboard state estimates,
+            but these are not suitable as a standalone research estimator — the internal filter
             details are opaque and the output mixes sensor fusion with control feedback. This
-            project implements an independent MEKF that consumes only raw sensor streams,
-            propagates the drone state from inertial measurements, and corrects it with GPS,
-            barometer, and magnetometer updates.
+            project implements an independent MEKF that consumes only raw MAVLink sensor
+            streams, propagates the drone state from inertial measurements, and corrects it
+            with GPS, barometer, and magnetometer updates.
           </p>
-          <p style="margin-top: 12px;">
-            The PX4 estimates are logged in parallel and used only as a comparison reference
-            for RMSE evaluation — they do not feed into the filter in any way.
+          <p>
+            The PX4 onboard EKF2 estimates are logged in parallel and used only as a
+            comparison reference for RMSE evaluation. They do not feed into the filter
+            in any way.
           </p>
         </div>
 
@@ -606,101 +773,134 @@
           <h3>State Vector</h3>
           <p>
             The filter maintains a 20-dimensional nominal state and a 19-dimensional error
-            state. The quaternion contributes only 3 DOF via the multiplicative error δθ,
-            not 4, preserving the unit-norm constraint without explicit re-normalization:
+            state. The quaternion contributes only 3 DOF via the multiplicative error
+            \(\delta\boldsymbol{\theta}\), not 4, which preserves the unit-norm constraint
+            on \(\mathbf{SO}(3)\) without explicit re-normalisation in the covariance equations:
           </p>
-          <div class="equation-box">Nominal state  x ∈ ℝ²⁰:
-  p   ∈ ℝ³   position (NED)
-  v   ∈ ℝ³   velocity (NED)
-  q   ∈ ℝ⁴   attitude quaternion
-  b_g ∈ ℝ³   gyroscope bias
-  b_a ∈ ℝ³   accelerometer bias
-  b_m ∈ ℝ³   magnetometer bias
-  b_b ∈ ℝ¹   barometer bias
-
-Error state  δx ∈ ℝ¹⁹:
-  δθ replaces δq  (3-DOF multiplicative)</div>
+          <div class="eq-block">
+            \[
+            \mathbf{x} \in \mathbb{R}^{20}: \quad
+            \mathbf{p} \in \mathbb{R}^3,\;
+            \mathbf{v} \in \mathbb{R}^3,\;
+            \mathbf{q} \in \mathbb{R}^4,\;
+            \mathbf{b}_g \in \mathbb{R}^3,\;
+            \mathbf{b}_a \in \mathbb{R}^3,\;
+            \mathbf{b}_m \in \mathbb{R}^3,\;
+            b_b \in \mathbb{R}
+            \]
+            \[
+            \delta\mathbf{x} \in \mathbb{R}^{19}: \quad
+            \delta\boldsymbol{\theta} \text{ replaces } \delta\mathbf{q}
+            \quad \text{(3-DOF multiplicative error)}
+            \]
+          </div>
         </div>
       </div>
     </section>
 
     <!-- ── ARCHITECTURE ── -->
-    <section id="architecture">
-      <div class="section-title">
-        <h2>Estimator Architecture</h2>
-        <p>
-          The MEKF follows the standard predict–correct cycle, with the IMU driving
-          high-rate prediction and GPS, barometer, and magnetometer providing low- to
-          medium-rate corrections.
-        </p>
-      </div>
+    <section id="architecture" class="section-gap reveal">
+      <p class="label">Architecture</p>
+      <h2 class="section-title">Estimator Architecture</h2>
+      <p class="section-sub">
+        The MEKF follows the standard predict–correct cycle. The IMU drives high-rate
+        prediction; GPS, barometer, and magnetometer provide corrections at lower rates.
+      </p>
 
       <div class="grid-3">
-        <div class="card method-card">
-          <span class="method-label">High Rate · ~200 Hz</span>
+
+        <div class="card">
+          <span class="card-label">High Rate · ≈ 200 Hz</span>
           <h3>IMU Prediction</h3>
           <p>
-            At every new IMU sample the bias-corrected gyroscope propagates the quaternion
-            multiplicatively and the bias-corrected accelerometer — rotated into the NED
-            navigation frame and augmented with gravity — propagates velocity and position.
+            At every IMU sample, bias-corrected gyroscope and accelerometer readings are
+            used to propagate quaternion, velocity, and position:
           </p>
-          <div class="equation-box">ω̂ = ω_m − b̂_g
-f̂ = f_m − b̂_a
-
-â_n = R_nb(q̂) f̂ + g_n
-
-p̂⁻ = p̂⁺ + v̂⁺Δt + ½â_nΔt²
-v̂⁻ = v̂⁺ + â_nΔt
-q̂⁻ = q̂⁺ ⊗ δq(ω̂Δt)</div>
+          <div class="eq-block">
+            \[
+            \hat{\boldsymbol{\omega}} = \boldsymbol{\omega}_m - \hat{\mathbf{b}}_g, \qquad
+            \hat{\mathbf{f}} = \mathbf{f}_m - \hat{\mathbf{b}}_a
+            \]
+            \[
+            \hat{\mathbf{a}}_n = R_{nb}(\hat{\mathbf{q}})\,\hat{\mathbf{f}} + \mathbf{g}_n
+            \]
+            \[
+            \hat{\mathbf{p}}^- = \hat{\mathbf{p}}^+ + \hat{\mathbf{v}}^+\Delta t + \tfrac{1}{2}\hat{\mathbf{a}}_n\Delta t^2
+            \]
+            \[
+            \hat{\mathbf{v}}^- = \hat{\mathbf{v}}^+ + \hat{\mathbf{a}}_n\,\Delta t
+            \]
+            \[
+            \hat{\mathbf{q}}^- = \hat{\mathbf{q}}^+ \otimes \delta\mathbf{q}(\hat{\boldsymbol{\omega}}\,\Delta t)
+            \]
+          </div>
         </div>
 
-        <div class="card method-card">
-          <span class="method-label">Low Rate · ~5 Hz</span>
+        <div class="card">
+          <span class="card-label">Low Rate · ≈ 5 Hz</span>
           <h3>GPS + Baro Update</h3>
           <p>
-            Whenever a new GPS or barometer measurement arrives the filter runs a standard
-            EKF correction. GPS provides a 3D position anchor and a 2D horizontal velocity
-            constraint; the barometer provides a scalar vertical correction that simultaneously
-            estimates the pressure-altitude offset.
+            Standard EKF correction applied whenever GPS or barometer data arrives.
+            The generic update equations are:
           </p>
-          <div class="equation-box">y_k = z_k − h(x̂⁻_k)
-S_k = H_k P⁻_k H_kᵀ + R_k
-K_k = P⁻_k H_kᵀ S_k⁻¹
-δx̂_k = K_k y_k
-x̂⁺_k = x̂⁻_k ⊞ δx̂_k</div>
+          <div class="eq-block">
+            \[
+            \mathbf{y}_k = \mathbf{z}_k - \mathbf{h}(\hat{\mathbf{x}}^-_k)
+            \]
+            \[
+            \mathbf{S}_k = H_k P^-_k H_k^\top + R_k
+            \]
+            \[
+            K_k = P^-_k H_k^\top S_k^{-1}
+            \]
+            \[
+            \hat{\mathbf{x}}^+_k = \hat{\mathbf{x}}^-_k \boxplus K_k\,\mathbf{y}_k
+            \]
+            \[
+            P^+_k = (I - K_k H_k)\,P^-_k\,(I - K_k H_k)^\top + K_k R_k K_k^\top
+            \]
+          </div>
         </div>
 
-        <div class="card method-card">
-          <span class="method-label">Medium Rate · ~50 Hz</span>
+        <div class="card">
+          <span class="card-label">Medium Rate · ≈ 50 Hz</span>
           <h3>Magnetometer Update</h3>
           <p>
-            The magnetometer corrects yaw and magnetometer bias via a normalized
-            horizontal-vector update and a separate z-channel update. A norm gate and a
-            heading gate reject distorted measurements before they can corrupt attitude.
+            Corrects yaw and magnetometer bias via a normalised horizontal-vector update
+            and a separate z-channel update. A norm gate and heading gate reject distorted
+            measurements before they can corrupt attitude:
           </p>
-          <div class="equation-box">m̂_b = R_nb(q̂)ᵀ m_n^ref + b̂_m
-
-h_m,xy = [m̂_b,x  m̂_b,y] / ‖m̂_b,xy‖
-h_m,z  = m̂_b,z / ‖m_n^ref‖</div>
+          <div class="eq-block">
+            \[
+            \hat{\mathbf{m}}_b = R_{nb}(\hat{\mathbf{q}})^\top \mathbf{m}_n^{\mathrm{ref}} + \hat{\mathbf{b}}_m
+            \]
+            \[
+            \mathbf{h}_{m,xy}(\mathbf{x}) = \frac{[\hat{m}_{b,x},\; \hat{m}_{b,y}]^\top}{\|\hat{\mathbf{m}}_{b,xy}\|}
+            \]
+            \[
+            h_{m,z}(\mathbf{x}) = \frac{\hat{m}_{b,z}}{\|\mathbf{m}_n^{\mathrm{ref}}\|}
+            \]
+          </div>
         </div>
+
       </div>
 
-      <!-- SITL_2 image — setup shot -->
+      <!-- SITL_2 image -->
       <div style="margin-top: 22px;">
-        <div class="card media-card">
+        <div class="media-card">
           <img
             src="assets/SITL_2.png"
-            alt="Gazebo Sim with x500 drone model loaded, entity tree showing park and coast_waves environment"
+            alt="Gazebo Sim with x500 drone model, entity tree showing park and coast_waves environment"
           />
-          <div class="media-content">
+          <div class="media-caption">
             <h3>PX4 SITL Simulation Environment</h3>
             <p>
-              The validation environment uses PX4 Software-In-The-Loop running the full PX4
-              flight stack inside Gazebo Sim. The x500 quadrotor model is loaded into a
-              realistic outdoor scene (Baylands park environment). All MAVLink telemetry streams
-              are exposed over UDP: the Python MEKF reads raw sensor streams via
-              <code>pymavlink</code> while QGroundControl connects simultaneously for flight
-              monitoring. PX4's onboard EKF2 estimates are logged only for comparison purposes.
+              The validation environment runs the full PX4 flight stack inside Gazebo Sim. The
+              x500 quadrotor is loaded into the Baylands park outdoor scene. All MAVLink streams
+              are exposed over UDP: the Python MEKF reads raw sensor data via
+              <code style="font-family:'Courier New',monospace;font-size:0.88em;color:var(--navy);">pymavlink</code>
+              while QGroundControl connects simultaneously for flight monitoring. PX4's EKF2
+              estimates are logged only for comparison.
             </p>
           </div>
         </div>
@@ -708,35 +908,40 @@ h_m,z  = m̂_b,z / ‖m_n^ref‖</div>
     </section>
 
     <!-- ── SENSOR STREAMS ── -->
-    <section id="sensors">
-      <div class="section-title">
-        <h2>Coordinate Frames and Sensor Streams</h2>
-        <p>
-          The filter uses two coordinate frames and five MAVLink data streams divided into
-          estimation inputs and comparison-only references.
-        </p>
-      </div>
+    <section id="sensors" class="section-gap reveal">
+      <p class="label">Sensors</p>
+      <h2 class="section-title">Coordinate Frames &amp; Sensor Streams</h2>
+      <p class="section-sub">
+        Two coordinate frames and five MAVLink streams, split into estimation inputs
+        and comparison-only references.
+      </p>
 
       <div class="grid-2">
         <div class="card">
           <h3>Coordinate Frames</h3>
           <p>
             All position and velocity states are represented in the local
-            <strong>NED (North-East-Down)</strong> navigation frame, with the origin set at
+            <strong>NED (North-East-Down)</strong> navigation frame, with the origin fixed at
             the first valid GPS fix. The <strong>body frame</strong> is attached to the drone;
             IMU and magnetometer measurements arrive in this frame. The attitude quaternion
-            R<sub>nb</sub>(q) rotates body-frame vectors into the navigation frame:
+            provides the rotation:
           </p>
-          <div class="equation-box">u_n = R_nb(q) · u_b</div>
-          <div class="mini-note">
-            In NED, altitude is the negative of the down coordinate p_D. GPS
-            latitude/longitude/altitude are converted into local NED on arrival using
-            the first valid GPS sample as origin.
+          <div class="eq-block">
+            \[
+            \mathbf{u}_n = R_{nb}(\mathbf{q})\,\mathbf{u}_b
+            \]
+          </div>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              GPS latitude/longitude/altitude are converted to local NED on arrival using the
+              first valid GPS sample as origin. Altitude maps to \(-p_D\) in NED convention.
+            </p>
           </div>
         </div>
 
         <div class="card">
-          <h3>MAVLink Streams Used</h3>
+          <h3>MAVLink Streams</h3>
           <div class="param-grid">
             <div class="param-item">
               <strong>HIGHRES_IMU</strong>
@@ -760,179 +965,221 @@ h_m,z  = m̂_b,z / ‖m_n^ref‖</div>
     </section>
 
     <!-- ── PROPAGATION ── -->
-    <section id="propagation">
-      <div class="section-title">
-        <h2>State Propagation Model</h2>
-        <p>
-          The prediction step integrates the full nonlinear dynamics at IMU rate, then
-          propagates the error-state covariance through the linearized transition Jacobian.
-        </p>
-      </div>
+    <section id="propagation" class="section-gap reveal">
+      <p class="label">Propagation</p>
+      <h2 class="section-title">State Propagation Model</h2>
+      <p class="section-sub">
+        The prediction step integrates the full nonlinear dynamics at IMU rate, then
+        propagates the error-state covariance through the linearised transition Jacobian.
+      </p>
 
       <div class="grid-2">
         <div class="card">
           <h3>Nominal State Propagation</h3>
           <p>
-            At each IMU step the estimated biases are subtracted, the corrected specific
-            force is rotated into NED and added to gravity, and the resulting acceleration
-            drives Euler integration of position and velocity. The quaternion is updated
-            multiplicatively using the gyroscope-derived rotation increment:
+            At each IMU step the estimated biases are subtracted, the corrected specific force
+            is rotated into NED and added to gravity, and the resulting acceleration drives
+            Euler integration. The quaternion updates multiplicatively:
           </p>
-          <div class="equation-box">â_n,k = R_nb(q̂_k)(f_m,k − b̂_a,k) + g_n
-
-p̂⁻_k+1 = p̂⁺_k + v̂⁺_k Δt + ½ â_n,k Δt²
-v̂⁻_k+1 = v̂⁺_k + â_n,k Δt
-q̂⁻_k+1 = q̂⁺_k ⊗ δq(ω̂_k Δt)</div>
-          <div class="mini-note">
-            Biases are modeled as random walks propagated with zero dynamics — only their
-            covariance entries grow with the corresponding process noise during prediction.
+          <div class="eq-block">
+            \[
+            \hat{\mathbf{a}}_{n,k} = R_{nb}(\hat{\mathbf{q}}_k)\bigl(\mathbf{f}_{m,k} - \hat{\mathbf{b}}_{a,k}\bigr) + \mathbf{g}_n
+            \]
+            \[
+            \hat{\mathbf{p}}^-_{k+1} = \hat{\mathbf{p}}^+_k + \hat{\mathbf{v}}^+_k\,\Delta t + \tfrac{1}{2}\hat{\mathbf{a}}_{n,k}\,\Delta t^2
+            \]
+            \[
+            \hat{\mathbf{v}}^-_{k+1} = \hat{\mathbf{v}}^+_k + \hat{\mathbf{a}}_{n,k}\,\Delta t
+            \]
+            \[
+            \hat{\mathbf{q}}^-_{k+1} = \hat{\mathbf{q}}^+_k \otimes \delta\mathbf{q}(\hat{\boldsymbol{\omega}}_k\,\Delta t)
+            \]
+          </div>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              Biases are modelled as random walks with zero nominal dynamics. Only their
+              covariance entries grow with the corresponding process noise during prediction.
+            </p>
           </div>
         </div>
 
         <div class="card">
           <h3>Covariance Propagation</h3>
           <p>
-            The 19×19 error-state covariance is propagated through the linearized
-            error-state transition matrix F<sub>k</sub>, computed numerically using
-            boxplus and boxminus operations on the SO(3) manifold:
+            The \(19 \times 19\) error-state covariance is propagated through the linearised
+            error-state transition matrix \(F_k\), computed numerically using
+            boxplus (\(\boxplus\)) and boxminus (\(\boxminus\)) operations on the
+            \(\mathbf{SO}(3)\) manifold:
           </p>
-          <div class="equation-box">P⁻_k+1 = F_k P⁺_k F_kᵀ + Q_k</div>
-          <p style="margin-top: 14px;">
-            Q<sub>k</sub> is the discrete process-noise covariance, tuned to reflect IMU
-            noise spectral density and bias instability. The error-state formulation keeps
-            the quaternion unit-norm constraint satisfied at every step without explicit
-            re-normalization in the covariance equations.
+          <div class="eq-block">
+            \[
+            P^-_{k+1} = F_k\,P^+_k\,F_k^\top + Q_k
+            \]
+          </div>
+          <p style="margin-top:14px;">
+            \(Q_k\) is the discrete process-noise covariance, tuned to reflect IMU noise
+            spectral density and bias instability. The error-state formulation keeps the
+            quaternion unit-norm constraint \(\|\mathbf{q}\| = 1\) satisfied at every step
+            without explicit re-normalisation in the covariance equations.
           </p>
         </div>
       </div>
     </section>
 
     <!-- ── MEASUREMENT UPDATES ── -->
-    <section id="updates">
-      <div class="section-title">
-        <h2>Measurement Updates and Sensor Fusion</h2>
-        <p>
-          Five separate update channels handle GPS position, GPS velocity, barometer
-          altitude, magnetometer horizontal vector, and magnetometer z-component.
-        </p>
-      </div>
+    <section id="updates" class="section-gap reveal">
+      <p class="label">Measurement Updates</p>
+      <h2 class="section-title">Sensor Fusion Logic</h2>
+      <p class="section-sub">
+        Five separate update channels handle GPS position, GPS velocity, barometer altitude,
+        magnetometer horizontal vector, and magnetometer z-component.
+      </p>
 
       <div class="grid-2">
+
         <div class="card">
           <h3>GPS Position Update</h3>
-          <p>The GPS position update directly observes the position state:</p>
-          <div class="equation-box">z_gps,p = [p_N^gps  p_E^gps  p_D^gps]ᵀ
-h_gps,p(x) = [p_N  p_E  p_D]ᵀ
-y_gps,p = z_gps,p − p̂</div>
+          <p>GPS position directly observes the position state with a linear measurement model:</p>
+          <div class="eq-block">
+            \[
+            \mathbf{z}_{gps,p} = \bigl[p_N^{gps},\; p_E^{gps},\; p_D^{gps}\bigr]^\top
+            \]
+            \[
+            \mathbf{h}_{gps,p}(\mathbf{x}) = \bigl[p_N,\; p_E,\; p_D\bigr]^\top
+            \]
+            \[
+            \mathbf{y}_{gps,p} = \mathbf{z}_{gps,p} - \hat{\mathbf{p}}
+            \]
+          </div>
         </div>
 
         <div class="card">
           <h3>GPS Horizontal Velocity Update</h3>
           <p>
-            When ground speed and course-over-ground are available, horizontal velocity
-            components are constructed and used as an additional correction. A gate rejects
-            measurements with excessive velocity innovation:
+            When ground speed \(s^{gps}\) and course angle \(\chi^{gps}\) are available,
+            horizontal NED velocity components are constructed and used as an additional
+            correction. A chi-squared gate rejects measurements with excessive innovation:
           </p>
-          <div class="equation-box">v_N^gps = s^gps · cos(χ^gps)
-v_E^gps = s^gps · sin(χ^gps)
-h_gps,v(x) = [v_N  v_E]ᵀ</div>
+          <div class="eq-block">
+            \[
+            v_N^{gps} = s^{gps}\cos\chi^{gps}, \qquad
+            v_E^{gps} = s^{gps}\sin\chi^{gps}
+            \]
+            \[
+            \mathbf{h}_{gps,v}(\mathbf{x}) = \bigl[v_N,\; v_E\bigr]^\top
+            \]
+          </div>
         </div>
 
         <div class="card">
           <h3>Barometer Update</h3>
           <p>
-            A scalar correction for the vertical channel. The barometer bias b<sub>b</sub>
-            absorbs any constant pressure-to-altitude offset, preventing the vertical
-            position state from being corrupted by systematic sensor error:
+            A scalar correction for the vertical channel. The barometer bias \(b_b\) absorbs
+            any constant pressure-to-altitude offset, preventing the vertical position state
+            from being corrupted by systematic sensor error:
           </p>
-          <div class="equation-box">z_b = p_D + b_b + n_b
-h_b(x) = p_D + b_b
-y_b = z_b − (p̂_D + b̂_b)</div>
+          <div class="eq-block">
+            \[
+            z_b = p_D + b_b + n_b
+            \]
+            \[
+            h_b(\mathbf{x}) = p_D + b_b
+            \]
+            \[
+            y_b = z_b - (\hat{p}_D + \hat{b}_b)
+            \]
+          </div>
         </div>
 
         <div class="card">
           <h3>Magnetometer Updates</h3>
           <p>
-            Two channels constrain yaw and magnetometer bias. A norm gate and heading gate
-            reject measurements with suspected magnetic disturbances:
+            Two channels jointly constrain yaw and magnetometer bias. A norm gate and a
+            heading gate reject measurements with suspected magnetic disturbances:
           </p>
-          <div class="equation-box">m̂_b = R_nb(q̂)ᵀ m_n^ref + b̂_m
-
-Horizontal:
-h_m,xy(x) = [m̂_b,x  m̂_b,y] / ‖m̂_b,xy‖
-
-Z-channel:
-h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
-          <div class="mini-note">
-            Gating on both the magnetic norm and the heading error prevents large yaw jumps
-            caused by magnetic disturbances near metallic structures or electrical equipment.
+          <div class="eq-block">
+            \[
+            \hat{\mathbf{m}}_b = R_{nb}(\hat{\mathbf{q}})^\top \mathbf{m}_n^{\mathrm{ref}} + \hat{\mathbf{b}}_m
+            \]
+            \[
+            \mathbf{h}_{m,xy}(\mathbf{x}) = \frac{\bigl[\hat{m}_{b,x},\;\hat{m}_{b,y}\bigr]^\top}{\left\|\hat{\mathbf{m}}_{b,xy}\right\|}
+            \]
+            \[
+            h_{m,z}(\mathbf{x}) = \frac{\hat{m}_{b,z}}{\left\|\mathbf{m}_n^{\mathrm{ref}}\right\|}
+            \]
+          </div>
+          <div class="note">
+            <span class="note-icon">⚠</span>
+            <p>
+              Gating on both the magnetic norm and the heading error prevents large yaw jumps
+              caused by disturbances near metallic structures or motor wiring.
+            </p>
           </div>
         </div>
+
       </div>
     </section>
 
     <!-- ── RESULTS ── -->
-    <section id="results">
-      <div class="section-title">
-        <h2>Results</h2>
-        <p>
-          The MEKF was validated in PX4 SITL across a full 80-second flight maneuver sequence
-          covering takeoff, aggressive lateral and vertical motion, and landing. The estimator
-          output is compared against PX4's onboard EKF2 estimates across attitude, velocity,
-          and position.
-        </p>
-      </div>
+    <section id="results" class="section-gap reveal">
+      <p class="label">Results</p>
+      <h2 class="section-title">Validation Results</h2>
+      <p class="section-sub">
+        The MEKF was validated in PX4 SITL across a full 80-second flight covering takeoff,
+        aggressive lateral and vertical manoeuvres, and landing. All outputs are compared
+        against PX4's onboard EKF2 reference estimates.
+      </p>
 
-      <!-- Attitude plot -->
-      <div class="card media-card" style="margin-bottom: 22px;">
+      <!-- Attitude -->
+      <div class="media-card" style="margin-bottom:22px;">
         <img
           src="assets/mekf_attitude.png"
-          alt="Attitude comparison: roll, pitch, and yaw between the MEKF estimator and PX4/SITL reference"
+          alt="Roll, pitch, and yaw comparison between the MEKF and PX4/SITL reference"
         />
-        <div class="media-content">
+        <div class="media-caption">
           <h3>Attitude Comparison — Roll, Pitch, Yaw</h3>
           <p>
-            The MEKF attitude (blue solid line) tracks the PX4/SITL reference (orange dashed)
-            very closely for roll and pitch throughout the entire flight. The yaw channel shows
-            a slowly varying offset during the most aggressive maneuvers between 20–50 s, which
-            is expected given that the only yaw correction comes from the magnetometer — a
-            single-axis sensor susceptible to temporary disturbances. The filter recovers
-            correctly once the maneuver ends.
+            The MEKF attitude (solid blue) tracks the PX4/SITL reference (orange dashed) very
+            closely for roll and pitch throughout the entire flight. The yaw channel shows a
+            slowly varying offset during the most aggressive manoeuvres between 20–50 s —
+            expected given that yaw is corrected only by the magnetometer. The filter recovers
+            correctly once the manoeuvre ends.
           </p>
         </div>
       </div>
 
-      <!-- Velocity plot -->
-      <div class="card media-card" style="margin-bottom: 22px;">
+      <!-- Velocity -->
+      <div class="media-card" style="margin-bottom:22px;">
         <img
           src="assets/mekf_velocity.png"
-          alt="Velocity comparison: vx, vy, and vz between the MEKF estimator and PX4/SITL reference"
+          alt="vx, vy, vz comparison between the MEKF and PX4/SITL reference"
         />
-        <div class="media-content">
-          <h3>Velocity Comparison — v_x, v_y, v_z</h3>
+        <div class="media-caption">
+          <h3>Velocity Comparison — \(v_x,\, v_y,\, v_z\)</h3>
           <p>
-            Horizontal velocity estimates (v_x and v_y) match the PX4 reference almost exactly
-            across the full flight envelope, including peak velocities above 4 m/s. The vertical
-            velocity v_z shows slightly more noise than the PX4 reference due to the barometer
-            update rate and the absence of a dedicated vertical velocity sensor, but the overall
-            trend and magnitude are well captured throughout.
+            Horizontal velocity estimates match the PX4 reference almost exactly across the full
+            flight envelope, including peak velocities above 4 m/s. Vertical velocity \(v_z\)
+            shows slightly more noise than the PX4 reference due to the barometer update rate
+            and the absence of a dedicated vertical-velocity sensor, but the trend and magnitude
+            are well captured throughout.
           </p>
         </div>
       </div>
 
-      <!-- Position plot -->
-      <div class="card media-card" style="margin-bottom: 22px;">
+      <!-- Position -->
+      <div class="media-card" style="margin-bottom:32px;">
         <img
           src="assets/mekf_position.png"
-          alt="Position comparison: x, y, and z between the MEKF estimator and PX4/SITL reference"
+          alt="x, y, z position comparison between the MEKF and PX4/SITL reference"
         />
-        <div class="media-content">
-          <h3>Position Comparison — x, y, z</h3>
+        <div class="media-caption">
+          <h3>Position Comparison — \(x,\, y,\, z\)</h3>
           <p>
-            Position estimates in all three axes remain tightly coupled to the PX4 reference
-            throughout the flight, including during the largest displacements of roughly 40 m
-            in the x-direction and −15 m in altitude. The close agreement demonstrates that
-            the GPS position and velocity updates, combined with barometer altitude correction,
+            Position in all three axes remains tightly coupled to the PX4 reference throughout
+            the flight, including during the largest displacements of roughly 40 m in the
+            \(x\)-direction and −15 m in altitude. The close agreement demonstrates that the
+            GPS position and velocity updates, combined with barometer altitude correction,
             effectively prevent inertial drift over the full 80-second flight duration.
           </p>
         </div>
@@ -942,12 +1189,11 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
       <div class="card">
         <h3>RMSE Summary</h3>
         <p>
-          Root-mean-square errors computed over the full flight log against PX4/SITL reference
-          estimates. Position errors are sub-0.23 m across all axes; roll and pitch errors are
-          below 0.4°. Yaw shows the largest error — consistent with magnetometer-only heading
-          correction and the absence of a dual-antenna GPS for direct yaw measurement.
+          Root-mean-square errors computed over the full flight log against the PX4/SITL
+          reference. Position errors are sub-23 cm in all axes; roll and pitch are below 0.4°.
+          Yaw shows the largest error, consistent with magnetometer-only heading correction.
         </p>
-        <div class="results-table-wrap">
+        <div class="table-wrap">
           <table>
             <thead>
               <tr>
@@ -958,121 +1204,120 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
               </tr>
             </thead>
             <tbody>
-              <tr class="row-good">
-                <td>Position x</td>
-                <td>0.1404</td>
+              <tr>
+                <td>Position \(x\)</td>
+                <td class="val-good">0.1404</td>
                 <td>m</td>
-                <td>Excellent — sub-15 cm</td>
+                <td><span class="badge-good">Excellent</span> — sub-15 cm</td>
               </tr>
-              <tr class="row-good">
-                <td>Position y</td>
-                <td>0.2265</td>
+              <tr>
+                <td>Position \(y\)</td>
+                <td class="val-good">0.2265</td>
                 <td>m</td>
-                <td>Good — sub-23 cm</td>
+                <td><span class="badge-good">Good</span> — sub-23 cm</td>
               </tr>
-              <tr class="row-good">
-                <td>Position z</td>
-                <td>0.1895</td>
+              <tr>
+                <td>Position \(z\)</td>
+                <td class="val-good">0.1895</td>
                 <td>m</td>
-                <td>Good — sub-19 cm</td>
+                <td><span class="badge-good">Good</span> — sub-19 cm</td>
               </tr>
-              <tr class="row-good">
-                <td>Velocity v_x</td>
-                <td>0.0702</td>
+              <tr>
+                <td>Velocity \(v_x\)</td>
+                <td class="val-good">0.0702</td>
                 <td>m/s</td>
-                <td>Excellent</td>
+                <td><span class="badge-good">Excellent</span></td>
               </tr>
-              <tr class="row-good">
-                <td>Velocity v_y</td>
-                <td>0.1000</td>
+              <tr>
+                <td>Velocity \(v_y\)</td>
+                <td class="val-good">0.1000</td>
                 <td>m/s</td>
-                <td>Excellent</td>
+                <td><span class="badge-good">Excellent</span></td>
               </tr>
-              <tr class="row-good">
-                <td>Velocity v_z</td>
-                <td>0.1015</td>
+              <tr>
+                <td>Velocity \(v_z\)</td>
+                <td class="val-good">0.1015</td>
                 <td>m/s</td>
-                <td>Good</td>
+                <td><span class="badge-good">Good</span></td>
               </tr>
-              <tr class="row-good">
+              <tr>
                 <td>Roll</td>
-                <td>0.3825</td>
+                <td class="val-good">0.3825</td>
                 <td>deg</td>
-                <td>Excellent</td>
+                <td><span class="badge-good">Excellent</span></td>
               </tr>
-              <tr class="row-good">
+              <tr>
                 <td>Pitch</td>
-                <td>0.2445</td>
+                <td class="val-good">0.2445</td>
                 <td>deg</td>
-                <td>Excellent</td>
+                <td><span class="badge-good">Excellent</span></td>
               </tr>
-              <tr class="row-warn">
+              <tr>
                 <td>Yaw</td>
-                <td>6.7576</td>
+                <td class="val-warn">6.7576</td>
                 <td>deg</td>
-                <td>Magnetometer limited</td>
+                <td><span class="badge-warn">Mag-limited</span></td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="mini-note">
-          The yaw RMSE of 6.76° reflects the inherent limitation of single-magnetometer
-          heading estimation in simulation. The filter tracks yaw trends correctly but
-          accumulates a slowly varying offset during aggressive maneuvers. A dual-antenna
-          GPS heading source would reduce this significantly and is planned for the
-          real-hardware extension.
+        <div class="note" style="margin-top:16px;">
+          <span class="note-icon">ℹ</span>
+          <p>
+            The yaw RMSE of 6.76° reflects the inherent limitation of single-magnetometer
+            heading estimation. The filter tracks yaw trends correctly but accumulates a
+            slowly-varying offset during aggressive manoeuvres. A dual-antenna GPS heading
+            source would eliminate this dominant error term and is planned for the
+            real-hardware extension.
+          </p>
         </div>
       </div>
     </section>
 
     <!-- ── SUNCUBES ── -->
-    <section id="suncubes">
-      <div class="section-title">
-        <h2>Extension to a Real Drone</h2>
-        <p>
-          The SITL-validated estimator is now being adapted for deployment on physical
-          hardware in collaboration with SunCubes.
-        </p>
-      </div>
+    <section id="suncubes" class="section-gap reveal">
+      <p class="label">Ongoing Work</p>
+      <h2 class="section-title">Extension to a Real Drone</h2>
+      <p class="section-sub">
+        The SITL-validated estimator is now being adapted for deployment on physical hardware
+        in collaboration with SunCubes.
+      </p>
 
-      <div style="margin-bottom: 22px;">
-        <div class="suncubes-banner">
-          <div class="suncubes-icon">🛸</div>
-          <div class="suncubes-body">
-            <h3>In Progress · SunCubes Company</h3>
-            <p>
-              The MEKF is currently being extended and redesigned for real hardware deployment
-              at <a href="http://suncubes.space/" target="_blank" rel="noopener">SunCubes</a>,
-              a drone technology company. The transition from SITL to a physical drone introduces
-              new challenges: real sensor noise characteristics, vibration-induced IMU corruption,
-              actual GPS multipath, magnetic interference from motors, and latency in the MAVLink
-              communication link — all of which require retuning and structural changes to the
-              filter. This ongoing work is being carried out on SunCubes hardware running PX4.
-            </p>
-          </div>
+      <div class="suncubes-banner" style="margin-bottom:24px;">
+        <div class="sc-icon">🛸</div>
+        <div class="sc-body">
+          <h3>In Progress · SunCubes, Milan</h3>
+          <p>
+            The MEKF is currently being extended and redesigned for real hardware deployment at
+            <a href="http://suncubes.space/" target="_blank" rel="noopener">SunCubes</a>,
+            a drone technology company based in Milan. The transition from SITL to a physical
+            drone introduces real sensor noise, vibration-induced IMU corruption, GPS multipath,
+            magnetic interference from motors, and MAVLink latency jitter — all requiring
+            structural changes to the filter and empirical retuning on flight logs.
+          </p>
         </div>
       </div>
 
       <div class="grid-2">
         <div class="card">
-          <h3>Key Differences: SITL → Real Hardware</h3>
+          <h3>Key Challenges: SITL → Real Hardware</h3>
           <ul>
             <li>
-              <strong>IMU noise:</strong> Real MEMS IMUs have vibration aliasing,
-              temperature-dependent bias drift, and correlated noise requiring characterization
+              <strong>IMU noise:</strong> Real MEMS IMUs exhibit vibration aliasing,
+              temperature-dependent bias drift, and correlated noise requiring characterisation
               from static and hover logs.
             </li>
             <li>
-              <strong>GPS quality:</strong> Real GPS is subject to multipath, HDOP variation,
-              and latency jitter that make position and velocity gating more critical.
+              <strong>GPS quality:</strong> Multipath, HDOP variation, and latency jitter make
+              position and velocity innovation gating more critical.
             </li>
             <li>
-              <strong>Magnetometer disturbances:</strong> Motor currents and ESC switching
-              create magnetic interference far stronger than in simulation.
+              <strong>Magnetometer disturbances:</strong> Motor currents and ESC switching create
+              magnetic interference far stronger than in simulation.
             </li>
             <li>
               <strong>Timing:</strong> Real MAVLink streams arrive with variable latency;
-              timestamp alignment between sensors needs explicit handling.
+              explicit timestamp alignment between sensors is required.
             </li>
           </ul>
         </div>
@@ -1080,36 +1325,46 @@ h_m,z(x)  = m̂_b,z / ‖m_n^ref‖</div>
         <div class="card">
           <h3>Planned Improvements</h3>
           <ul>
+            <li>Empirical noise covariance identification from static and hover flight logs.</li>
+            <li>Adaptive measurement gating based on GPS fix quality and HDOP.</li>
+            <li>Vibration pre-filtering on the accelerometer channel, tuned to rotor harmonics.</li>
+            <li>Soft magnetic calibration to reduce motor-current-induced heading errors.</li>
             <li>
-              Empirical noise covariance identification from static and hover flight logs.
+              Dual-antenna GPS heading source to replace magnetometer-only yaw correction and
+              eliminate the dominant RMSE term.
             </li>
             <li>
-              Adaptive measurement gating based on GPS fix quality and HDOP.
-            </li>
-            <li>
-              Vibration pre-filtering on the accelerometer channel tuned to rotor harmonics.
-            </li>
-            <li>
-              Soft magnetic calibration to reduce motor-current-induced heading errors.
-            </li>
-            <li>
-              Dual-antenna GPS heading source to replace magnetometer-only yaw estimation
-              and eliminate the dominant RMSE term.
+              Federated Kalman Filter architecture to fuse laser-based range measurements with
+              the MEKF pose-estimation pipeline.
             </li>
           </ul>
-          <div class="mini-note">
-            The SITL validation baseline provides a clean regression reference: any change
-            that degrades SITL RMSE below the values in the table above is rejected before
-            being tested on hardware.
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              The SITL RMSE values serve as a regression baseline: any change that degrades
+              performance below the table values above is rejected before being tested on hardware.
+            </p>
           </div>
         </div>
       </div>
     </section>
 
-    <footer>
-      © 2026 Omid Arefian · UAV State Estimation · PX4 SITL · SunCubes Collaboration
-    </footer>
-
   </main>
+
+  <footer class="site-footer">
+    © 2026 Omid Arefian · UAV State Estimation · PX4 SITL · SunCubes Collaboration
+  </footer>
+
+  <script>
+    const items = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); }
+      }),
+      { threshold: 0.07 }
+    );
+    items.forEach(el => io.observe(el));
+  </script>
+
 </body>
 </html>
