@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TurtleBot3 Path-Following Controller | Omid Arefian</title>
+  <title>SLAM-Based Navigation and Path Planning on TurtleBot3 | Omid Arefian</title>
   <meta
     name="description"
     content="Autonomous navigation pipeline for TurtleBot3: SLAM mapping, A* planning, AMCL localization, and pure-pursuit feedback control in ROS 2 and Gazebo."
@@ -438,8 +438,7 @@
       <p class="label">Overview</p>
       <h2 class="section-title">Project Overview</h2>
       <p class="section-sub">
-        A full autonomy chain built on TurtleBot3, demonstrating the integration of
-        perception, planning, and control from first principles.
+
       </p>
 
       <div class="grid-2">
@@ -475,8 +474,7 @@
       <p class="label">Mapping</p>
       <h2 class="section-title">Mapping with SLAM and RViz</h2>
       <p class="section-sub">
-        Before planning can begin, a consistent 2D occupancy map of the full environment
-        must be built.
+
       </p>
 
       <div class="grid-2">
@@ -525,8 +523,7 @@
       <p class="label">Planning</p>
       <h2 class="section-title">A* Global Planning</h2>
       <p class="section-sub">
-        A memory-efficient A* planner was implemented from scratch to find collision-free
-        paths on the full-size occupancy grid.
+
       </p>
 
       <div class="grid-3">
@@ -665,8 +662,7 @@
       <p class="label">Control</p>
       <h2 class="section-title">Control System Design</h2>
       <p class="section-sub">
-        The navigation controller combines a nominal pure-pursuit path-following law with
-        a reactive laser-scan safety layer.
+
       </p>
 
       <div class="grid-2">
@@ -772,8 +768,7 @@
       <p class="label">Localisation</p>
       <h2 class="section-title">AMCL Localisation</h2>
       <p class="section-sub">
-        Accurate continuous pose estimation is required before the feedback controller
-        can execute the planned path.
+
       </p>
 
       <div class="grid-2">
@@ -833,10 +828,7 @@
         <div class="media-caption">
           <h3>Robot Executing the Planned Path</h3>
           <p>
-            The left panel shows the Gazebo 3D simulation; the right panel shows the
-            real-time path tracking visualisation in MATLAB. The cyan line is the
-            A*-planned reference path and the coloured overlay is the robot's actual
-            odometry trajectory. The yellow dot marks the current robot position.
+
           </p>
         </div>
       </div>
@@ -849,11 +841,7 @@
         <div class="media-caption">
           <h3>Full Multi-Path Navigation Map</h3>
           <p>
-            The complete tracking map shows all four executed legs through the house
-            environment. The cyan lines are the A*-planned paths; the orange and purple
-            overlays are the robot's actual driven trajectories across different navigation
-            runs. The close agreement between planned and executed paths demonstrates the
-            accuracy of the pure-pursuit controller combined with AMCL localisation.
+
           </p>
         </div>
       </div>
