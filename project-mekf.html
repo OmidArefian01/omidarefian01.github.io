@@ -797,9 +797,7 @@ without explicit re-normalisation in the covariance equations. -->
         <div class="card">
           <h3>GPS Horizontal Velocity Update</h3>
           <p>
-            When ground speed \(s^{gps}\) and course angle \(\chi^{gps}\) are available,
-            horizontal NED velocity components are constructed and used as an additional
-            correction. A chi-squared gate rejects measurements with excessive innovation:
+          
           </p>
           <div class="eq-block">
             \[
@@ -870,9 +868,7 @@ without explicit re-normalisation in the covariance equations. -->
       <p class="label">Results</p>
       <h2 class="section-title">Validation Results</h2>
       <p class="section-sub">
-        The MEKF was validated in PX4 SITL across a full 80-second flight covering takeoff,
-        aggressive lateral and vertical manoeuvres, and landing. All outputs are compared
-        against PX4's onboard EKF2 reference estimates.
+
       </p>
 
       <!-- Attitude -->
@@ -884,11 +880,7 @@ without explicit re-normalisation in the covariance equations. -->
         <div class="media-caption">
           <h3>Attitude Comparison — Roll, Pitch, Yaw</h3>
           <p>
-            The MEKF attitude (solid blue) tracks the PX4/SITL reference (orange dashed) very
-            closely for roll and pitch throughout the entire flight. The yaw channel shows a
-            slowly varying offset during the most aggressive manoeuvres between 20–50 s —
-            expected given that yaw is corrected only by the magnetometer. The filter recovers
-            correctly once the manoeuvre ends.
+
           </p>
         </div>
       </div>
@@ -902,11 +894,7 @@ without explicit re-normalisation in the covariance equations. -->
         <div class="media-caption">
           <h3>Velocity Comparison — \(v_x,\; v_y,\; v_z\)</h3>
           <p>
-            Horizontal velocity estimates match the PX4 reference almost exactly across the full
-            flight envelope, including peak velocities above 4 m/s. Vertical velocity \(v_z\)
-            shows slightly more noise than the PX4 reference due to the barometer update rate
-            and the absence of a dedicated vertical-velocity sensor, but the trend and magnitude
-            are well captured throughout.
+
           </p>
         </div>
       </div>
@@ -920,11 +908,7 @@ without explicit re-normalisation in the covariance equations. -->
         <div class="media-caption">
           <h3>Position Comparison — \(x,\; y,\; z\)</h3>
           <p>
-            Position in all three axes remains tightly coupled to the PX4 reference throughout
-            the flight, including during the largest displacements of roughly 40 m in the
-            \(x\)-direction and \(-15\) m in altitude. The close agreement demonstrates that
-            GPS and barometer updates effectively prevent inertial drift over the full
-            80-second flight duration.
+
           </p>
         </div>
       </div>
