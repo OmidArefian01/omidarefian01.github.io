@@ -456,8 +456,7 @@
       <p class="label">Overview</p>
       <h2 class="section-title">Project Overview</h2>
       <p class="section-sub">
-        The aim is to learn a control policy that manages multiple boxes in a constrained
-        environment while improving organisation quality and avoiding undesired configurations.
+
       </p>
 
       <div class="grid-2">
@@ -497,10 +496,7 @@
             tuning through entropy regularisation, clipping ratio, discounting, and network
             architecture choices.
           </p>
-          <p>
-            Compared to vanilla policy gradient, PPO prevents destructively large updates by
-            constraining the policy ratio \(r_t(\theta)\):
-          </p>
+
           <div class="eq-block">
             \[
               r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\mathrm{old}}}(a_t \mid s_t)}
@@ -531,8 +527,7 @@
       <p class="label">Environment</p>
       <h2 class="section-title">Environment and Task Setup</h2>
       <p class="section-sub">
-        The custom environment models a structured workspace where an agent must coordinate
-        the motion of two boxes simultaneously.
+
       </p>
 
       <div class="media-card" style="margin-bottom:22px;">
@@ -592,8 +587,7 @@
       <p class="label">Algorithm</p>
       <h2 class="section-title">PPO Training Algorithm</h2>
       <p class="section-sub">
-        The full PPO objective augments the clipped surrogate loss with a value-function
-        term and an entropy bonus to encourage exploration.
+
       </p>
 
       <div class="grid-2">
@@ -744,9 +738,7 @@
           <div class="media-caption">
             <h3>Reward Distribution</h3>
             <p>
-              This 3D plot provides geometric intuition about the reward landscape. It helps
-              explain why certain regions of the state space are attractive to the policy and
-              why the learned behaviour converges toward specific spatial configurations.
+
             </p>
           </div>
         </div>
@@ -806,7 +798,7 @@
       <p class="label">Analysis</p>
       <h2 class="section-title">Discussion</h2>
       <p class="section-sub">
-        Interpretation of the results and the significance of the design choices.
+
       </p>
 
       <div class="grid-2">
