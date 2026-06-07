@@ -485,7 +485,7 @@
             Commercial autopilots such as PX4 provide high-quality onboard state estimates,
             but these are not suitable as a standalone research estimator — the internal filter
             details are opaque and the output mixes sensor fusion with control feedback. This
-            project implements an independent MEKF that consumes only raw MAVLink sensor
+            project implements an independent MEKF that consumes only raw sensor
             streams, propagates the drone state from inertial measurements, and corrects it
             with GPS, barometer, and magnetometer updates.
           </p>
@@ -499,10 +499,8 @@
         <div class="card">
           <h3>State Vector</h3>
           <p>
-            The filter maintains a 20-dimensional nominal state and a 19-dimensional error
-            state. The quaternion contributes only 3 DOF via the multiplicative error
-            \(\delta\boldsymbol{\theta}\), not 4, which preserves the unit-norm constraint
-            on \(\mathbf{SO}(3)\) without explicit re-normalisation in the covariance equations:
+            The filter maintains a 19-dimensional error
+            state.
           </p>
           <div class="eq-block">
             \[
@@ -566,7 +564,7 @@
         </div>
 
         <div class="card">
-          <span class="card-label">Low Rate · ≈ 5 Hz</span>
+          <span class="card-label">Low Rate · ≈ 1 Hz</span>
           <h3>GPS + Baro Update</h3>
           <p>
             Standard EKF correction applied whenever GPS or barometer data arrives.
@@ -594,7 +592,7 @@
         </div>
 
         <div class="card">
-          <span class="card-label">Medium Rate · ≈ 50 Hz</span>
+          <span class="card-label">Medium Rate · ≈ 8 Hz</span>
           <h3>Magnetometer Update</h3>
           <p>
             Corrects yaw and magnetometer bias via a normalised horizontal-vector update
@@ -648,8 +646,7 @@
       <p class="label">Sensors</p>
       <h2 class="section-title">Coordinate Frames &amp; Sensor Streams</h2>
       <p class="section-sub">
-        Two coordinate frames and five MAVLink streams, split into estimation inputs
-        and comparison-only references.
+        
       </p>
 
       <div class="grid-2">
@@ -705,8 +702,7 @@
       <p class="label">Propagation</p>
       <h2 class="section-title">State Propagation Model</h2>
       <p class="section-sub">
-        The prediction step integrates the full nonlinear dynamics at IMU rate, then
-        propagates the error-state covariance through the linearised transition Jacobian.
+
       </p>
 
       <div class="grid-2">
@@ -751,22 +747,22 @@
 
         <div class="card">
           <h3>Covariance Propagation</h3>
-          <p>
-            The \(19 \times 19\) error-state covariance is propagated through the linearised
-            error-state transition matrix \(F_k\), computed numerically using
-            boxplus (\(\boxplus\)) and boxminus (\(\boxminus\)) operations on the
-            \(\mathbf{SO}(3)\) manifold:
-          </p>
+     <!-- <p>
+  The \(19 \times 19\) error-state covariance is propagated through the linearised
+  error-state transition matrix \(F_k\), computed numerically using
+  boxplus (\(\boxplus\)) and boxminus (\(\boxminus\)) operations on the
+  \(\mathbf{SO}(3)\) manifold:
+</p> -->
           <div class="eq-block">
             \[
               P^{-}_{k+1} = F_k\,P^{+}_k\,F_k^\top + Q_k
             \]
           </div>
           <p style="margin-top:14px;">
-            \(Q_k\) is the discrete process-noise covariance, tuned to reflect IMU noise
-            spectral density and bias instability. The error-state formulation keeps the
-            quaternion unit-norm constraint \(\lVert\mathbf{q}\rVert = 1\) satisfied at every step
-            without explicit re-normalisation in the covariance equations.
+   <!-- \(Q_k\) is the discrete process-noise covariance, tuned to reflect IMU noise
+spectral density and bias instability. The error-state formulation keeps the
+quaternion unit-norm constraint \(\lVert\mathbf{q}\rVert = 1\) satisfied at every step
+without explicit re-normalisation in the covariance equations. -->
           </p>
         </div>
       </div>
@@ -777,8 +773,7 @@
       <p class="label">Measurement Updates</p>
       <h2 class="section-title">Sensor Fusion Logic</h2>
       <p class="section-sub">
-        Five separate update channels handle GPS position, GPS velocity, barometer altitude,
-        magnetometer horizontal vector, and magnetometer z-component.
+
       </p>
 
       <div class="grid-2">
