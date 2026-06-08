@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Optimal Obstacle-Avoiding Trajectory Design | Omid Arefian</title>
+  <title>Optimal Control and Trajectory Generation with NLP and PMP | Omid Arefian</title>
   <meta
     name="description"
     content="Nonlinear optimal control project: indirect and direct single-shooting methods with LQR tracking for obstacle-avoiding trajectory design."
@@ -603,7 +603,7 @@
 
       <div class="hero-text">
         <p class="hero-overline">Indirect Method · Direct Method · LQR Comparison</p>
-        <h1 class="hero-title">Optimal Obstacle-Avoiding<br />Trajectory Design</h1>
+        <h1 class="hero-title">Optimal Control and Trajectory Generation with NLP and PMP</h1>
         <p class="hero-lead">
           A nonlinear optimal control problem for a simplified 2D vehicle: drive the system
           from an initial state to a target while minimising control effort, avoiding an
@@ -641,8 +641,7 @@
       <p class="label">Problem Statement</p>
       <h2 class="section-title">Project Assignment</h2>
       <p class="section-sub">
-        Formulate and solve a nonlinear optimal control problem for a simplified vehicle
-        model, incorporating obstacle avoidance through a smooth penalty in the cost function.
+       
       </p>
 
       <div class="grid-2">
@@ -704,8 +703,7 @@
       <p class="label">Modelling</p>
       <h2 class="section-title">Assumptions &amp; Model Setup</h2>
       <p class="section-sub">
-        Simplifications made before solving the optimisation problem, and the analytical
-        form of the obstacle penalty.
+        
       </p>
 
       <div class="grid-2">
@@ -740,9 +738,7 @@
             \]
           </div>
           <p style="margin-top:12px;">
-            This smooth penalty makes paths near the obstacle more expensive and encourages
-            the optimiser to bend the trajectory around the forbidden region without
-            introducing hard constraints that would complicate the Hamiltonian analysis.
+
           </p>
         </div>
       </div>
@@ -965,8 +961,7 @@
             at \((5, 5)\), but produce slightly different paths. The indirect method follows
             the Hamiltonian optimality conditions analytically, while the direct method
             treats the problem as a parametric optimisation over the control sequence.
-            Both converge to near-identical cost values, confirming consistency of the
-            two formulations.
+            
           </p>
         </div>
       </div>
@@ -1033,65 +1028,13 @@
             heuristics.
           </p>
           <p>
-            The LQR tracking layer shows how a locally-optimal linear controller can be
-            constructed around the nominal trajectory, providing robustness to small
-            perturbations while preserving the globally-optimal reference path.
+
           </p>
         </div>
       </div>
     </section>
 
-    <!-- ── EXTENSIONS ── -->
-    <section id="extensions" class="section-gap reveal">
-      <p class="label">Further Work</p>
-      <h2 class="section-title">Possible Extensions</h2>
-      <p class="section-sub">
-        Extensions that go beyond the base solution and deepen the analysis.
-      </p>
-
-      <div class="card">
-        <ul>
-          <li>
-            <strong>Zero-velocity terminal constraint:</strong> augment the state so the
-            target is reached with \(v(t_f) = 0\), adding a boundary condition to the
-            costate equations.
-          </li>
-          <li>
-            <strong>Hard obstacle constraint:</strong> replace the smooth penalty
-            \(\Pi(x,y)\) with a hard state constraint \(g(\mathbf{z}) \leq 0\) and
-            handle it via path-constraint multipliers in the Hamiltonian.
-          </li>
-          <li>
-            <strong>Minimum-time formulation:</strong> minimise the final time \(t_f\)
-            subject to the dynamics and obstacle constraints, converting the free-endpoint
-            problem into a fixed-endpoint one.
-          </li>
-          <li>
-            <strong>Higher-fidelity vehicle model:</strong> include rotational inertia,
-            actuator dynamics, and a full 6-DOF model to test the sensitivity of the
-            optimal solution to modelling assumptions.
-          </li>
-          <li>
-            <strong>Neighbouring optimal control:</strong> compute the second-order
-            optimality conditions and implement a neighbouring optimal feedback law
-            to actively reject disturbances along the nominal trajectory.
-          </li>
-          <li>
-            <strong>Multiple obstacles:</strong> extend \(\Pi(x,y)\) to a sum of Gaussian
-            penalties and study how the optimal path topology changes as obstacle
-            configuration varies.
-          </li>
-        </ul>
-        <div class="note" style="margin-top:16px;">
-          <span class="note-icon">ℹ</span>
-          <p>
-            Among these, the indirect–direct comparison and the LQR tracking layer were
-            implemented and validated. The remaining extensions represent natural next
-            steps for a more complete treatment of the problem.
-          </p>
-        </div>
-      </div>
-    </section>
+  
 
     <!-- ── FILES ── -->
     <section id="files" class="section-gap reveal">
