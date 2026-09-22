@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SLAM-Based Navigation and Path Planning on TurtleBot3 | Omid Arefian</title>
+  <title>KFPnP: Robust, Adaptive ArUco Pose Estimation | Omid Arefian</title>
   <meta
     name="description"
-    content="Autonomous navigation pipeline for TurtleBot3: SLAM mapping, A* planning, AMCL localization, and pure-pursuit feedback control in ROS 2 and Gazebo."
+    content="KFPnP: a robust marker-identification and adaptive-uncertainty pose pipeline built on MLPnP — CNN-assisted marker recovery, a live per-corner noise model, and covariance-weighted pose estimation."
   />
 
   <!-- Google Fonts — identical to index -->
@@ -53,6 +53,8 @@
       --accent-pale: #ddeef8;
       --green:       #1a7a5e;
       --green-pale:  #d4ede7;
+      --amber:       #a4651d;
+      --amber-pale:  #f3e4d4;
       --line:        #dde6ee;
       --card-bg:     #ffffff;
       --card-border: #e2ebf2;
@@ -276,6 +278,7 @@
     /* ── GRIDS ── */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 
     /* ── CARDS ── */
     .card {
@@ -331,6 +334,37 @@
     .note-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
     .note p { font-size: 0.88rem; color: var(--navy-mid); line-height: 1.6; margin: 0 !important; }
 
+    .note.guard {
+      background: var(--amber-pale);
+      border-color: rgba(164,101,29,0.22);
+    }
+    .note.guard p { color: var(--amber); }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--off-white);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--navy);
+      flex: 1 1 180px;
+    }
+    .flow-step.accent { background: var(--accent-pale); border-color: rgba(29,111,164,0.2); }
+    .flow-step.amber { background: var(--amber-pale); border-color: rgba(164,101,29,0.2); }
+    .flow-arrow { color: var(--steel); font-size: 1.1rem; flex: 0 0 auto; }
+
     /* ── MEDIA CARD ── */
     .media-card {
       background: var(--card-bg);
@@ -339,10 +373,32 @@
       overflow: hidden;
       box-shadow: var(--shadow-sm);
     }
-    .media-card img { width: 100%; height: auto; display: block; border-bottom: 1px solid var(--card-border); }
+    .media-card img,
+    .media-card video { width: 100%; height: auto; display: block; border-bottom: 1px solid var(--card-border); background: var(--navy); }
     .media-caption { padding: 20px 24px 22px; }
     .media-caption h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 7px; }
     .media-caption p { font-size: 0.9rem; color: var(--text-soft); line-height: 1.68; }
+
+    /* ── STAT STRIP ── */
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-card .stat-num {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      color: var(--navy);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .stat-card .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
 
     /* ── RESULTS TABLE ── */
     .table-wrap { overflow-x: auto; margin-top: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
@@ -363,7 +419,7 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 960px) {
-      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
       .hero-img-wrap { height: 300px; }
     }
     @media (max-width: 640px) {
@@ -380,7 +436,7 @@
       <a href="index.html" class="brand">Omid Arefian</a>
       <div class="nav-actions">
         <a href="index.html#projects" class="btn-secondary">← All Projects</a>
-        <a href="#results" class="btn-primary">Jump to Results</a>
+        <a href="#validation" class="btn-primary">Jump to Validation</a>
       </div>
     </div>
   </nav>
@@ -391,42 +447,41 @@
     <section class="hero">
       <div class="hero-img-wrap">
         <img
-          src="assets/tbot4.png"
-          alt="Real-time tracking of TurtleBot3 path vs planned A* path overlaid on the house map"
+          src="assets/kfpnp-cover.png"
+          alt="Three ArUco markers tracked live under changing illumination, with per-corner confidence overlays"
         />
-        <div class="hero-badge">Autonomous Navigation · Politecnico di Milano · 2025/2026</div>
+        <div class="hero-badge">Robust · Adaptive Pose Estimation · 2026</div>
       </div>
 
       <div class="hero-text">
-        <p class="hero-overline">SLAM Mapping · A* Planning · AMCL Localisation · Pure-Pursuit Control</p>
-        <h1 class="hero-title">SLAM-Based Navigation and Path Planning on TurtleBot3 </h1>
+        <p class="hero-overline">Robust Marker Recovery · Adaptive Uncertainty · Weighted MLPnP</p>
+        <h1 class="hero-title">KFPnP: Robust and Adaptive ArUco Pose Estimation</h1>
         <p class="hero-lead">
-          A complete autonomous navigation pipeline for the TurtleBot3 robot inside the
-          <em>turtlebot3_house</em> Gazebo simulation. The work covers every layer of a
-          standard mobile-robot stack: building a 2D occupancy map with SLAM, planning
-          collision-free paths with a custom A* algorithm, localising with AMCL, and tracking
-          waypoints with a pure-pursuit feedback controller augmented by a laser-scan
-          safety layer.
+          KFPnP rebuilds the ArUco-to-pose pipeline around a single idea: a pose solver is only
+          as good as the confidence it places in each measurement. Classical marker detection
+          treats every corner as equally trustworthy and every frame as equally lit — an
+          assumption that breaks down under motion blur, glare, and low light. KFPnP replaces
+          that assumption with a marker-recovery stage that stays robust when classical detection
+          falters, and a live uncertainty model that tells the pose solver exactly how much to
+          trust each corner, frame by frame.
         </p>
 
         <div class="tag-row">
-          <span class="tag">ROS 2</span>
-          <span class="tag">MATLAB</span>
-          <span class="tag">Gazebo</span>
-          <span class="tag">A* Planning</span>
-          <span class="tag">Pure Pursuit</span>
-          <span class="tag">AMCL</span>
-          <span class="tag">SLAM</span>
-          <span class="tag">Dijkstra</span>
+          <span class="tag">Computer Vision</span>
+          <span class="tag">MLPnP</span>
+          <span class="tag">CNN Classification</span>
+          <span class="tag">Uncertainty Modelling</span>
+          <span class="tag">Camera Calibration</span>
+          <span class="tag">Python</span>
+          <span class="tag">OpenCV</span>
         </div>
 
         <div class="anchor-row">
           <a class="anchor-btn" href="#overview">Overview</a>
-          <a class="anchor-btn" href="#mapping">Mapping</a>
-          <a class="anchor-btn" href="#planning">Planning</a>
-          <a class="anchor-btn" href="#comparison">Algorithm Comparison</a>
-          <a class="anchor-btn" href="#control">Control System</a>
-          <a class="anchor-btn" href="#localization">AMCL</a>
+          <a class="anchor-btn" href="#identification">Robust Identification</a>
+          <a class="anchor-btn" href="#noise">Adaptive Noise</a>
+          <a class="anchor-btn" href="#integration">Weighted MLPnP</a>
+          <a class="anchor-btn" href="#validation">Live Validation</a>
           <a class="anchor-btn" href="#results">Results</a>
           <a class="anchor-btn" href="#conclusion">Conclusion</a>
         </div>
@@ -436,376 +491,317 @@
     <!-- ── OVERVIEW ── -->
     <section id="overview" class="section-gap reveal">
       <p class="label">Overview</p>
-      <h2 class="section-title">Project Overview</h2>
+      <h2 class="section-title">Why a Fixed Noise Assumption Falls Short</h2>
       <p class="section-sub">
-
+        Conventional PnP pipelines feed every detected corner into the solver with the same
+        assumed measurement noise, no matter how the marker was actually lit or how sharply its
+        corners were resolved. KFPnP was built to close that gap.
       </p>
 
       <div class="grid-2">
         <div class="card">
-          <h3>Course Context</h3>
+          <h3>The Problem With "One Noise Value Fits All"</h3>
           <p>
-            This project was completed as the final report for <em>Autonomous Vehicles</em>
-            (Prof. Stefano Arrigoni, A.Y. 2025/2026) at Politecnico di Milano. The objective
-            was to design and validate a full navigation stack on the TurtleBot3 platform inside
-            the <code style="font-family:'Courier New',monospace;font-size:0.88em;color:var(--navy);">turtlebot3_house</code>
-            Gazebo environment.
+            A pose solver that weights every corner equally is implicitly told that a corner
+            seen in bright, sharp conditions is just as reliable as one glimpsed near the sensor's
+            darkness limit or smeared by motion. In practice that forces the solver to either
+            under-trust its best measurements or over-trust its worst ones — there is no way to
+            tell them apart after the fact.
           </p>
           <p>
-            The bonus task — closed-loop navigation using AMCL localisation and a
-            path-tracking feedback controller — was also completed in full.
+            KFPnP addresses this at two points in the pipeline: <strong>recovering the marker's
+            identity</strong> even when classical detection is uncertain, and <strong>estimating
+            a fresh, per-corner measurement uncertainty</strong> on every frame, so the pose
+            solver can weight each observation by how much it actually deserves to be trusted.
           </p>
         </div>
 
         <div class="card">
-          <h3>High-Level Pipeline</h3>
-          <ul>
-            <li><strong>Stage 1 — SLAM Mapping:</strong> Teleoperate the robot and build a 2D occupancy grid in RViz using SLAM.</li>
-            <li><strong>Stage 2 — A* Planning:</strong> Implement a memory-efficient A* planner on the saved occupancy grid; test four start–goal pairs.</li>
-            <li><strong>Stage 3 — AMCL Localisation:</strong> Load the saved map and initialise the particle filter with a manual pose estimate in RViz.</li>
-            <li><strong>Stage 4 — Feedback Control:</strong> Track the planned waypoints with a pure-pursuit controller and a laser-scan safety layer.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── MAPPING ── -->
-    <section id="mapping" class="section-gap reveal">
-      <p class="label">Mapping</p>
-      <h2 class="section-title">Mapping with SLAM and RViz</h2>
-      <p class="section-sub">
-
-      </p>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3>Procedure</h3>
-          <p>
-            The simulation was launched and the robot was manually driven with
-            <code style="font-family:'Courier New',monospace;font-size:0.88em;color:var(--navy);">teleop_node</code>
-            through every corridor and around every obstacle. While exploring, SLAM
-            incrementally estimated the robot pose and accumulated laser scan observations
-            into a 2D occupancy grid. Each cell is labelled as <strong>free</strong>,
-            <strong>occupied</strong>, or <strong>unknown</strong>.
-          </p>
-          <p>
-            Once the map was visually consistent and all accessible areas were covered, it
-            was saved as a fixed reference for all planning and navigation stages.
-          </p>
-          <div class="note">
+          <span class="card-label">Pipeline</span>
+          <h3>High-Level Architecture</h3>
+          <div class="flow-row">
+            <div class="flow-step">Marker Detection</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step accent">Robust Identification</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step amber">Adaptive Noise Estimate</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Weighted MLPnP</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Pose + Covariance</div>
+          </div>
+          <div class="note" style="margin-top:20px;">
             <span class="note-icon">ℹ</span>
             <p>
-              A critical requirement for the AMCL stage is that the map covers the full
-              navigable environment — gaps in the map degrade particle-filter localisation quality.
+              Every stage produces a number the next stage can act on: an identity and
+              confidence, a per-corner uncertainty, and finally a pose with its own six-degree-of-
+              freedom covariance — not just a point estimate.
             </p>
           </div>
         </div>
+      </div>
 
+      <div style="margin-top:22px;">
         <div class="media-card">
           <img
-            src="assets/tbot2.png"
-            alt="Occupancy grid map built in RViz using SLAM while teloperating the TurtleBot3"
+            src="assets/kfpnp-pipeline-diagram.png"
+            alt="KFPnP pipeline overview: identification, robust identification, pose covariance estimation, and adaptive noise modelling stages"
           />
           <div class="media-caption">
-            <h3>Constructed Occupancy Map</h3>
+            <h3>Pipeline at a Glance</h3>
             <p>
-              The RViz view shows the completed occupancy grid after manually exploring the
-              house environment. White cells are free space, black cells are obstacles, and
-              the teal-shaded region is unmapped territory at the time of saving.
+              The four stages of KFPnP, from marker identification through to a pose that carries
+              its own covariance — the map, not the method.
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── PLANNING ── -->
-    <section id="planning" class="section-gap reveal">
-      <p class="label">Planning</p>
-      <h2 class="section-title">A* Global Planning</h2>
+    <!-- ── ROBUST IDENTIFICATION ── -->
+    <section id="identification" class="section-gap reveal">
+      <p class="label">Robust Identification</p>
+      <h2 class="section-title">Recovering Markers When Classical Detection Struggles</h2>
       <p class="section-sub">
-
+        Dictionary-based ArUco decoding is fast and reliable in good conditions, but it is a hard
+        pass/fail test: a blurred, tilted, or partially shadowed marker either decodes cleanly or
+        is discarded entirely. KFPnP adds a learned fallback that degrades gracefully instead.
       </p>
 
       <div class="grid-3">
-
         <div class="card">
-          <span class="card-label">Grid Formulation</span>
-          <h3>Map to Graph</h3>
+          <span class="card-label">Training</span>
+          <h3>Learning From Synthetic Variation</h3>
           <p>
-            The saved occupancy image is converted to a binary matrix where each cell is
-            either free or an obstacle. Start and goal are defined in grid coordinates
-            and validated to lie on free cells:
+            A classifier is trained on a large, synthetically generated set of marker crops that
+            span the distortions a real camera actually produces — blur, rotation, partial
+            occlusion, and lighting extremes — rather than only the clean, frontal examples a
+            classical decoder assumes.
           </p>
-          <div class="eq-block">
-            \[
-              BW(r,c) = \begin{cases} 1 & \text{free cell} \\ 0 & \text{obstacle} \end{cases}
-            \]
-          </div>
         </div>
-
         <div class="card">
-          <span class="card-label">Search Algorithm</span>
-          <h3>A* with \(f = g + h\)</h3>
+          <span class="card-label">Inference</span>
+          <h3>Identity, Orientation, Confidence</h3>
           <p>
-            Neighbours are generated on-the-fly — no pre-built adjacency list — keeping
-            memory use constant regardless of grid size. The Euclidean heuristic guides
-            search toward the goal:
+            At runtime the classifier returns not just a marker ID but an orientation estimate
+            and a confidence score for the prediction, so downstream stages know when to trust
+            the recovered identity and when to fall back to classical redetection.
           </p>
-          <div class="eq-block">
-            \[
-              f(q) = g(q) + h(q)
-            \]
-            \[
-              h(q) = \sqrt{(x_g - x)^2 + (y_g - y)^2}
-            \]
-          </div>
         </div>
-
         <div class="card">
-          <span class="card-label">Output</span>
-          <h3>Waypoint Sequences</h3>
+          <span class="card-label">Outcome</span>
+          <h3>Graceful Degradation</h3>
           <p>
-            For each start–goal pair the discrete grid path is converted back to metric
-            coordinates and saved to a file. Planning is done offline once; the same
-            waypoint list is reused for all navigation runs.
+            Instead of a marker vanishing from the tracked set the moment classical decoding
+            fails, KFPnP keeps a confidence-scored identity available through exactly the
+            conditions — blur, glare, partial visibility — where it matters most.
           </p>
-          <div class="note">
-            <span class="note-icon">ℹ</span>
+        </div>
+      </div>
+
+      <div style="margin-top:22px;">
+        <div class="media-card">
+          <video controls playsinline preload="metadata" poster="assets/kfpnp-identification-poster.png">
+            <source src="assets/kfpnp-identification-demo.mp4" type="video/mp4" />
+            Your browser doesn't support embedded video — see kfpnp-identification-demo.mp4.
+          </video>
+          <div class="media-caption">
+            <h3>Marker Recovery Under Degradation</h3>
             <p>
-              This offline-planning / online-execution separation allows the controller to
-              be tuned independently of the planner.
+              Raw camera footage of the markers being identified live — recovering identity,
+              orientation, and confidence exactly where classical dictionary decoding alone
+              would drop the detection entirely.
             </p>
           </div>
         </div>
+      </div>
 
+      <div class="note guard" style="margin-top:22px;">
+        <span class="note-icon">⚠</span>
+        <p>
+          The exact network architecture, training-data composition, and augmentation recipe are
+          intentionally left out of this write-up.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── ADAPTIVE NOISE ── -->
+    <section id="noise" class="section-gap reveal">
+      <p class="label">Adaptive Noise</p>
+      <h2 class="section-title">A Per-Corner Uncertainty, Recomputed Every Frame</h2>
+      <p class="section-sub">
+        Instead of a single fixed pixel-noise constant, KFPnP estimates a fresh measurement
+        uncertainty for every detected corner on every frame — built from two complementary
+        signals that are combined into one covariance the pose solver can consume directly.
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <span class="card-label">Signal 1</span>
+          <h3>Sensor Noise, Calibrated Offline</h3>
+          <p>
+            A camera's own read noise and photon noise depend on how bright the scene is and how
+            much gain the sensor is applying — a corner observed at low light and high gain is
+            simply noisier than one observed in bright, low-gain conditions. This relationship is
+            characterized once, offline, against the camera itself, and evaluated live using only
+            the current frame's brightness and gain.
+          </p>
+        </div>
+        <div class="card">
+          <span class="card-label">Signal 2</span>
+          <h3>Local Image Structure</h3>
+          <p>
+            A well-defined corner with strong gradients in two directions constrains its own
+            position tightly; a corner that looks more like an edge is poorly constrained along
+            that edge's direction. KFPnP reads this directly from the local gradient structure
+            around each corner, so two corners can receive different uncertainty estimates even
+            under identical lighting.
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top:22px;">
+        <div class="card">
+          <span class="card-label">Combined</span>
+          <h3>One Covariance, Recomputed Live</h3>
+          <p>
+            The two signals are blended into a single per-corner covariance matrix, evaluated
+            independently for every corner on every frame — never fitted once and reused, and
+            never assumed to be the same across the frame.
+          </p>
+          <div class="flow-row">
+            <div class="flow-step">Sensor Noise Estimate</div>
+            <span class="flow-arrow">+</span>
+            <div class="flow-step">Local Structure Estimate</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step accent">Per-Corner Covariance</div>
+          </div>
+          <div class="note" style="margin-top:16px;">
+            <span class="note-icon">ℹ</span>
+            <p>
+              Calibrated on the target camera through a dedicated noise-characterization
+              procedure, then evaluated at runtime with no online re-fitting required.
+            </p>
+          </div>
+        </div>
       </div>
 
       <div style="margin-top:22px;">
         <div class="media-card">
           <img
-            src="assets/tbot1.png"
-            alt="Sequential Sparse A* planning results across four start-goal pairs on the house map"
+            src="assets/kfpnp-noise-overview.png"
+            alt="Sensor conditions and local structure feeding into a per-corner adaptive noise estimate"
           />
           <div class="media-caption">
-            <h3>Four Start–Goal Experiments</h3>
+            <h3>How the Two Signals Combine</h3>
             <p>
-              Each map variant (House_1 through House_4) uses a different start and goal
-              position chosen to test distinct navigation scenarios — short straight corridors,
-              multi-room routes, and tight corner navigation. The cyan line shows the
-              A*-planned path; the yellow circle is the start and the red/green stars mark
-              goal positions.
+              A high-level view of how sensor conditions and local corner structure feed a single
+              per-corner covariance — the exact combination is left out of this page.
             </p>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- ── ALGORITHM COMPARISON ── -->
-    <section id="comparison" class="section-gap reveal">
-      <p class="label">Benchmarking</p>
-      <h2 class="section-title">Algorithm Comparison</h2>
-      <p class="section-sub">
-        Five grid-search variants were benchmarked on the same maps. A* with the Manhattan
-        heuristic consistently explored the fewest nodes while returning paths of identical
-        quality to Dijkstra.
-      </p>
-
-      <div class="card">
-        <h3>Map 1 — Representative Results</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Method</th>
-                <th>Runtime (s)</th>
-                <th>Explored nodes</th>
-                <th>Path steps</th>
-                <th>Travel dist.</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Dijkstra (4-neigh.)</td>
-                <td>0.0263</td><td>659</td><td>48</td><td>48.00</td>
-              </tr>
-              <tr>
-                <td>Dijkstra (8-neigh., diag cost \(= \sqrt{2}\))</td>
-                <td>0.0296</td><td>659</td><td>41</td><td>43.90</td>
-              </tr>
-              <tr>
-                <td>A* — Euclidean heuristic</td>
-                <td>0.0179</td><td>389</td><td>41</td><td>43.90</td>
-              </tr>
-              <tr>
-                <td>A* — Manhattan heuristic</td>
-                <td class="val-good">0.0103</td><td class="val-good">372</td><td>41</td><td>43.90</td>
-              </tr>
-              <tr>
-                <td>A* — Chebyshev heuristic</td>
-                <td>0.0105</td><td>408</td><td>41</td><td>43.90</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="note" style="margin-top:16px;">
-          <span class="note-icon">ℹ</span>
-          <p>
-            A* with the Manhattan heuristic explores 44% fewer nodes than Dijkstra while
-            finding a path of identical length. All methods reach the goal successfully.
-          </p>
-        </div>
+      <div class="note guard" style="margin-top:22px;">
+        <span class="note-icon">⚠</span>
+        <p>
+          The exact functional form, fitted calibration constants, and calibration procedure
+          are intentionally omitted here.
+        </p>
       </div>
     </section>
 
-    <!-- ── CONTROL SYSTEM ── -->
-    <section id="control" class="section-gap reveal">
-      <p class="label">Control</p>
-      <h2 class="section-title">Control System Design</h2>
+    <!-- ── WEIGHTED MLPnP ── -->
+    <section id="integration" class="section-gap reveal">
+      <p class="label">Integration</p>
+      <h2 class="section-title">Feeding Uncertainty Into the Pose Solver</h2>
       <p class="section-sub">
-
-      </p>
-
-      <div class="grid-2">
-
-        <div class="card">
-          <span class="card-label">Assignment Controller</span>
-          <h3>Proportional Waypoint Tracker</h3>
-          <p>
-            Each waypoint is tracked with a proportional distance-and-heading law. The robot
-            drives toward the active waypoint, decelerating as it gets closer, then aligns
-            its heading in place before advancing:
-          </p>
-          <div class="eq-block">
-            \[
-              d = \sqrt{(x_g - x)^2 + (y_g - y)^2}
-            \]
-            \[
-              \alpha = \mathrm{wrap}\!\left(\mathrm{atan2}(y_g - y,\; x_g - x) - \psi\right)
-            \]
-            \[
-              v = \mathrm{sat}(k_v \cdot d,\; 0,\; v_{\max})
-            \]
-            \[
-              \omega = \mathrm{sat}(k_\omega \cdot \alpha,\; -\omega_{\max},\; \omega_{\max})
-            \]
-          </div>
-          <div class="note">
-            <span class="note-icon">ℹ</span>
-            <p>
-              Reach condition: \(d \leq r_{\mathrm{goal}} = 0.05\) m.
-              Align condition: \(\lvert e_\psi \rvert \leq 3°\). The variable gain
-              \(k_{\mathrm{thrust}} = \mathrm{sat}(d/d_{\max}, 0, 1)\) gives smooth
-              deceleration without a separate speed scheduler.
-            </p>
-          </div>
-        </div>
-
-        <div class="card">
-          <span class="card-label">Project Controller</span>
-          <h3>Pure Pursuit + Safety Layer</h3>
-          <p>
-            The project controller selects a look-ahead point at fixed distance \(L_d\)
-            ahead on the path, transforms it to the robot frame, and computes a curvature
-            command. Speed is automatically reduced in sharp turns:
-          </p>
-          <div class="eq-block">
-            \[
-              \kappa = \frac{2\,y_r}{L_d^2}
-            \]
-            \[
-              \omega_{\mathrm{track}} = v_{\mathrm{track}} \cdot \kappa, \qquad
-              v_{\mathrm{track}} = \frac{v_{\max}}{1 + k_{\mathrm{slow}}\,\lvert\omega_{\mathrm{track}}\rvert}
-            \]
-          </div>
-          <p>
-            The laser-scan safety layer blends in a danger-weighted avoidance signal:
-          </p>
-          <div class="eq-block">
-            \[
-              v = \min(v_{\mathrm{track}},\; v_{\mathrm{cap}})
-            \]
-            \[
-              \omega = (1-\lambda)\,\omega_{\mathrm{track}} + \lambda\,\omega_{\mathrm{avoid}}
-            \]
-          </div>
-        </div>
-
-      </div>
-
-      <div style="margin-top:22px;">
-        <div class="card">
-          <h3>Speed Cap from LaserScan</h3>
-          <p>
-            Two distance measures are computed from the front laser beams:
-            \(d_{\min}\) (minimum range) and \(d_p\) (low percentile of front ranges).
-            A smooth ramp limits forward speed based on proximity to obstacles:
-          </p>
-          <div class="eq-block">
-            \[
-              v_{\mathrm{cap}} = \begin{cases}
-                0          & d_p \leq d_{\mathrm{stop}} \\
-                v_{\max}   & d_p \geq d_{\mathrm{slow}} \\
-                v_{\max}\,\eta(d_p) & \text{otherwise} \quad (\eta \in (0,1))
-              \end{cases}
-            \]
-          </div>
-          <div class="note">
-            <span class="note-icon">ℹ</span>
-            <p>
-              The danger weight \(\lambda \in [0,1]\) increases as the robot approaches
-              obstacles, smoothly handing steering authority from the path tracker to the
-              avoidance signal before any emergency stop is required. If \(d_{\min}\) falls
-              below an emergency threshold \(d_{\mathrm{emg}}\), the controller overrides
-              everything: \(v = 0\), \(\omega = \omega_{\mathrm{avoid}}\).
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── AMCL ── -->
-    <section id="localization" class="section-gap reveal">
-      <p class="label">Localisation</p>
-      <h2 class="section-title">AMCL Localisation</h2>
-      <p class="section-sub">
-
+        The per-corner covariance is not a diagnostic on the side — it is consumed directly by
+        the pose solver, so corners that are more reliable this frame are trusted more this frame.
       </p>
 
       <div class="grid-2">
         <div class="card">
-          <h3>Particle Filter Initialisation</h3>
+          <span class="card-label">Weighting</span>
+          <h3>Reliability-Weighted Refinement</h3>
           <p>
-            AMCL was run against the saved occupancy map. Before the robot started moving,
-            the particle filter was initialised using the RViz "2D Pose Estimate" tool,
-            which seeds the distribution close to the robot's true pose. Without this step,
-            the initial uncertainty is large and the robot may diverge before converging.
+            The camera pose is recovered through an iterative refinement that weights each
+            corner's contribution by the inverse of its estimated uncertainty: a sharp,
+            well-lit corner pulls the solution toward it more strongly than a dim, poorly
+            constrained one, and that balance is free to shift from one frame to the next.
           </p>
-          <div class="note">
-            <span class="note-icon">ℹ</span>
+        </div>
+        <div class="card">
+          <span class="card-label">Output</span>
+          <h3>Pose With Its Own Covariance</h3>
+          <p>
+            The solver's output is not just a position and orientation — it also carries a
+            propagated six-degree-of-freedom pose covariance, giving any downstream filter or
+            controller an honest measure of how much to trust that frame's estimate.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── LIVE VALIDATION ── -->
+    <section id="validation" class="section-gap reveal">
+      <p class="label">Live Validation</p>
+      <h2 class="section-title">Validated Under Real, Dynamic Lighting</h2>
+      <p class="section-sub">
+        The full pipeline — already calibrated, with no online re-fitting — was tested live
+        against three independently tracked markers while illumination and marker pose were
+        varied continuously and by hand.
+      </p>
+
+      <div class="grid-4">
+        <div class="stat-card">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Independently tracked markers, live</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">~75s</div>
+          <div class="stat-label">Continuous session under dynamic lighting and motion</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">~2.5×</div>
+          <div class="stat-label">Uncertainty rise from brightest to darkest conditions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">0</div>
+          <div class="stat-label">Online re-fitting steps during the session</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:22px;">
+        <div class="media-card">
+          <img
+            src="assets/kfpnp-pose-covariance.png"
+            alt="Propagated pose covariance tracking a dimming and re-brightening lighting cycle in real time"
+          />
+          <div class="media-caption">
+            <h3>Uncertainty That Tracks Reality</h3>
             <p>
-              After initialisation, AMCL continuously updates the particle weights using
-              incoming laser scans and the motion model, providing a reliable
-              \((x, y, \psi)\) estimate for the waypoint tracker.
+              As the scene was dimmed and re-brightened by hand, the reported per-corner and
+              propagated pose uncertainty rose and fell in step — consistently across all three
+              markers, regardless of their position or orientation on screen — confirming that the
+              effect is driven by illumination itself, not by any single marker's geometry.
             </p>
           </div>
         </div>
 
-        <div class="card">
-          <h3>Waypoint Tracking Logic</h3>
-          <p>
-            Once AMCL provides the pose, the controller loops over the waypoint list:
-          </p>
-          <ul>
-            <li>Select the next waypoint \((x_g, y_g)\).</li>
-            <li>Compute Euclidean distance \(d\) and heading error \(\alpha\).</li>
-            <li>Output saturated linear and angular velocity commands.</li>
-            <li>Advance to the next waypoint when \(d \leq r_{\mathrm{goal}}\).</li>
-          </ul>
-          <div class="eq-block">
-            \[
-              v = \mathrm{sat}(k_v \cdot d,\; 0,\; v_{\max}), \qquad
-              \omega = \mathrm{sat}(k_\omega \cdot \alpha,\; -\omega_{\max},\; \omega_{\max})
-            \]
+        <div class="media-card">
+          <video controls playsinline preload="metadata" poster="assets/kfpnp-covariance-light-poster.png">
+            <source src="assets/kfpnp-covariance-light-demo.mp4" type="video/mp4" />
+            Your browser doesn't support embedded video — see kfpnp-covariance-light-demo.mp4.
+          </video>
+          <div class="media-caption">
+            <h3>Watching It Happen Live</h3>
+            <p>
+              Screen capture of the live monitoring view, with a flashlight swept across the
+              markers to make the effect unambiguous: the per-corner and pose uncertainty
+              ellipses visibly widen as the light moves away and tighten again as it returns,
+              with no re-fitting between frames.
+            </p>
           </div>
         </div>
       </div>
@@ -814,34 +810,55 @@
     <!-- ── RESULTS ── -->
     <section id="results" class="section-gap reveal">
       <p class="label">Results</p>
-      <h2 class="section-title">Navigation Results</h2>
+      <h2 class="section-title">Does the Extra Signal Actually Help?</h2>
       <p class="section-sub">
-        The figures below show the robot executing all four planned paths inside the Gazebo
-        house environment, with the real-time tracked trajectory overlaid on the A* reference.
+        Several candidate uncertainty models were compared under held-out, grouped
+        cross-validation — evaluating each one only on imaging conditions it never saw during
+        fitting.
       </p>
 
-      <div class="media-card" style="margin-bottom:22px;">
-        <img
-          src="assets/tbot3.png"
-          alt="Robot navigating inside Gazebo turtlebot3_house with real-time path tracking in MATLAB"
-        />
-        <div class="media-caption">
-          <h3>Robot Executing the Planned Path</h3>
-          <p>
-
-          </p>
+      <div class="card">
+        <h3>Candidate Comparison — Held-Out Performance</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Candidate Model</th>
+                <th>Relative Fit Quality</th>
+                <th>Uncertainty Prediction Error</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Fixed, constant uncertainty</td>
+                <td>Baseline</td>
+                <td>Highest</td>
+              </tr>
+              <tr>
+                <td>Sensor-noise only</td>
+                <td>Modest improvement</td>
+                <td>Reduced</td>
+              </tr>
+              <tr>
+                <td>Sensor noise + local structure <em>(selected)</em></td>
+                <td class="val-good">Best held-out fit</td>
+                <td class="val-good">Lowest</td>
+              </tr>
+              <tr>
+                <td>Above + extra unexplained-variance term</td>
+                <td>No meaningful gain over selected model</td>
+                <td>Comparable, added complexity</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-
-      <div class="media-card">
-        <img
-          src="assets/tbot4.png"
-          alt="Final map showing all four planned and executed paths through the house environment"
-        />
-        <div class="media-caption">
-          <h3>Full Multi-Path Navigation Map</h3>
+        <div class="note" style="margin-top:16px;">
+          <span class="note-icon">ℹ</span>
           <p>
-
+            Adding local image structure to the sensor-noise term produced the clearest gain in
+            held-out predictive accuracy; a further, more flexible candidate was tested and
+            discarded because it added complexity without a corresponding improvement — the
+            simpler model was preferred.
           </p>
         </div>
       </div>
@@ -852,35 +869,33 @@
       <p class="label">Conclusion</p>
       <h2 class="section-title">Conclusion</h2>
       <p class="section-sub">
-        The project demonstrated the complete autonomy chain for mobile robot navigation,
-        from raw sensor data to closed-loop path execution.
+        KFPnP shows that a pose pipeline improves the most not by chasing a better point
+        estimate, but by being honest about how much to trust each measurement.
       </p>
 
       <div class="grid-2">
         <div class="card">
           <h3>Key Findings</h3>
           <ul>
-            <li>SLAM produced a consistent, usable occupancy map after a single teleoperation session covering the full accessible area.</li>
-            <li>A* with the Manhattan heuristic explored up to 44% fewer nodes than Dijkstra while finding paths of identical geometric quality.</li>
-            <li>The initial AMCL pose estimate via RViz is critical — without it, the particle filter takes many seconds to converge, causing path deviations.</li>
-            <li>The danger-weighted mixing law between pure pursuit and obstacle avoidance produced smooth, collision-free behaviour without hard mode switches.</li>
+            <li>A learned identification stage keeps markers trackable through blur, glare, and partial visibility where classical decoding alone would drop them.</li>
+            <li>Per-corner uncertainty that reacts to both sensor conditions and local image structure predicts real measurement scatter far better than a fixed constant.</li>
+            <li>Feeding that uncertainty into the pose solver, rather than treating every corner equally, propagates cleanly through to pose covariance without any online re-fitting.</li>
+            <li>The effect was consistent across three independently tracked markers under live, hand-varied lighting — not an artifact of one marker's geometry.</li>
           </ul>
         </div>
 
         <div class="card">
-          <h3>Full Autonomy Chain</h3>
-          <p>The project validates the standard mobile-robot navigation pipeline end-to-end:</p>
-          <ul style="margin-top:12px;">
-            <li><strong>Build</strong> a map with SLAM.</li>
-            <li><strong>Plan</strong> globally on the map with A*.</li>
-            <li><strong>Localise</strong> in the map with AMCL.</li>
-            <li><strong>Drive</strong> to the goal with feedback control.</li>
-          </ul>
+          <h3>Where This Fits</h3>
+          <p>
+            KFPnP is designed as a drop-in front end for any MLPnP-style solver that already
+            accepts per-observation weights: swap in a robust identity, swap in a live covariance,
+            and the rest of the pose-estimation and downstream filtering stack is unchanged.
+          </p>
           <div class="note" style="margin-top:14px;">
             <span class="note-icon">ℹ</span>
             <p>
-              Each stage was implemented from scratch in ROS 2, with MATLAB used for
-              real-time path visualisation and post-processing of odometry data.
+              Full implementation details are kept out of this write-up by design — reach out
+              directly for a deeper technical discussion.
             </p>
           </div>
         </div>
@@ -890,7 +905,7 @@
   </main>
 
   <footer class="site-footer">
-    © 2026 Omid Arefian · Autonomous Vehicles · Politecnico di Milano · 2025/2026
+    © 2026 Omid Arefian · KFPnP — Robust and Adaptive ArUco Pose Estimation
   </footer>
 
   <script>
