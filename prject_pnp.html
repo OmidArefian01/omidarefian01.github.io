@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SLAM-Based Navigation and Path Planning on TurtleBot3 | Omid Arefian</title>
+  <meta
+    name="description"
+    content="Autonomous navigation pipeline for TurtleBot3: SLAM mapping, A* planning, AMCL localization, and pure-pursuit feedback control in ROS 2 and Gazebo."
+  />
+
+  <!-- Google Fonts — identical to index -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'none'
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+      startup: { typeset: true }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+
+  <style>
+    /* ─────────────────────────────────────────
+       TOKENS — identical to index.html
+    ───────────────────────────────────────── */
+    :root {
+      --navy:        #0d1b2a;
+      --navy-mid:    #1a2e42;
+      --navy-light:  #243a52;
+      --slate:       #3d5a73;
+      --steel:       #6b8fa8;
+      --fog:         #c8d8e4;
+      --ice:         #e8f0f6;
+      --white:       #ffffff;
+      --off-white:   #f7f9fb;
+      --text:        #0d1b2a;
+      --text-soft:   #445668;
+      --text-muted:  #6b8fa8;
+      --accent:      #1d6fa4;
+      --accent-light:#2587c5;
+      --accent-pale: #ddeef8;
+      --green:       #1a7a5e;
+      --green-pale:  #d4ede7;
+      --line:        #dde6ee;
+      --card-bg:     #ffffff;
+      --card-border: #e2ebf2;
+      --shadow-sm:   0 1px 4px rgba(13,27,42,0.06), 0 4px 12px rgba(13,27,42,0.06);
+      --shadow-md:   0 2px 8px rgba(13,27,42,0.07), 0 8px 24px rgba(13,27,42,0.09);
+      --shadow-lg:   0 4px 16px rgba(13,27,42,0.08), 0 16px 48px rgba(13,27,42,0.12);
+      --radius-sm:   6px;
+      --radius-md:   10px;
+      --radius-lg:   16px;
+      --radius-xl:   22px;
+      --max-width:   1160px;
+      --font-body:   'DM Sans', system-ui, -apple-system, sans-serif;
+      --font-display:'DM Serif Display', Georgia, serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      background-color: var(--off-white);
+      color: var(--text);
+      line-height: 1.65;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { display: block; max-width: 100%; }
+    a   { text-decoration: none; color: inherit; }
+
+    .container {
+      width: min(var(--max-width), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .section-gap { padding: 72px 0 0; }
+
+    /* ── SECTION HEADERS ── */
+    .label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.7rem, 3vw, 2.4rem);
+      line-height: 1.15;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .section-sub {
+      font-size: 0.97rem;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-inner {
+      width: min(var(--max-width), calc(100% - 40px));
+      margin: 0 auto;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      color: var(--navy);
+    }
+
+    .nav-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      background: var(--white);
+      color: var(--navy);
+      font-size: 0.86rem;
+      font-weight: 600;
+      border: 1.5px solid var(--card-border);
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--steel); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      background: var(--navy);
+      color: var(--white);
+      font-size: 0.86rem;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--navy-mid); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero { padding: 56px 0 0; }
+
+    .hero-img-wrap {
+      position: relative;
+      width: 100%;
+      height: 440px;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      background: var(--ice);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--card-border);
+    }
+    .hero-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    .hero-badge {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(255,255,255,0.7);
+      color: var(--navy);
+      font-size: 0.82rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+      letter-spacing: 0.01em;
+    }
+
+    .hero-text { padding: 36px 0 0; }
+
+    .hero-overline {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4.5vw, 3.4rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: var(--navy);
+      margin-bottom: 18px;
+    }
+
+    .hero-lead {
+      font-size: 1.02rem;
+      color: var(--text-soft);
+      line-height: 1.72;
+      max-width: 820px;
+      margin-bottom: 24px;
+    }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+    .tag {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--navy-mid);
+      background: var(--ice);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      padding: 5px 11px;
+    }
+
+    .anchor-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-bottom: 56px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .anchor-btn {
+      display: inline-flex;
+      align-items: center;
+      height: 36px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--text-soft);
+      font-size: 0.83rem;
+      font-weight: 500;
+      border: 1.5px solid var(--card-border);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .anchor-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── GRIDS ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 26px 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-pale);
+      border-radius: var(--radius-sm);
+      padding: 3px 8px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
+    .card h3 { font-size: 1.02rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; line-height: 1.4; }
+    .card p, .card li { font-size: 0.93rem; color: var(--text-soft); line-height: 1.7; }
+    .card p + p { margin-top: 10px; }
+    .card ul { padding-left: 18px; margin-top: 10px; }
+    .card li + li { margin-top: 8px; }
+
+    /* ── EQUATION BLOCK ── */
+    .eq-block {
+      background: var(--off-white);
+      border: 1px solid var(--card-border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin: 14px 0;
+      overflow-x: auto;
+      line-height: 1.9;
+    }
+
+    /* ── NOTE ── */
+    .note {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: var(--accent-pale);
+      border: 1px solid rgba(29,111,164,0.18);
+      border-radius: var(--radius-md);
+      padding: 13px 16px;
+      margin-top: 14px;
+    }
+    .note-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+    .note p { font-size: 0.88rem; color: var(--navy-mid); line-height: 1.6; margin: 0 !important; }
+
+    /* ── MEDIA CARD ── */
+    .media-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .media-card img { width: 100%; height: auto; display: block; border-bottom: 1px solid var(--card-border); }
+    .media-caption { padding: 20px 24px 22px; }
+    .media-caption h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 7px; }
+    .media-caption p { font-size: 0.9rem; color: var(--text-soft); line-height: 1.68; }
+
+    /* ── RESULTS TABLE ── */
+    .table-wrap { overflow-x: auto; margin-top: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    thead tr { background: var(--navy); }
+    thead th { color: var(--white); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.04em; padding: 12px 16px; text-align: left; }
+    tbody td { padding: 10px 16px; border-bottom: 1px solid var(--line); color: var(--text-soft); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--off-white); }
+    .val-good { color: var(--green); font-weight: 700; }
+
+    /* ── FOOTER ── */
+    .site-footer { padding: 36px 0 40px; text-align: center; font-size: 0.84rem; color: var(--text-muted); border-top: 1px solid var(--line); margin-top: 80px; }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .hero-img-wrap { height: 300px; }
+    }
+    @media (max-width: 640px) {
+      .hero-img-wrap { height: 220px; }
+      .nav-actions .btn-primary { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="brand">Omid Arefian</a>
+      <div class="nav-actions">
+        <a href="index.html#projects" class="btn-secondary">← All Projects</a>
+        <a href="#results" class="btn-primary">Jump to Results</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <!-- ── HERO ── -->
+    <section class="hero">
+      <div class="hero-img-wrap">
+        <img
+          src="assets/tbot4.png"
+          alt="Real-time tracking of TurtleBot3 path vs planned A* path overlaid on the house map"
+        />
+        <div class="hero-badge">Autonomous Navigation · Politecnico di Milano · 2025/2026</div>
+      </div>
+
+      <div class="hero-text">
+        <p class="hero-overline">SLAM Mapping · A* Planning · AMCL Localisation · Pure-Pursuit Control</p>
+        <h1 class="hero-title">SLAM-Based Navigation and Path Planning on TurtleBot3 </h1>
+        <p class="hero-lead">
+          A complete autonomous navigation pipeline for the TurtleBot3 robot inside the
+          <em>turtlebot3_house</em> Gazebo simulation. The work covers every layer of a
+          standard mobile-robot stack: building a 2D occupancy map with SLAM, planning
+          collision-free paths with a custom A* algorithm, localising with AMCL, and tracking
+          waypoints with a pure-pursuit feedback controller augmented by a laser-scan
+          safety layer.
+        </p>
+
+        <div class="tag-row">
+          <span class="tag">ROS 2</span>
+          <span class="tag">MATLAB</span>
+          <span class="tag">Gazebo</span>
+          <span class="tag">A* Planning</span>
+          <span class="tag">Pure Pursuit</span>
+          <span class="tag">AMCL</span>
+          <span class="tag">SLAM</span>
+          <span class="tag">Dijkstra</span>
+        </div>
+
+        <div class="anchor-row">
+          <a class="anchor-btn" href="#overview">Overview</a>
+          <a class="anchor-btn" href="#mapping">Mapping</a>
+          <a class="anchor-btn" href="#planning">Planning</a>
+          <a class="anchor-btn" href="#comparison">Algorithm Comparison</a>
+          <a class="anchor-btn" href="#control">Control System</a>
+          <a class="anchor-btn" href="#localization">AMCL</a>
+          <a class="anchor-btn" href="#results">Results</a>
+          <a class="anchor-btn" href="#conclusion">Conclusion</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── OVERVIEW ── -->
+    <section id="overview" class="section-gap reveal">
+      <p class="label">Overview</p>
+      <h2 class="section-title">Project Overview</h2>
+      <p class="section-sub">
+
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Course Context</h3>
+          <p>
+            This project was completed as the final report for <em>Autonomous Vehicles</em>
+            (Prof. Stefano Arrigoni, A.Y. 2025/2026) at Politecnico di Milano. The objective
+            was to design and validate a full navigation stack on the TurtleBot3 platform inside
+            the <code style="font-family:'Courier New',monospace;font-size:0.88em;color:var(--navy);">turtlebot3_house</code>
+            Gazebo environment.
+          </p>
+          <p>
+            The bonus task — closed-loop navigation using AMCL localisation and a
+            path-tracking feedback controller — was also completed in full.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>High-Level Pipeline</h3>
+          <ul>
+            <li><strong>Stage 1 — SLAM Mapping:</strong> Teleoperate the robot and build a 2D occupancy grid in RViz using SLAM.</li>
+            <li><strong>Stage 2 — A* Planning:</strong> Implement a memory-efficient A* planner on the saved occupancy grid; test four start–goal pairs.</li>
+            <li><strong>Stage 3 — AMCL Localisation:</strong> Load the saved map and initialise the particle filter with a manual pose estimate in RViz.</li>
+            <li><strong>Stage 4 — Feedback Control:</strong> Track the planned waypoints with a pure-pursuit controller and a laser-scan safety layer.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MAPPING ── -->
+    <section id="mapping" class="section-gap reveal">
+      <p class="label">Mapping</p>
+      <h2 class="section-title">Mapping with SLAM and RViz</h2>
+      <p class="section-sub">
+
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Procedure</h3>
+          <p>
+            The simulation was launched and the robot was manually driven with
+            <code style="font-family:'Courier New',monospace;font-size:0.88em;color:var(--navy);">teleop_node</code>
+            through every corridor and around every obstacle. While exploring, SLAM
+            incrementally estimated the robot pose and accumulated laser scan observations
+            into a 2D occupancy grid. Each cell is labelled as <strong>free</strong>,
+            <strong>occupied</strong>, or <strong>unknown</strong>.
+          </p>
+          <p>
+            Once the map was visually consistent and all accessible areas were covered, it
+            was saved as a fixed reference for all planning and navigation stages.
+          </p>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              A critical requirement for the AMCL stage is that the map covers the full
+              navigable environment — gaps in the map degrade particle-filter localisation quality.
+            </p>
+          </div>
+        </div>
+
+        <div class="media-card">
+          <img
+            src="assets/tbot2.png"
+            alt="Occupancy grid map built in RViz using SLAM while teloperating the TurtleBot3"
+          />
+          <div class="media-caption">
+            <h3>Constructed Occupancy Map</h3>
+            <p>
+              The RViz view shows the completed occupancy grid after manually exploring the
+              house environment. White cells are free space, black cells are obstacles, and
+              the teal-shaded region is unmapped territory at the time of saving.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PLANNING ── -->
+    <section id="planning" class="section-gap reveal">
+      <p class="label">Planning</p>
+      <h2 class="section-title">A* Global Planning</h2>
+      <p class="section-sub">
+
+      </p>
+
+      <div class="grid-3">
+
+        <div class="card">
+          <span class="card-label">Grid Formulation</span>
+          <h3>Map to Graph</h3>
+          <p>
+            The saved occupancy image is converted to a binary matrix where each cell is
+            either free or an obstacle. Start and goal are defined in grid coordinates
+            and validated to lie on free cells:
+          </p>
+          <div class="eq-block">
+            \[
+              BW(r,c) = \begin{cases} 1 & \text{free cell} \\ 0 & \text{obstacle} \end{cases}
+            \]
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-label">Search Algorithm</span>
+          <h3>A* with \(f = g + h\)</h3>
+          <p>
+            Neighbours are generated on-the-fly — no pre-built adjacency list — keeping
+            memory use constant regardless of grid size. The Euclidean heuristic guides
+            search toward the goal:
+          </p>
+          <div class="eq-block">
+            \[
+              f(q) = g(q) + h(q)
+            \]
+            \[
+              h(q) = \sqrt{(x_g - x)^2 + (y_g - y)^2}
+            \]
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-label">Output</span>
+          <h3>Waypoint Sequences</h3>
+          <p>
+            For each start–goal pair the discrete grid path is converted back to metric
+            coordinates and saved to a file. Planning is done offline once; the same
+            waypoint list is reused for all navigation runs.
+          </p>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              This offline-planning / online-execution separation allows the controller to
+              be tuned independently of the planner.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:22px;">
+        <div class="media-card">
+          <img
+            src="assets/tbot1.png"
+            alt="Sequential Sparse A* planning results across four start-goal pairs on the house map"
+          />
+          <div class="media-caption">
+            <h3>Four Start–Goal Experiments</h3>
+            <p>
+              Each map variant (House_1 through House_4) uses a different start and goal
+              position chosen to test distinct navigation scenarios — short straight corridors,
+              multi-room routes, and tight corner navigation. The cyan line shows the
+              A*-planned path; the yellow circle is the start and the red/green stars mark
+              goal positions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ALGORITHM COMPARISON ── -->
+    <section id="comparison" class="section-gap reveal">
+      <p class="label">Benchmarking</p>
+      <h2 class="section-title">Algorithm Comparison</h2>
+      <p class="section-sub">
+        Five grid-search variants were benchmarked on the same maps. A* with the Manhattan
+        heuristic consistently explored the fewest nodes while returning paths of identical
+        quality to Dijkstra.
+      </p>
+
+      <div class="card">
+        <h3>Map 1 — Representative Results</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Runtime (s)</th>
+                <th>Explored nodes</th>
+                <th>Path steps</th>
+                <th>Travel dist.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dijkstra (4-neigh.)</td>
+                <td>0.0263</td><td>659</td><td>48</td><td>48.00</td>
+              </tr>
+              <tr>
+                <td>Dijkstra (8-neigh., diag cost \(= \sqrt{2}\))</td>
+                <td>0.0296</td><td>659</td><td>41</td><td>43.90</td>
+              </tr>
+              <tr>
+                <td>A* — Euclidean heuristic</td>
+                <td>0.0179</td><td>389</td><td>41</td><td>43.90</td>
+              </tr>
+              <tr>
+                <td>A* — Manhattan heuristic</td>
+                <td class="val-good">0.0103</td><td class="val-good">372</td><td>41</td><td>43.90</td>
+              </tr>
+              <tr>
+                <td>A* — Chebyshev heuristic</td>
+                <td>0.0105</td><td>408</td><td>41</td><td>43.90</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note" style="margin-top:16px;">
+          <span class="note-icon">ℹ</span>
+          <p>
+            A* with the Manhattan heuristic explores 44% fewer nodes than Dijkstra while
+            finding a path of identical length. All methods reach the goal successfully.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONTROL SYSTEM ── -->
+    <section id="control" class="section-gap reveal">
+      <p class="label">Control</p>
+      <h2 class="section-title">Control System Design</h2>
+      <p class="section-sub">
+
+      </p>
+
+      <div class="grid-2">
+
+        <div class="card">
+          <span class="card-label">Assignment Controller</span>
+          <h3>Proportional Waypoint Tracker</h3>
+          <p>
+            Each waypoint is tracked with a proportional distance-and-heading law. The robot
+            drives toward the active waypoint, decelerating as it gets closer, then aligns
+            its heading in place before advancing:
+          </p>
+          <div class="eq-block">
+            \[
+              d = \sqrt{(x_g - x)^2 + (y_g - y)^2}
+            \]
+            \[
+              \alpha = \mathrm{wrap}\!\left(\mathrm{atan2}(y_g - y,\; x_g - x) - \psi\right)
+            \]
+            \[
+              v = \mathrm{sat}(k_v \cdot d,\; 0,\; v_{\max})
+            \]
+            \[
+              \omega = \mathrm{sat}(k_\omega \cdot \alpha,\; -\omega_{\max},\; \omega_{\max})
+            \]
+          </div>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              Reach condition: \(d \leq r_{\mathrm{goal}} = 0.05\) m.
+              Align condition: \(\lvert e_\psi \rvert \leq 3°\). The variable gain
+              \(k_{\mathrm{thrust}} = \mathrm{sat}(d/d_{\max}, 0, 1)\) gives smooth
+              deceleration without a separate speed scheduler.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-label">Project Controller</span>
+          <h3>Pure Pursuit + Safety Layer</h3>
+          <p>
+            The project controller selects a look-ahead point at fixed distance \(L_d\)
+            ahead on the path, transforms it to the robot frame, and computes a curvature
+            command. Speed is automatically reduced in sharp turns:
+          </p>
+          <div class="eq-block">
+            \[
+              \kappa = \frac{2\,y_r}{L_d^2}
+            \]
+            \[
+              \omega_{\mathrm{track}} = v_{\mathrm{track}} \cdot \kappa, \qquad
+              v_{\mathrm{track}} = \frac{v_{\max}}{1 + k_{\mathrm{slow}}\,\lvert\omega_{\mathrm{track}}\rvert}
+            \]
+          </div>
+          <p>
+            The laser-scan safety layer blends in a danger-weighted avoidance signal:
+          </p>
+          <div class="eq-block">
+            \[
+              v = \min(v_{\mathrm{track}},\; v_{\mathrm{cap}})
+            \]
+            \[
+              \omega = (1-\lambda)\,\omega_{\mathrm{track}} + \lambda\,\omega_{\mathrm{avoid}}
+            \]
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:22px;">
+        <div class="card">
+          <h3>Speed Cap from LaserScan</h3>
+          <p>
+            Two distance measures are computed from the front laser beams:
+            \(d_{\min}\) (minimum range) and \(d_p\) (low percentile of front ranges).
+            A smooth ramp limits forward speed based on proximity to obstacles:
+          </p>
+          <div class="eq-block">
+            \[
+              v_{\mathrm{cap}} = \begin{cases}
+                0          & d_p \leq d_{\mathrm{stop}} \\
+                v_{\max}   & d_p \geq d_{\mathrm{slow}} \\
+                v_{\max}\,\eta(d_p) & \text{otherwise} \quad (\eta \in (0,1))
+              \end{cases}
+            \]
+          </div>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              The danger weight \(\lambda \in [0,1]\) increases as the robot approaches
+              obstacles, smoothly handing steering authority from the path tracker to the
+              avoidance signal before any emergency stop is required. If \(d_{\min}\) falls
+              below an emergency threshold \(d_{\mathrm{emg}}\), the controller overrides
+              everything: \(v = 0\), \(\omega = \omega_{\mathrm{avoid}}\).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── AMCL ── -->
+    <section id="localization" class="section-gap reveal">
+      <p class="label">Localisation</p>
+      <h2 class="section-title">AMCL Localisation</h2>
+      <p class="section-sub">
+
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Particle Filter Initialisation</h3>
+          <p>
+            AMCL was run against the saved occupancy map. Before the robot started moving,
+            the particle filter was initialised using the RViz "2D Pose Estimate" tool,
+            which seeds the distribution close to the robot's true pose. Without this step,
+            the initial uncertainty is large and the robot may diverge before converging.
+          </p>
+          <div class="note">
+            <span class="note-icon">ℹ</span>
+            <p>
+              After initialisation, AMCL continuously updates the particle weights using
+              incoming laser scans and the motion model, providing a reliable
+              \((x, y, \psi)\) estimate for the waypoint tracker.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Waypoint Tracking Logic</h3>
+          <p>
+            Once AMCL provides the pose, the controller loops over the waypoint list:
+          </p>
+          <ul>
+            <li>Select the next waypoint \((x_g, y_g)\).</li>
+            <li>Compute Euclidean distance \(d\) and heading error \(\alpha\).</li>
+            <li>Output saturated linear and angular velocity commands.</li>
+            <li>Advance to the next waypoint when \(d \leq r_{\mathrm{goal}}\).</li>
+          </ul>
+          <div class="eq-block">
+            \[
+              v = \mathrm{sat}(k_v \cdot d,\; 0,\; v_{\max}), \qquad
+              \omega = \mathrm{sat}(k_\omega \cdot \alpha,\; -\omega_{\max},\; \omega_{\max})
+            \]
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RESULTS ── -->
+    <section id="results" class="section-gap reveal">
+      <p class="label">Results</p>
+      <h2 class="section-title">Navigation Results</h2>
+      <p class="section-sub">
+        The figures below show the robot executing all four planned paths inside the Gazebo
+        house environment, with the real-time tracked trajectory overlaid on the A* reference.
+      </p>
+
+      <div class="media-card" style="margin-bottom:22px;">
+        <img
+          src="assets/tbot3.png"
+          alt="Robot navigating inside Gazebo turtlebot3_house with real-time path tracking in MATLAB"
+        />
+        <div class="media-caption">
+          <h3>Robot Executing the Planned Path</h3>
+          <p>
+
+          </p>
+        </div>
+      </div>
+
+      <div class="media-card">
+        <img
+          src="assets/tbot4.png"
+          alt="Final map showing all four planned and executed paths through the house environment"
+        />
+        <div class="media-caption">
+          <h3>Full Multi-Path Navigation Map</h3>
+          <p>
+
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONCLUSION ── -->
+    <section id="conclusion" class="section-gap reveal">
+      <p class="label">Conclusion</p>
+      <h2 class="section-title">Conclusion</h2>
+      <p class="section-sub">
+        The project demonstrated the complete autonomy chain for mobile robot navigation,
+        from raw sensor data to closed-loop path execution.
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Key Findings</h3>
+          <ul>
+            <li>SLAM produced a consistent, usable occupancy map after a single teleoperation session covering the full accessible area.</li>
+            <li>A* with the Manhattan heuristic explored up to 44% fewer nodes than Dijkstra while finding paths of identical geometric quality.</li>
+            <li>The initial AMCL pose estimate via RViz is critical — without it, the particle filter takes many seconds to converge, causing path deviations.</li>
+            <li>The danger-weighted mixing law between pure pursuit and obstacle avoidance produced smooth, collision-free behaviour without hard mode switches.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Full Autonomy Chain</h3>
+          <p>The project validates the standard mobile-robot navigation pipeline end-to-end:</p>
+          <ul style="margin-top:12px;">
+            <li><strong>Build</strong> a map with SLAM.</li>
+            <li><strong>Plan</strong> globally on the map with A*.</li>
+            <li><strong>Localise</strong> in the map with AMCL.</li>
+            <li><strong>Drive</strong> to the goal with feedback control.</li>
+          </ul>
+          <div class="note" style="margin-top:14px;">
+            <span class="note-icon">ℹ</span>
+            <p>
+              Each stage was implemented from scratch in ROS 2, with MATLAB used for
+              real-time path visualisation and post-processing of odometry data.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    © 2026 Omid Arefian · Autonomous Vehicles · Politecnico di Milano · 2025/2026
+  </footer>
+
+  <script>
+    const items = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); }
+      }),
+      { threshold: 0.07 }
+    );
+    items.forEach(el => io.observe(el));
+  </script>
+
+</body>
+</html>
