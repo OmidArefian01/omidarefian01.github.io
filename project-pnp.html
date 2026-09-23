@@ -6,8 +6,9 @@
   <title>KFPnP: Robust, Adaptive ArUco Pose Estimation | Omid Arefian</title>
   <meta
     name="description"
-    content="KFPnP: a robust marker-identification and adaptive-uncertainty pose pipeline built on MLPnP — CNN-assisted marker recovery, a live per-corner noise model, and covariance-weighted pose estimation."
+    content="KFPnP: a real-world ArUco pipeline combining OpenCV quadrilateral localization, CNN-based robust ID and rotation recovery, adaptive per-corner uncertainty, and covariance-weighted MLPnP pose estimation."
   />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d1b2a'/%3E%3Crect x='12' y='12' width='40' height='40' fill='white'/%3E%3Crect x='18' y='18' width='12' height='12' fill='%230d1b2a'/%3E%3Crect x='34' y='18' width='12' height='20' fill='%230d1b2a'/%3E%3Crect x='18' y='34' width='20' height='12' fill='%230d1b2a'/%3E%3C/svg%3E" />
 
   <!-- Google Fonts — identical to index -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -457,13 +458,13 @@
         <p class="hero-overline">Robust Marker Recovery · Adaptive Uncertainty · Weighted MLPnP</p>
         <h1 class="hero-title">KFPnP: Robust and Adaptive ArUco Pose Estimation</h1>
         <p class="hero-lead">
-          KFPnP rebuilds the ArUco-to-pose pipeline around a single idea: a pose solver is only
-          as good as the confidence it places in each measurement. Classical marker detection
-          treats every corner as equally trustworthy and every frame as equally lit — an
-          assumption that breaks down under motion blur, glare, and low light. KFPnP replaces
-          that assumption with a marker-recovery stage that stays robust when classical detection
-          falters, and a live uncertainty model that tells the pose solver exactly how much to
-          trust each corner, frame by frame.
+          KFPnP strengthens both ends of the ArUco-to-pose pipeline. At the front end, OpenCV
+          still localizes candidate quadrilaterals, while a learned classifier recovers marker
+          identity and orientation when blur, sensor noise, glare, or poor illumination makes
+          classical dictionary decoding unreliable. At the pose-estimation end, a live
+          per-corner covariance tells the weighted MLPnP refinement how strongly each observation
+          should influence the solution. The result is a pipeline designed for real camera
+          experiments rather than only clean, frontal marker images.
         </p>
 
         <div class="tag-row">
@@ -491,28 +492,29 @@
     <!-- ── OVERVIEW ── -->
     <section id="overview" class="section-gap reveal">
       <p class="label">Overview</p>
-      <h2 class="section-title">Why a Fixed Noise Assumption Falls Short</h2>
+      <h2 class="section-title">Why Real-World ArUco Tracking Needs Two Kinds of Robustness</h2>
       <p class="section-sub">
-        Conventional PnP pipelines feed every detected corner into the solver with the same
-        assumed measurement noise, no matter how the marker was actually lit or how sharply its
-        corners were resolved. KFPnP was built to close that gap.
+        A pose cannot be estimated if the marker identity disappears, and it should not be trusted
+        blindly when its corners are poorly observed. KFPnP therefore improves both marker
+        identification and measurement weighting.
       </p>
 
       <div class="grid-2">
         <div class="card">
-          <h3>The Problem With "One Noise Value Fits All"</h3>
+          <h3>What Breaks Outside the Laboratory</h3>
           <p>
-            A pose solver that weights every corner equally is implicitly told that a corner
-            seen in bright, sharp conditions is just as reliable as one glimpsed near the sensor's
-            darkness limit or smeared by motion. In practice that forces the solver to either
-            under-trust its best measurements or over-trust its worst ones — there is no way to
-            tell them apart after the fact.
+            Classical ArUco decoding depends on a clear black border and correctly sampled binary
+            cells. Motion blur mixes neighbouring cells, glare erases black regions, low light
+            increases sensor noise, and perspective or resizing reduces the number of useful
+            pixels. A candidate can therefore be geometrically visible but fail the dictionary
+            test. Even when it is detected, its four corners do not all have the same precision.
           </p>
           <p>
-            KFPnP addresses this at two points in the pipeline: <strong>recovering the marker's
-            identity</strong> even when classical detection is uncertain, and <strong>estimating
-            a fresh, per-corner measurement uncertainty</strong> on every frame, so the pose
-            solver can weight each observation by how much it actually deserves to be trusted.
+            KFPnP addresses these failures separately: <strong>robust identification</strong>
+            recovers the ID and rotation of a localized candidate, while <strong>adaptive
+            uncertainty</strong> estimates how accurately each corner was measured. Robustness
+            therefore means both keeping the correct marker in the pipeline and preventing weak
+            corners from dominating its pose.
           </p>
         </div>
 
@@ -520,11 +522,11 @@
           <span class="card-label">Pipeline</span>
           <h3>High-Level Architecture</h3>
           <div class="flow-row">
-            <div class="flow-step">Marker Detection</div>
+            <div class="flow-step">OpenCV Quadrilateral Candidates</div>
             <span class="flow-arrow">→</span>
-            <div class="flow-step accent">Robust Identification</div>
+            <div class="flow-step accent">Classical Decode or CNN Recovery</div>
             <span class="flow-arrow">→</span>
-            <div class="flow-step amber">Adaptive Noise Estimate</div>
+            <div class="flow-step amber">Per-Corner Covariance</div>
             <span class="flow-arrow">→</span>
             <div class="flow-step">Weighted MLPnP</div>
             <span class="flow-arrow">→</span>
@@ -533,9 +535,10 @@
           <div class="note" style="margin-top:20px;">
             <span class="note-icon">ℹ</span>
             <p>
-              Every stage produces a number the next stage can act on: an identity and
-              confidence, a per-corner uncertainty, and finally a pose with its own six-degree-of-
-              freedom covariance — not just a point estimate.
+              The CNN does not search the entire image for invisible markers. It classifies a
+              quadrilateral already localized by OpenCV, returning an ID, one of four rotations,
+              and confidence. The next stages use the recovered corner order and a separate
+              covariance estimate to produce a pose with six-degree-of-freedom uncertainty.
             </p>
           </div>
         </div>
@@ -561,40 +564,161 @@
     <!-- ── ROBUST IDENTIFICATION ── -->
     <section id="identification" class="section-gap reveal">
       <p class="label">Robust Identification</p>
-      <h2 class="section-title">Recovering Markers When Classical Detection Struggles</h2>
+      <h2 class="section-title">Recovering ID and Orientation Under Real-World Degradation</h2>
       <p class="section-sub">
-        Dictionary-based ArUco decoding is fast and reliable in good conditions, but it is a hard
-        pass/fail test: a blurred, tilted, or partially shadowed marker either decodes cleanly or
-        is discarded entirely. KFPnP adds a learned fallback that degrades gracefully instead.
+        Dictionary-based ArUco decoding remains the fastest first choice in clean conditions.
+        The learned stage is added as a recovery path for localized candidates whose borders are
+        still usable but whose internal binary pattern has been damaged by blur, noise, glare,
+        low contrast, or limited image resolution.
       </p>
+
+      <!-- PHOTO 1
+           File name: assets/aruco-real-world-failures.png
+           Place here: immediately after the Robust Identification introduction.
+           Recommended content: a 4-panel montage of REAL camera frames showing
+           (1) clean marker, (2) motion blur, (3) glare, and (4) low light/noise.
+           Keep the same marker ID and similar scale where possible so the visual
+           difference is caused mainly by degradation. Recommended aspect ratio: 16:7. -->
+      <div class="media-card" style="margin-bottom:22px;">
+        <img
+          src="assets/aruco-real-world-failures.png"
+          alt="The same ArUco marker observed cleanly and under motion blur, glare, and low-light sensor noise"
+        />
+        <div class="media-caption">
+          <h3>Why Robustification Is Needed</h3>
+          <p>
+            In real experiments, the marker does not remain perfectly frontal, sharp, and evenly
+            illuminated. A short camera or screen movement introduces directional blur; reflections
+            saturate parts of the code; and low light increases pixel noise. Classical decoding can
+            reject the complete marker after only a few corrupted cells. Robustification preserves
+            identification continuity so the downstream pose estimator does not lose the marker at
+            exactly the moments when the experiment becomes difficult.
+          </p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:22px;">
+        <span class="card-label">System Integration</span>
+        <h3>How the Learned Identifier Was Added to OpenCV</h3>
+        <p>
+          OpenCV is still responsible for locating quadrilateral regions that may contain a marker.
+          Candidates that decode normally follow the classical path. A rejected or uncertain
+          candidate can instead be perspective-warped into a canonical 40 × 40 grayscale crop and
+          sent to the learned classifier.
+        </p>
+
+        <div class="flow-row">
+          <div class="flow-step">OpenCV Candidate</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">40 × 40 Perspective Warp</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step accent">CNN: 201 Logits</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step amber">Confidence + Background Test</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">ID, Rotation, Ordered Corners</div>
+        </div>
+
+        <p style="margin-top:18px;">
+          The 201 output classes have a direct meaning. Classes 0–199 represent 50 selected
+          marker IDs under four rotations: 0°, 90°, 180°, and 270°. Class 200 represents
+          background or a non-marker crop. The marker classes use
+          <strong>class = 4 × marker ID + rotation index</strong>. The highest softmax probability
+          becomes the confidence score.
+        </p>
+        <p>
+          A background prediction or a confidence below the chosen threshold rejects the
+          candidate. Otherwise, the predicted class is decoded into marker ID and rotation. The
+          rotation is then used to reorder the four corners into the canonical ArUco order before
+          the known marker geometry and image corners are sent to pose estimation.
+        </p>
+
+        <div class="note" style="margin-top:16px;">
+          <span class="note-icon">ℹ</span>
+          <p>
+            This is robust identification, not unconstrained object detection. If OpenCV cannot
+            produce a usable quadrilateral at all, the classifier has no crop to classify. The
+            learned model complements candidate localization rather than replacing it.
+          </p>
+        </div>
+      </div>
+
+      <!-- PHOTO 2
+           File name: assets/aruco-candidate-normalization.png
+           Place here: directly after the integration-flow card.
+           Recommended content: left side = real camera frame with the candidate
+           quadrilateral outlined and numbered corners; middle = perspective-warp
+           arrow; right side = final 40x40 normalized crop with predicted ID,
+           rotation, and confidence. Recommended aspect ratio: 16:8. -->
+      <div class="media-card" style="margin-bottom:22px;">
+        <img
+          src="assets/aruco-candidate-normalization.png"
+          alt="OpenCV quadrilateral candidate transformed into a normalized 40 by 40 crop for learned ArUco classification"
+        />
+        <div class="media-caption">
+          <h3>From Camera Candidate to Classifier Input</h3>
+          <p>
+            Perspective normalization removes most of the apparent projective distortion and gives
+            the CNN a fixed-size input. The network solves a controlled classification problem:
+            determine whether the crop is background, or determine its marker ID and discrete
+            rotation so the physical corner correspondences can be restored.
+          </p>
+        </div>
+      </div>
 
       <div class="grid-3">
         <div class="card">
-          <span class="card-label">Training</span>
-          <h3>Learning From Synthetic Variation</h3>
+          <span class="card-label">Dataset</span>
+          <h3>200 Marker-Rotation Classes</h3>
           <p>
-            A classifier is trained on a large, synthetically generated set of marker crops that
-            span the distortions a real camera actually produces — blur, rotation, partial
-            occlusion, and lighting extremes — rather than only the clean, frontal examples a
-            classical decoder assumes.
+            Fifty marker IDs are rendered in four canonical rotations, producing 200 positive
+            classes. Real image crops without markers form class 200. Training and validation use
+            separate background source images so the classifier cannot succeed by memorizing the
+            same background textures.
           </p>
         </div>
         <div class="card">
-          <span class="card-label">Inference</span>
-          <h3>Identity, Orientation, Confidence</h3>
+          <span class="card-label">Robustification</span>
+          <h3>Degradations Added During Training</h3>
           <p>
-            At runtime the classifier returns not just a marker ID but an orientation estimate
-            and a confidence score for the prediction, so downstream stages know when to trust
-            the recovered identity and when to fall back to classical redetection.
+            Training crops are randomly modified with box, Gaussian, and directional motion blur;
+            Gaussian read noise, intensity-dependent shot noise, and hot/dead pixels; specular
+            glare; and lighting or contrast changes. The same families of corruption are also
+            applied to background crops so the model cannot learn that “noise means marker.”
           </p>
         </div>
         <div class="card">
-          <span class="card-label">Outcome</span>
-          <h3>Graceful Degradation</h3>
+          <span class="card-label">Model Selection</span>
+          <h3>CNN Compared With an RBF SVM</h3>
           <p>
-            Instead of a marker vanishing from the tracked set the moment classical decoding
-            fails, KFPnP keeps a confidence-scored identity available through exactly the
-            conditions — blur, glare, partial visibility — where it matters most.
+            A small CNN operating on 40 × 40 crops and a paper-style RBF SVM operating on 10 × 10
+            inputs are evaluated on the same 201-class task. Selection considers marker accuracy,
+            background rejection, marker-to-background errors, background false positives, and
+            wrong ID or rotation predictions—not only overall accuracy.
+          </p>
+        </div>
+      </div>
+
+      <!-- PHOTO 3
+           File name: assets/aruco-training-augmentations.png
+           Place here: after the Dataset / Robustification / Model Selection cards.
+           Recommended content: a labelled grid with one clean crop followed by
+           box blur, Gaussian blur, motion blur, Gaussian noise, shot noise,
+           hot/dead pixels, glare, dark/low-contrast, plus 2-3 degraded background
+           crops. Use actual generated images from the dataset preview script.
+           Recommended aspect ratio: 16:9. -->
+      <div class="media-card" style="margin-top:22px;">
+        <img
+          src="assets/aruco-training-augmentations.png"
+          alt="Clean ArUco crop and robust training examples containing blur, sensor noise, glare, and illumination changes"
+        />
+        <div class="media-caption">
+          <h3>Training the Failure Modes We Expect to See</h3>
+          <p>
+            The augmentation set is not decoration; it defines the invariances the classifier is
+            expected to learn. Marker identity and rotation remain the label while blur, noise,
+            glare, and illumination vary. Background crops receive comparable degradation to
+            teach a genuine marker-versus-non-marker decision.
           </p>
         </div>
       </div>
@@ -608,19 +732,22 @@
           <div class="media-caption">
             <h3>Marker Recovery Under Degradation</h3>
             <p>
-              Raw camera footage of the markers being identified live — recovering identity,
-              orientation, and confidence exactly where classical dictionary decoding alone
-              would drop the detection entirely.
+              Use a real camera recording, not a synthetic animation. Display the OpenCV candidate,
+              the recovered ID, predicted rotation, softmax confidence, and whether the classical
+              or learned route supplied the identity. Include deliberate blur, glare, low light,
+              and viewpoint change to demonstrate the conditions used to motivate robustification.
             </p>
           </div>
         </div>
       </div>
 
-      <div class="note guard" style="margin-top:22px;">
+      <div class="note" style="margin-top:22px;">
         <span class="note-icon">⚠</span>
         <p>
-          The exact network architecture, training-data composition, and augmentation recipe are
-          intentionally left out of this write-up.
+          A confident wrong ID or wrong rotation is more dangerous than a rejected crop because it
+          creates incorrect 3D-to-2D corner correspondences. This is why the background class,
+          confidence threshold, and separate reporting of ID/rotation errors are essential parts
+          of the robust design.
         </p>
       </div>
     </section>
@@ -750,7 +877,9 @@
       <p class="section-sub">
         The full pipeline — already calibrated, with no online re-fitting — was tested live
         against three independently tracked markers while illumination and marker pose were
-        varied continuously and by hand.
+        varied continuously and by hand. The validation therefore checks both parts of the
+        design: whether identity remains available during degradation and whether the reported
+        covariance increases when the corner measurements become less reliable.
       </p>
 
       <div class="grid-4">
@@ -769,6 +898,31 @@
         <div class="stat-card">
           <div class="stat-num">0</div>
           <div class="stat-label">Online re-fitting steps during the session</div>
+        </div>
+      </div>
+
+      <!-- PHOTO 4
+           File name: assets/aruco-classical-vs-learned.png
+           Place here: after the four validation statistics and before the
+           covariance plot/video cards.
+           Recommended content: 3-4 matched real frames. On each frame show
+           classical OpenCV result on the left and the learned recovery result
+           on the right. Include at least one clean frame and difficult frames
+           with blur, glare, and low light. Label "decoded", "rejected", or
+           "CNN recovered: ID / rotation / confidence". Recommended ratio: 16:8. -->
+      <div class="media-card" style="margin-top:22px;">
+        <img
+          src="assets/aruco-classical-vs-learned.png"
+          alt="Matched real-world frames comparing classical ArUco decoding with learned ID and orientation recovery"
+        />
+        <div class="media-caption">
+          <h3>Classical Decode Versus Learned Recovery</h3>
+          <p>
+            A fair robustness demonstration uses the same candidate crops for both methods and
+            shows success, rejection, and mistakes—not only selected successful examples. The
+            learned route should improve continuity under degradation while the confidence and
+            background class prevent uncertain crops from being forced into a marker identity.
+          </p>
         </div>
       </div>
 
@@ -812,13 +966,74 @@
       <p class="label">Results</p>
       <h2 class="section-title">Does the Extra Signal Actually Help?</h2>
       <p class="section-sub">
-        Several candidate uncertainty models were compared under held-out, grouped
-        cross-validation — evaluating each one only on imaging conditions it never saw during
-        fitting.
+        Robust identification and adaptive uncertainty answer different questions and should be
+        evaluated separately. The classifier is tested on ID, rotation, and background rejection;
+        the covariance model is tested on its prediction of measured corner scatter under held-out
+        imaging conditions.
       </p>
 
+      <div class="card" style="margin-bottom:22px;">
+        <span class="card-label">Identification Evaluation</span>
+        <h3>What Was Compared for Robust Marker Recovery</h3>
+        <div class="grid-2">
+          <div>
+            <p>
+              The 40 × 40 CNN and 10 × 10 RBF SVM solve the same 201-class problem. Reporting only
+              total accuracy can hide dangerous failure modes, especially when marker classes and
+              background samples are not equally frequent.
+            </p>
+            <ul>
+              <li>Accuracy across the 200 marker-and-rotation classes</li>
+              <li>Background-class accuracy</li>
+              <li>Background crops incorrectly accepted as markers</li>
+              <li>Markers incorrectly rejected as background</li>
+              <li>Wrong marker ID or wrong rotation</li>
+            </ul>
+          </div>
+          <div>
+            <p>
+              The final deployment uses the selected classifier together with a confidence
+              threshold. Real-world reporting should additionally separate clean, blur, noise,
+              glare, and low-light subsets so the improvement is visibly connected to the
+              degradations used during robustification.
+            </p>
+            <div class="note" style="margin-top:14px;">
+              <span class="note-icon">ℹ</span>
+              <p>
+                Insert your measured CNN and SVM values here. Do not invent percentages; export
+                them directly from the evaluation scripts and keep the validation split independent
+                from the training backgrounds.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIGURE 5
+           File name: assets/aruco-cnn-svm-comparison.png
+           Place here: after the identification-evaluation card and before the
+           covariance-model table.
+           Recommended content: grouped bars or a compact table exported as a
+           high-resolution figure. Include CNN and SVM marker accuracy,
+           background accuracy, background-to-marker errors, marker-to-background
+           errors, and wrong ID/rotation count. Use real evaluation numbers. -->
+      <div class="media-card" style="margin-bottom:22px;">
+        <img
+          src="assets/aruco-cnn-svm-comparison.png"
+          alt="Comparison of CNN and RBF SVM robust ArUco classification performance on marker and background classes"
+        />
+        <div class="media-caption">
+          <h3>CNN and SVM Under the Same Degraded Test Set</h3>
+          <p>
+            The comparison should make the deployment decision auditable: both models receive the
+            same class definitions and degradation-aware validation set, while the chart separates
+            marker recognition from background rejection and wrong-orientation errors.
+          </p>
+        </div>
+      </div>
+
       <div class="card">
-        <h3>Candidate Comparison — Held-Out Performance</h3>
+        <h3>Adaptive Covariance Candidate Comparison — Held-Out Performance</h3>
         <div class="table-wrap">
           <table>
             <thead>
@@ -877,25 +1092,29 @@
         <div class="card">
           <h3>Key Findings</h3>
           <ul>
-            <li>A learned identification stage keeps markers trackable through blur, glare, and partial visibility where classical decoding alone would drop them.</li>
+            <li>A learned recovery stage extends OpenCV candidate localization by classifying degraded quadrilateral crops into marker ID, rotation, or background.</li>
+            <li>Training with blur, sensor noise, glare, lighting variation, and similarly degraded background crops targets the failure modes observed in real camera experiments.</li>
             <li>Per-corner uncertainty that reacts to both sensor conditions and local image structure predicts real measurement scatter far better than a fixed constant.</li>
             <li>Feeding that uncertainty into the pose solver, rather than treating every corner equally, propagates cleanly through to pose covariance without any online re-fitting.</li>
-            <li>The effect was consistent across three independently tracked markers under live, hand-varied lighting — not an artifact of one marker's geometry.</li>
+            <li>The live experiment must test both continuity of correct identification and the response of covariance under real blur, glare, low light, motion, and changing viewpoint.</li>
           </ul>
         </div>
 
         <div class="card">
           <h3>Where This Fits</h3>
           <p>
-            KFPnP is designed as a drop-in front end for any MLPnP-style solver that already
-            accepts per-observation weights: swap in a robust identity, swap in a live covariance,
-            and the rest of the pose-estimation and downstream filtering stack is unchanged.
+            KFPnP preserves the useful parts of the classical pipeline. OpenCV still proposes
+            quadrilaterals and performs normal dictionary decoding when possible. The CNN adds a
+            confidence-scored recovery path for difficult candidates, and the adaptive covariance
+            adds observation-specific weights for MLPnP-style refinement. Downstream filtering can
+            continue to consume pose and covariance without knowing which identification path was used.
           </p>
           <div class="note" style="margin-top:14px;">
             <span class="note-icon">ℹ</span>
             <p>
-              Full implementation details are kept out of this write-up by design — reach out
-              directly for a deeper technical discussion.
+              The central limitation remains explicit: learned identification requires an OpenCV
+              candidate crop. Severe occlusion or blur that destroys the quadrilateral itself still
+              requires redetection, temporal tracking, or a separate object-detection stage.
             </p>
           </div>
         </div>
