@@ -302,9 +302,8 @@
     /* ─────────────────────────────────────────
        ABOUT
     ───────────────────────────────────────── */
-    .about-grid {
+    .about-stack {
       display: grid;
-      grid-template-columns: 1fr 1fr;
       gap: 24px;
     }
 
@@ -335,20 +334,92 @@
       margin-top: 10px;
     }
 
-    .skill-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .profile-card p {
+      max-width: 980px;
     }
 
-    .skill-pill {
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: var(--navy-mid);
-      background: var(--ice);
+    .skills-card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .skills-card-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 28px;
+      padding: 25px 30px 21px;
+      background: linear-gradient(135deg, var(--white), var(--accent-pale));
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .skills-card-head .card-title {
+      margin-bottom: 0;
+      color: var(--accent);
+    }
+
+    .skills-intro {
+      max-width: 520px;
+      color: var(--text-muted) !important;
+      font-size: 0.88rem !important;
+      line-height: 1.55 !important;
+      text-align: right;
+    }
+
+    .skill-groups {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .skill-group {
+      min-width: 0;
+      padding: 19px 20px;
+      background: var(--off-white);
       border: 1px solid var(--card-border);
-      border-radius: var(--radius-sm);
-      padding: 5px 12px;
+      border-radius: var(--radius-md);
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .skill-group:hover {
+      border-color: var(--fog);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .skill-group-head {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-bottom: 9px;
+    }
+
+    .skill-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      flex: 0 0 30px;
+      border-radius: 50%;
+      color: var(--accent);
+      background: var(--accent-pale);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .skill-group h3 {
+      color: var(--navy);
+      font-size: 0.96rem;
+      line-height: 1.3;
+    }
+
+    .skill-group p {
+      color: var(--text-soft);
+      font-size: 0.88rem;
+      line-height: 1.65;
     }
 
     /* ─────────────────────────────────────────
@@ -798,7 +869,9 @@
     @media (max-width: 960px) {
       .hero               { grid-template-columns: 1fr; gap: 40px; padding: 60px 0 56px; }
       .hero-photo         { max-width: 260px; }
-      .about-grid         { grid-template-columns: 1fr; }
+      .skill-groups       { grid-template-columns: 1fr; }
+      .skills-card-head   { align-items: flex-start; flex-direction: column; gap: 8px; }
+      .skills-intro       { max-width: none; text-align: left; }
       .edu-grid           { grid-template-columns: 1fr; }
       .project-grid       { grid-template-columns: 1fr; }
       .tl-item            { grid-template-columns: 1fr; gap: 4px; }
@@ -812,6 +885,9 @@
     @media (max-width: 640px) {
       .nav-links          { display: none; }
       .section-gap        { padding: 56px 0 0; }
+      .skills-card-head   { padding: 22px; }
+      .skill-groups       { padding: 12px; gap: 10px; }
+      .skill-group        { padding: 17px; }
       .contact-card       { padding: 28px 22px; }
     }
   </style>
@@ -880,8 +956,8 @@
       <h2 class="section-title">Profile &amp; Skills</h2>
       <p class="section-sub"></p>
 
-      <div class="about-grid">
-        <div class="card">
+      <div class="about-stack">
+        <div class="card profile-card">
           <p class="card-title">Profile</p>
           <p>
             I am pursuing an M.Sc. in Mechanical Engineering in the Mechatronics and Robotics track at Politecnico di Milano. My work focuses on computer vision, camera-based pose estimation, target tracking, Kalman filtering, sensor fusion, and autonomous robotic systems.
@@ -890,20 +966,46 @@
           </p>
         </div>
 
-        <div class="card">
-          <p class="card-title">Skills &amp; Tools</p>
-          <div class="skill-wrap">
-            <span class="skill-pill">MATLAB</span>
-            <span class="skill-pill">Python</span>
-            <span class="skill-pill">ROS 2</span>
-            <span class="skill-pill">PX4 / MAVLink</span>
-            <span class="skill-pill">Gazebo</span>
-            <span class="skill-pill">ANSYS</span>
-            <!-- <span class="skill-pill">SolidWorks</span> -->
-            <span class="skill-pill">Kalman Filtering</span>
-            <span class="skill-pill">MPC</span>
-            <span class="skill-pill">LQR</span>
-            <span class="skill-pill">Reinforcement Learning</span>
+        <div class="card skills-card">
+          <div class="skills-card-head">
+            <p class="card-title">Skills &amp; Tools</p>
+            <p class="skills-intro">
+              A focused toolkit for vision, estimation, robotics, and real-time experimentation.
+            </p>
+          </div>
+
+          <div class="skill-groups">
+            <article class="skill-group">
+              <div class="skill-group-head">
+                <span class="skill-number">01</span>
+                <h3>Programming &amp; Workflow</h3>
+              </div>
+              <p>Python · MATLAB · Git · Linux</p>
+            </article>
+
+            <article class="skill-group">
+              <div class="skill-group-head">
+                <span class="skill-number">02</span>
+                <h3>Computer Vision &amp; ML</h3>
+              </div>
+              <p>OpenCV · PyTorch · CNN Training · Image Processing · Synthetic Data · Camera Calibration</p>
+            </article>
+
+            <article class="skill-group">
+              <div class="skill-group-head">
+                <span class="skill-number">03</span>
+                <h3>Estimation &amp; Tracking</h3>
+              </div>
+              <p>Kalman Filtering · MEKF · Sensor Fusion · Uncertainty Propagation · Innovation Gating · NIS Analysis</p>
+            </article>
+
+            <article class="skill-group">
+              <div class="skill-group-head">
+                <span class="skill-number">04</span>
+                <h3>Robotics &amp; Control</h3>
+              </div>
+              <p>ROS 2 · PX4 / MAVLink · Gazebo · MPC · LQR · Reinforcement Learning</p>
+            </article>
           </div>
         </div>
       </div>
