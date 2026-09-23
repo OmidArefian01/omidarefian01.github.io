@@ -94,6 +94,81 @@
 
     .section-gap { padding: 72px 0 0; }
 
+    /* ── CONTRIBUTION STAGES ── */
+    .stage-map {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .stage-panel {
+      border: 1px solid var(--card-border);
+      border-top: 4px solid var(--accent);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      background: var(--off-white);
+    }
+
+    .stage-panel.covariance { border-top-color: var(--amber); }
+
+    .stage-kicker {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .stage-panel.covariance .stage-kicker { color: var(--amber); }
+    .stage-panel h3 { margin-bottom: 7px; }
+    .stage-panel p { font-size: 0.87rem; color: var(--text-soft); line-height: 1.58; }
+    .stage-panel p + p { margin-top: 8px; }
+
+    .stage-contract {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin: 0 0 22px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      background: var(--card-border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stage-contract > div { padding: 17px 20px; background: var(--white); }
+    .stage-contract span {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .stage-contract strong { display: block; color: var(--navy); font-size: 0.9rem; line-height: 1.45; }
+
+    .stage-divider {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 18px;
+      margin: 72px 0 0;
+      padding: 18px 22px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(90deg, var(--accent-pale), var(--white) 49%, var(--amber-pale));
+      box-shadow: var(--shadow-sm);
+      color: var(--navy);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-align: center;
+    }
+    .stage-divider-arrow { color: var(--steel); font-size: 1.25rem; }
+
     /* ── SECTION HEADERS ── */
     .label {
       display: inline-block;
@@ -420,7 +495,9 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 960px) {
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .grid-2, .grid-3, .grid-4, .stage-map, .stage-contract { grid-template-columns: 1fr; }
+      .stage-divider { grid-template-columns: 1fr; }
+      .stage-divider-arrow { transform: rotate(90deg); }
       .hero-img-wrap { height: 300px; }
     }
     @media (max-width: 640px) {
@@ -520,25 +597,34 @@
 
         <div class="card">
           <span class="card-label">Pipeline</span>
-          <h3>High-Level Architecture</h3>
+          <h3>Two Separate Contributions, One Final Solver</h3>
+          <div class="stage-map">
+            <div class="stage-panel identification">
+              <span class="stage-kicker">Stage 1 · Identification</span>
+              <h3>Which marker is this?</h3>
+              <p>OpenCV localizes the quadrilateral; classical decoding or CNN recovery returns the marker ID, rotation, confidence, and ordered corners.</p>
+              <p><strong>Output:</strong> reliable 3D-to-2D correspondences.</p>
+            </div>
+            <div class="stage-panel covariance">
+              <span class="stage-kicker">Stage 2 · Covariance</span>
+              <h3>How reliable is each corner?</h3>
+              <p>Brightness, gain, and local image gradients produce a new 2 × 2 uncertainty matrix for every detected corner.</p>
+              <p><strong>Output:</strong> per-corner measurement covariance.</p>
+            </div>
+          </div>
           <div class="flow-row">
-            <div class="flow-step">OpenCV Quadrilateral Candidates</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step accent">Classical Decode or CNN Recovery</div>
-            <span class="flow-arrow">→</span>
+            <div class="flow-step accent">ID + Ordered Corners</div>
+            <span class="flow-arrow">+</span>
             <div class="flow-step amber">Per-Corner Covariance</div>
             <span class="flow-arrow">→</span>
-            <div class="flow-step">Weighted MLPnP</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step">Pose + Covariance</div>
+            <div class="flow-step">Weighted MLPnP → Pose + Covariance</div>
           </div>
           <div class="note" style="margin-top:20px;">
             <span class="note-icon">ℹ</span>
             <p>
-              The CNN does not search the entire image for invisible markers. It classifies a
-              quadrilateral already localized by OpenCV, returning an ID, one of four rotations,
-              and confidence. The next stages use the recovered corner order and a separate
-              covariance estimate to produce a pose with six-degree-of-freedom uncertainty.
+              These stages are related but not interchangeable. Robust identification protects
+              correspondence continuity; light-adaptive covariance controls how strongly each
+              accepted correspondence influences the pose.
             </p>
           </div>
         </div>
@@ -548,13 +634,14 @@
         <div class="media-card">
           <img
             src="assets/kfpnp-pipeline-diagram.png"
-            alt="KFPnP pipeline overview: identification, robust identification, pose covariance estimation, and adaptive noise modelling stages"
+            alt="Two independent KFPnP branches: robust marker identification and light-adaptive corner covariance, merging in weighted MLPnP"
           />
           <div class="media-caption">
-            <h3>Pipeline at a Glance</h3>
+            <h3>Two Contributions at a Glance</h3>
             <p>
-              The four stages of KFPnP, from marker identification through to a pose that carries
-              its own covariance — the map, not the method.
+              The identification branch produces the correct marker correspondences. The
+              covariance branch estimates their reliability. Only then are both outputs combined
+              by weighted MLPnP to estimate the pose and its uncertainty.
             </p>
           </div>
         </div>
@@ -563,7 +650,7 @@
 
     <!-- ── ROBUST IDENTIFICATION ── -->
     <section id="identification" class="section-gap reveal">
-      <p class="label">Robust Identification</p>
+      <p class="label">Stage 1 · Robust Identification</p>
       <h2 class="section-title">Recovering ID and Orientation Under Real-World Degradation</h2>
       <p class="section-sub">
         Dictionary-based ArUco decoding remains the fastest first choice in clean conditions.
@@ -572,13 +659,20 @@
         low contrast, or limited image resolution.
       </p>
 
+      <div class="stage-contract">
+        <div><span>Input</span><strong>OpenCV quadrilateral candidate</strong></div>
+        <div><span>Question answered</span><strong>Which marker is it, and how is it rotated?</strong></div>
+        <div><span>Output</span><strong>ID, rotation, confidence, and canonical corner order</strong></div>
+      </div>
+
       <!-- PHOTO 1
            File name: assets/aruco-real-world-failures.png
            Place here: immediately after the Robust Identification introduction.
-           Recommended content: a 4-panel montage of REAL camera frames showing
-           (1) clean marker, (2) motion blur, (3) glare, and (4) low light/noise.
-           Keep the same marker ID and similar scale where possible so the visual
-           difference is caused mainly by degradation. Recommended aspect ratio: 16:7. -->
+           Current supplied asset: illustrative blur, glare, and low-light
+           transformations applied to one real camera capture. It is clearly
+           labelled as illustrative and must not be presented as validation.
+           Replace it later with matched real experiment frames if available.
+           Recommended aspect ratio: 16:7. -->
       <div class="media-card" style="margin-bottom:22px;">
         <img
           src="assets/aruco-real-world-failures.png"
@@ -639,29 +733,6 @@
             This is robust identification, not unconstrained object detection. If OpenCV cannot
             produce a usable quadrilateral at all, the classifier has no crop to classify. The
             learned model complements candidate localization rather than replacing it.
-          </p>
-        </div>
-      </div>
-
-      <!-- PHOTO 2
-           File name: assets/aruco-candidate-normalization.png
-           Place here: directly after the integration-flow card.
-           Recommended content: left side = real camera frame with the candidate
-           quadrilateral outlined and numbered corners; middle = perspective-warp
-           arrow; right side = final 40x40 normalized crop with predicted ID,
-           rotation, and confidence. Recommended aspect ratio: 16:8. -->
-      <div class="media-card" style="margin-bottom:22px;">
-        <img
-          src="assets/aruco-candidate-normalization.png"
-          alt="OpenCV quadrilateral candidate transformed into a normalized 40 by 40 crop for learned ArUco classification"
-        />
-        <div class="media-caption">
-          <h3>From Camera Candidate to Classifier Input</h3>
-          <p>
-            Perspective normalization removes most of the apparent projective distortion and gives
-            the CNN a fixed-size input. The network solves a controlled classification problem:
-            determine whether the crop is background, or determine its marker ID and discrete
-            rotation so the physical corner correspondences can be restored.
           </p>
         </div>
       </div>
@@ -752,15 +823,28 @@
       </div>
     </section>
 
+    <div class="stage-divider reveal" role="separator" aria-label="Transition from robust identification to light-adaptive covariance estimation">
+      <span>Stage 1 ends with ID and ordered corners</span>
+      <span class="stage-divider-arrow">→</span>
+      <span>Stage 2 independently estimates corner uncertainty</span>
+    </div>
+
     <!-- ── ADAPTIVE NOISE ── -->
-    <section id="noise" class="section-gap reveal">
-      <p class="label">Adaptive Noise</p>
-      <h2 class="section-title">A Per-Corner Uncertainty, Recomputed Every Frame</h2>
+    <section id="noise" class="section-gap reveal" style="padding-top:40px;">
+      <p class="label" style="color:var(--amber);">Stage 2 · Light-Adaptive Pose Covariance</p>
+      <h2 class="section-title">Estimating How Much to Trust Each Detected Corner</h2>
       <p class="section-sub">
-        Instead of a single fixed pixel-noise constant, KFPnP estimates a fresh measurement
-        uncertainty for every detected corner on every frame — built from two complementary
-        signals that are combined into one covariance the pose solver can consume directly.
+        This second contribution begins after marker identity and corner ordering are already
+        known. It does not classify the marker. Instead of using one fixed pixel-noise constant,
+        it estimates a fresh measurement uncertainty for every corner in every frame using the
+        current illumination and local image structure.
       </p>
+
+      <div class="stage-contract">
+        <div><span>Input</span><strong>Ordered corners, local image patches, brightness, and camera gain</strong></div>
+        <div><span>Question answered</span><strong>How reliable is each measured corner right now?</strong></div>
+        <div><span>Output</span><strong>One 2 × 2 image-plane covariance for each corner</strong></div>
+      </div>
 
       <div class="grid-2">
         <div class="card">
@@ -840,12 +924,22 @@
 
     <!-- ── WEIGHTED MLPnP ── -->
     <section id="integration" class="section-gap reveal">
-      <p class="label">Integration</p>
-      <h2 class="section-title">Feeding Uncertainty Into the Pose Solver</h2>
+      <p class="label">Stage 3 · Integration</p>
+      <h2 class="section-title">Combining Correspondence and Uncertainty in Weighted MLPnP</h2>
       <p class="section-sub">
-        The per-corner covariance is not a diagnostic on the side — it is consumed directly by
-        the pose solver, so corners that are more reliable this frame are trusted more this frame.
+        Stage 1 supplies the correct marker geometry and ordered 2D corners. Stage 2 supplies a
+        covariance describing the reliability of each corner. Weighted MLPnP consumes both:
+        correspondence tells it what each point means, while covariance tells it how strongly
+        that point should influence the solution.
       </p>
+
+      <div class="flow-row" style="margin:0 0 22px;">
+        <div class="flow-step accent">Stage 1: ID + Ordered 3D–2D Correspondences</div>
+        <span class="flow-arrow">+</span>
+        <div class="flow-step amber">Stage 2: Per-Corner 2 × 2 Covariances</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">Weighted MLPnP: Pose + 6 × 6 Pose Covariance</div>
+      </div>
 
       <div class="grid-2">
         <div class="card">
@@ -898,31 +992,6 @@
         <div class="stat-card">
           <div class="stat-num">0</div>
           <div class="stat-label">Online re-fitting steps during the session</div>
-        </div>
-      </div>
-
-      <!-- PHOTO 4
-           File name: assets/aruco-classical-vs-learned.png
-           Place here: after the four validation statistics and before the
-           covariance plot/video cards.
-           Recommended content: 3-4 matched real frames. On each frame show
-           classical OpenCV result on the left and the learned recovery result
-           on the right. Include at least one clean frame and difficult frames
-           with blur, glare, and low light. Label "decoded", "rejected", or
-           "CNN recovered: ID / rotation / confidence". Recommended ratio: 16:8. -->
-      <div class="media-card" style="margin-top:22px;">
-        <img
-          src="assets/aruco-classical-vs-learned.png"
-          alt="Matched real-world frames comparing classical ArUco decoding with learned ID and orientation recovery"
-        />
-        <div class="media-caption">
-          <h3>Classical Decode Versus Learned Recovery</h3>
-          <p>
-            A fair robustness demonstration uses the same candidate crops for both methods and
-            shows success, rejection, and mistakes—not only selected successful examples. The
-            learned route should improve continuity under degradation while the confidence and
-            background class prevent uncertain crops from being forced into a marker identity.
-          </p>
         </div>
       </div>
 
