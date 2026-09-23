@@ -838,25 +838,6 @@
         </div>
       </div>
 
-      <div style="margin-top:22px;">
-        <div class="media-card">
-          <video controls playsinline preload="metadata" poster="assets/kfpnp-identification-poster.png">
-            <source src="assets/kfpnp-identification-demo.mp4" type="video/mp4" />
-            Your browser doesn't support embedded video — see kfpnp-identification-demo.mp4.
-          </video>
-          <div class="media-caption">
-            <h3>Marker Recovery Under Degradation</h3>
-            <p>
-              Use a real camera recording, not a synthetic animation. Display the OpenCV candidate,
-              the recovered ID, predicted rotation, softmax confidence, and whether the classical
-              or learned route supplied the identity. Include deliberate blur, glare, direct
-              sunlight, cast shadow, low light, and viewpoint change to demonstrate the conditions
-              used to motivate robustification.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div class="note" style="margin-top:22px;">
         <span class="note-icon">⚠</span>
         <p>
@@ -1007,6 +988,44 @@
           </p>
         </div>
       </div>
+
+      <div style="margin-top:22px;">
+        <div class="media-card">
+          <video controls playsinline preload="metadata" poster="assets/kfpnp-identification-poster.png">
+            <source src="assets/kfpnp-identification-demo.mp4" type="video/mp4" />
+            Your browser doesn't support embedded video — see kfpnp-identification-demo.mp4.
+          </video>
+          <div class="media-caption">
+            <h3>Marker Recovery Under Degradation</h3>
+            <p>
+              Use a real camera recording, not a synthetic animation. Display the OpenCV candidate,
+              the recovered ID, predicted rotation, softmax confidence, and whether the classical
+              or learned route supplied the identity. Include deliberate blur, glare, direct
+              sunlight, cast shadow, low light, and viewpoint change to demonstrate the conditions
+              used to motivate robustification.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:22px;">
+        <div class="media-card">
+          <video controls playsinline preload="metadata">
+            <source src="assets/kfpnp-covariance-light-demo.mp4" type="video/mp4" />
+            Your browser does not support embedded video. Download
+            kfpnp-covariance-light-demo.mp4 to watch the experiment.
+          </video>
+          <div class="media-caption">
+            <h3>Live Validation Under Changing Illumination</h3>
+            <p>
+              This recording shows the complete calibrated pipeline operating in real time while
+              illumination and marker pose are changed by hand. Marker identity remains available,
+              while the estimated corner and pose uncertainty increase as visual conditions become
+              less reliable and decrease again when the observations improve.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ── LIVE VALIDATION ── -->
@@ -1021,24 +1040,7 @@
         covariance increases when the corner measurements become less reliable.
       </p>
 
-      <div class="media-card" style="margin-bottom:22px;">
-        <video controls playsinline preload="metadata">
-          <source src="assets/kfpnp-covariance-light-demo.mp4" type="video/mp4" />
-          Your browser does not support embedded video. Download
-          kfpnp-covariance-light-demo.mp4 to watch the experiment.
-        </video>
-        <div class="media-caption">
-          <h3>Live Validation Under Changing Illumination</h3>
-          <p>
-            This recording shows the complete calibrated pipeline operating in real time while
-            illumination and marker pose are changed by hand. Marker identity remains available,
-            while the estimated corner and pose uncertainty increase as visual conditions become
-            less reliable and decrease again when the observations improve.
-          </p>
-        </div>
-      </div>
-
-      <div class="grid-4">
+      <div class="grid-3">
         <div class="stat-card">
           <div class="stat-num">3</div>
           <div class="stat-label">Independently tracked markers, live</div>
@@ -1050,10 +1052,6 @@
         <div class="stat-card">
           <div class="stat-num">~2.5×</div>
           <div class="stat-label">Uncertainty rise from brightest to darkest conditions</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">0</div>
-          <div class="stat-label">Online re-fitting steps during the session</div>
         </div>
       </div>
 
@@ -1121,29 +1119,6 @@
               </p>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- FIGURE 5
-           File name: assets/aruco-cnn-svm-comparison.png
-           Place here: after the identification-evaluation card and before the
-           covariance-model table.
-           Recommended content: grouped bars or a compact table exported as a
-           high-resolution figure. Include CNN and SVM marker accuracy,
-           background accuracy, background-to-marker errors, marker-to-background
-           errors, and wrong ID/rotation count. Use real evaluation numbers. -->
-      <div class="media-card" style="margin-bottom:22px;">
-        <img
-          src="assets/aruco-cnn-svm-comparison.png"
-          alt="Comparison of CNN and RBF SVM robust ArUco classification performance on marker and background classes"
-        />
-        <div class="media-caption">
-          <h3>CNN and SVM Under the Same Degraded Test Set</h3>
-          <p>
-            The comparison should make the deployment decision auditable: both models receive the
-            same class definitions and degradation-aware validation set, while the chart separates
-            marker recognition from background rejection and wrong-orientation errors.
-          </p>
         </div>
       </div>
 
