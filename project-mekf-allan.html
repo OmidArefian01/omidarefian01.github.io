@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GPS-Denied Drone MEKF and Sensor Characterization | Omid Arefian</title>
+  <meta name="description" content="Sensor characterization with Allan and Hadamard deviation, Q/R identification, and a GPS-denied multiplicative extended Kalman filter validated on four drone flights." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d1b2a'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='%23ffffff' stroke-width='4'/%3E%3Cpath d='M32 13v38M13 32h38' stroke='%232587c5' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23ffffff'/%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']], tags: 'none' },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+      startup: { typeset: true }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+
+  <style>
+    :root {
+      --navy:#0d1b2a; --navy-mid:#1a2e42; --navy-light:#243a52;
+      --slate:#3d5a73; --steel:#6b8fa8; --fog:#c8d8e4; --ice:#e8f0f6;
+      --white:#ffffff; --off-white:#f7f9fb; --text:#0d1b2a;
+      --text-soft:#445668; --text-muted:#6b8fa8; --accent:#1d6fa4;
+      --accent-light:#2587c5; --accent-pale:#ddeef8; --green:#1a7a5e;
+      --green-pale:#d4ede7; --amber:#a4651d; --amber-pale:#f3e4d4;
+      --line:#dde6ee; --card-border:#e2ebf2;
+      --shadow-sm:0 1px 4px rgba(13,27,42,.06),0 4px 12px rgba(13,27,42,.06);
+      --shadow-md:0 2px 8px rgba(13,27,42,.07),0 8px 24px rgba(13,27,42,.09);
+      --radius-sm:6px; --radius-md:10px; --radius-lg:16px; --radius-xl:22px;
+      --max-width:1160px; --font-body:'DM Sans',system-ui,-apple-system,sans-serif;
+      --font-display:'DM Serif Display',Georgia,serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;font-size:16px}
+    body{font-family:var(--font-body);background:var(--off-white);color:var(--text);line-height:1.65;-webkit-font-smoothing:antialiased}
+    img{display:block;max-width:100%} a{text-decoration:none;color:inherit}
+    .container{width:min(var(--max-width),calc(100% - 40px));margin:0 auto}
+    .section-gap{padding:72px 0 0;scroll-margin-top:84px}
+
+    .navbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+    .nav-inner{width:min(var(--max-width),calc(100% - 40px));height:68px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{font-family:var(--font-display);font-size:1.05rem;color:var(--navy)}
+    .nav-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn-secondary,.btn-primary{display:inline-flex;align-items:center;height:40px;padding:0 18px;border-radius:var(--radius-md);font-size:.86rem;font-weight:600;transition:.2s}
+    .btn-secondary{background:var(--white);border:1.5px solid var(--card-border)}
+    .btn-primary{background:var(--navy);color:var(--white);border:1.5px solid var(--navy)}
+    .btn-secondary:hover{border-color:var(--steel);transform:translateY(-1px)}
+    .btn-primary:hover{background:var(--navy-mid);transform:translateY(-1px)}
+
+    .hero{padding:56px 0 0}
+    .hero-img-wrap{height:470px;border-radius:var(--radius-xl);overflow:hidden;position:relative;background:var(--navy);box-shadow:var(--shadow-md)}
+    .hero-img-wrap img{width:100%;height:100%;object-fit:cover}
+    .hero-badge{position:absolute;top:22px;left:22px;padding:7px 12px;border-radius:var(--radius-sm);background:rgba(13,27,42,.82);color:var(--white);font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;backdrop-filter:blur(8px)}
+    .hero-text{padding:32px 0 0}
+    .hero-overline,.label{display:inline-block;color:var(--accent);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+    .hero-title{font-family:var(--font-display);font-size:clamp(2.3rem,5vw,4rem);line-height:1.05;color:var(--navy);max-width:970px}
+    .hero-lead{max-width:900px;margin-top:18px;color:var(--text-soft);font-size:1.04rem;line-height:1.75}
+    .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0}
+    .tag{padding:5px 11px;border:1px solid #d9e7f1;border-radius:7px;background:var(--ice);font-size:.8rem;font-weight:600;color:var(--navy-mid)}
+    .anchor-row{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:56px;border-bottom:1px solid var(--line)}
+    .anchor-btn{display:inline-flex;align-items:center;height:36px;padding:0 14px;border-radius:var(--radius-sm);background:var(--white);border:1.5px solid var(--card-border);font-size:.83rem;font-weight:500;color:var(--text-soft)}
+    .anchor-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+    .section-title{font-family:var(--font-display);font-size:clamp(1.7rem,3vw,2.4rem);line-height:1.15;color:var(--navy);margin-bottom:8px}
+    .section-sub{font-size:.97rem;color:var(--text-muted);max-width:820px;margin-bottom:32px;line-height:1.65}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+    .card{background:var(--white);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:26px 28px;box-shadow:var(--shadow-sm);min-width:0}
+    .card-label{display:inline-block;margin-bottom:12px;padding:3px 8px;border-radius:var(--radius-sm);background:var(--accent-pale);color:var(--accent);font-size:.68rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+    .card h3{font-size:1.02rem;color:var(--navy);margin-bottom:10px;line-height:1.4}
+    .card p,.card li{font-size:.93rem;color:var(--text-soft);line-height:1.7}
+    .card p+p{margin-top:10px}.card ul{padding-left:18px;margin-top:10px}.card li+li{margin-top:8px}
+    .eq-block{background:var(--off-white);border:1px solid var(--card-border);border-left:3px solid var(--accent);border-radius:var(--radius-md);padding:15px 20px;margin:15px 0;overflow-x:auto;line-height:1.9}
+    .note{display:flex;gap:10px;align-items:flex-start;background:var(--accent-pale);border:1px solid rgba(29,111,164,.18);border-radius:var(--radius-md);padding:13px 16px;margin-top:14px}
+    .note.guard{background:var(--amber-pale);border-color:rgba(164,101,29,.22)}
+    .note p{font-size:.88rem;color:var(--navy-mid);line-height:1.6}.note.guard p{color:var(--amber)}
+    .note-icon{flex-shrink:0}
+    .status-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-bottom:22px;overflow:hidden;border:1px solid var(--card-border);border-radius:var(--radius-lg);background:var(--card-border);box-shadow:var(--shadow-sm)}
+    .status-row>div{background:var(--white);padding:17px 20px}.status-row span{display:block;margin-bottom:5px;color:var(--text-muted);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}.status-row strong{display:block;font-size:.9rem;line-height:1.45}
+    .media-card{overflow:hidden;background:var(--white);border:1px solid var(--card-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+    .media-card img{width:100%;height:auto;background:var(--white);border-bottom:1px solid var(--card-border)}
+    .media-caption{padding:19px 22px}.media-caption h3{font-size:1rem;margin-bottom:7px}.media-caption p{font-size:.9rem;color:var(--text-soft);line-height:1.65}
+    .media-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .table-wrap{overflow-x:auto;border:1px solid var(--card-border);border-radius:var(--radius-md)}
+    table{width:100%;border-collapse:collapse;min-width:700px}thead tr{background:var(--navy);color:var(--white)}
+    th,td{text-align:left;padding:12px 15px;font-size:.88rem;vertical-align:top}th{font-weight:600}td{color:var(--text-soft);border-bottom:1px solid var(--line)}tbody tr:last-child td{border-bottom:0}
+    .val-good{color:var(--green);font-weight:700}.val-warn{color:var(--amber);font-weight:700}
+    .stat-card{background:var(--white);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow-sm)}
+    .stat-num{font-family:var(--font-display);font-size:2rem;color:var(--accent)}.stat-label{font-size:.82rem;color:var(--text-muted);line-height:1.45;margin-top:5px}
+    .site-footer{padding:36px 0 40px;text-align:center;font-size:.84rem;color:var(--text-muted);border-top:1px solid var(--line);margin-top:80px}
+    .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}.reveal.show{opacity:1;transform:translateY(0)}
+    @media(max-width:960px){.grid-2,.grid-3,.grid-4,.media-grid,.status-row{grid-template-columns:1fr}.hero-img-wrap{height:330px}}
+    @media(max-width:640px){.hero-img-wrap{height:230px}.nav-actions .btn-primary{display:none}.container,.nav-inner{width:min(100% - 24px,var(--max-width))}.card{padding:21px}.section-gap{padding-top:56px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="brand">Omid Arefian</a>
+      <div class="nav-actions">
+        <a href="index.html#projects" class="btn-secondary">← All Projects</a>
+        <a href="#results" class="btn-primary">Jump to Results</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-img-wrap">
+        <img src="assets/mekf-allan/mekf-allan-cover.png" alt="Sensor characterization, covariance identification, MEKF processing, and flight-validation pipeline" />
+        <div class="hero-badge">Sensor Characterization · State Estimation · 2026</div>
+      </div>
+      <div class="hero-text">
+        <p class="hero-overline">Allan & Hadamard Deviation · Q/R Identification · GPS-Denied MEKF</p>
+        <h1 class="hero-title">Uncertainty-Driven Drone State Estimation</h1>
+        <p class="hero-lead">
+          A complete estimation workflow connects long stationary sensor tests to a GPS-denied
+          multiplicative extended Kalman filter. Allan and Hadamard deviation, time-domain
+          residuals, spectral density, dynamic flight replay, and innovation consistency are used
+          together to decide which elements of \(Q\) and \(R\) are measured, provisional, or still unknown.
+        </p>
+        <div class="tag-row">
+          <span class="tag">PX4</span><span class="tag">MEKF</span><span class="tag">Quaternion</span>
+          <span class="tag">Allan deviation</span><span class="tag">Hadamard deviation</span>
+          <span class="tag">Optical flow</span><span class="tag">NIS</span><span class="tag">Python</span>
+        </div>
+        <div class="anchor-row">
+          <a class="anchor-btn" href="#overview">Overview</a>
+          <a class="anchor-btn" href="#architecture">Architecture</a>
+          <a class="anchor-btn" href="#characterization">Allan & Hadamard</a>
+          <a class="anchor-btn" href="#q-matrix">Process Noise Q</a>
+          <a class="anchor-btn" href="#r-matrix">Measurement Noise R</a>
+          <a class="anchor-btn" href="#filter">MEKF Mathematics</a>
+          <a class="anchor-btn" href="#results">Flight Results</a>
+          <a class="anchor-btn" href="#conclusion">Conclusion</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="overview" class="section-gap reveal">
+      <p class="label">Project Overview</p>
+      <h2 class="section-title">The filter is only as credible as its uncertainty model</h2>
+      <p class="section-sub">
+        State estimation is not only the calculation of a smooth trajectory. The covariance must
+        describe what the estimator knows, what it does not know, and how strongly each sensor
+        should influence the state under real flight conditions.
+      </p>
+      <div class="grid-2">
+        <div class="card">
+          <span class="card-label">The engineering problem</span>
+          <h3>GPS-denied navigation with sensors that change behavior</h3>
+          <p>
+            The drone predicts motion from the IMU and corrects it with barometric height,
+            downward range, optical-flow velocity, and magnetic heading. Noise measured while the
+            vehicle is motionless is often much smaller than the effective error seen in flight,
+            where vibration, tilt, height, timing, and model mismatch also contribute.
+          </p>
+          <p>
+            If \(Q\) is too small, the filter becomes overconfident in propagation. If \(R\) is too
+            small, measurements fail innovation gates or pull the state aggressively. Increasing
+            either matrix without physical evidence can hide a modelling error instead of fixing it.
+          </p>
+        </div>
+        <div class="card">
+          <span class="card-label">The contribution</span>
+          <h3>One traceable evidence chain</h3>
+          <ul>
+            <li>Characterize stationary accelerometer and gyroscope noise across time scales.</li>
+            <li>Use Allan, Hadamard, Welch PSD, residual distributions, and datasheets as complementary evidence.</li>
+            <li>Convert only defensible coefficients into the continuous process-noise matrix \(Q_c\).</li>
+            <li>Estimate measurement-noise floors, then validate effective \(R\) values through complete-flight MEKF replay.</li>
+            <li>Judge the result using NIS, rejection rate, covariance health, trajectory behavior, and no-GPS EKF2 agreement.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note guard">
+        <span class="note-icon">⚠</span>
+        <p><strong>Important:</strong> PX4 EKF2 is used only after each independent MEKF replay for one constant frame alignment and comparison. Because both estimators share sensors, agreement is not independent ground-truth accuracy.</p>
+      </div>
+    </section>
+
+    <section id="architecture" class="section-gap reveal">
+      <p class="label">Evidence Architecture</p>
+      <h2 class="section-title">No single test is allowed to identify every covariance</h2>
+      <p class="section-sub">
+        Fast IMU noise, slow bias evolution, static sensor scatter, and dynamic measurement error
+        are different physical quantities. The workflow separates them before combining them in the MEKF.
+      </p>
+      <div class="media-card">
+        <img src="assets/mekf-allan/sensor-to-mekf-architecture.png" alt="Eight-stage evidence chain from stationary recordings through Q and R construction to MEKF validation" />
+        <div class="media-caption">
+          <h3>From recordings to a filter that can be audited</h3>
+          <p>Every accepted parameter retains its source and confidence level. Measured white-noise densities are separated from provisional bias random walks, while dynamic replay prevents static lower bounds from being used blindly in flight.</p>
+        </div>
+      </div>
+      <div class="status-row" style="margin-top:22px">
+        <div><span>Measured with strong evidence</span><strong>Accelerometer/gyro white noise and range noise for the tested regime</strong></div>
+        <div><span>Operational but provisional</span><strong>Bias random walks, optical-flow noise, and legacy magnetic heading noise</strong></div>
+        <div><span>Validation principle</span><strong>Independent replay first; EKF2 enters only after estimation is complete</strong></div>
+      </div>
+    </section>
+
+    <section id="characterization" class="section-gap reveal">
+      <p class="label">Allan and Hadamard Analysis</p>
+      <h2 class="section-title">Measure how sensor stability changes with averaging time</h2>
+      <p class="section-sub">
+        Ordinary variance returns one number for one dataset. Allan and Hadamard deviation return
+        curves, revealing which processes dominate at short, medium, and long averaging times.
+      </p>
+      <div class="grid-2">
+        <div class="card">
+          <span class="card-label">Overlapping Allan deviation</span>
+          <h3>Difference between adjacent cluster averages</h3>
+          <p>For averaging time \(\tau\), samples are grouped into local averages \(\bar y_i(\tau)\). Allan variance measures how successive averages change:</p>
+          <div class="eq-block">
+            \[\sigma_A^2(\tau)=\frac{1}{2(M-1)}\sum_{i=1}^{M-1}\left(\bar y_{i+1}-\bar y_i\right)^2.\]
+          </div>
+          <p>A log–log slope near \(-1/2\) indicates white noise. A flat region suggests bias-instability behavior. A sustained \(+1/2\) region can support a random-walk coefficient, but only when enough independent clusters exist.</p>
+        </div>
+        <div class="card">
+          <span class="card-label">Overlapping Hadamard deviation</span>
+          <h3>Second difference suppresses constant linear drift</h3>
+          <p>Hadamard variance compares three adjacent cluster averages:</p>
+          <div class="eq-block">
+            \[\sigma_H^2(\tau)=\frac{1}{6(M-2)}\sum_{i=1}^{M-2}\left(\bar y_{i+2}-2\bar y_{i+1}+\bar y_i\right)^2.\]
+          </div>
+          <p>If Allan deviation rises strongly at large \(\tau\) while Hadamard deviation stays lower, deterministic linear drift is a likely contributor. If both rise similarly, a stochastic slow process is more plausible, although temperature and environment must still be checked.</p>
+        </div>
+      </div>
+
+      <div class="media-grid" style="margin-top:22px">
+        <div class="media-card">
+          <img src="assets/mekf-allan/allan-vs-hadamard-schematic.png" alt="Schematic comparison showing Allan deviation responding more strongly to linear drift than Hadamard deviation" />
+          <div class="media-caption">
+            <h3>Why both estimators are useful</h3>
+            <p>This labelled schematic is explanatory rather than measured data. It shows the diagnostic role of Hadamard deviation when long-term drift can imitate stochastic random walk.</p>
+          </div>
+        </div>
+        <div class="media-card">
+          <img src="assets/mekf-allan/measured-allan-deviation.png" alt="Measured preliminary gyroscope and accelerometer Allan-deviation curves on logarithmic axes" />
+          <div class="media-caption">
+            <h3>Measured project curves</h3>
+            <p>The descending left side supports white-noise identification. The minima and rising tails reveal slower effects, but the completed recording was not long or controlled enough to replace every bias-random-walk baseline.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="media-card" style="margin-top:22px">
+        <img src="assets/mekf-allan/imu-white-noise-diagnostics.png" alt="Gyroscope and accelerometer fast residual time histories and probability distributions" />
+        <div class="media-caption">
+          <h3>Time-domain cross-check</h3>
+          <p>Fast residuals and their distributions verify the short-term scatter independently of the Allan curve. Welch spectral density and datasheet values provide additional checks before the white-noise coefficient is accepted.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="q-matrix" class="section-gap reveal">
+      <p class="label">Process Noise Identification</p>
+      <h2 class="section-title">Building \(Q_c\) without pretending every term was measured</h2>
+      <p class="section-sub">
+        Process noise describes uncertainty entering through IMU propagation and bias evolution.
+        The latest conservative recommendation combines measured short-term densities with clearly labelled provisional random walks.
+      </p>
+      <div class="card">
+        <span class="card-label">Continuous process-noise model</span>
+        <h3>Evidence-based and provisional blocks remain visibly separate</h3>
+        <div class="eq-block">
+          \[Q_c=\operatorname{diag}\!\left((1.2\!\times\!10^{-3})^2I_3,
+          (6.8\!\times\!10^{-5})^2I_3,
+          (3.0\!\times\!10^{-3})^2I_3,
+          (3.0\!\times\!10^{-4})^2I_3,
+          \sigma_{bm}^2I_3,
+          (1.0\!\times\!10^{-2})^2\right).\]
+        </div>
+        <p>The first two blocks represent accelerometer and gyroscope white-noise densities. The next blocks describe accelerometer-, gyroscope-, magnetometer-, and barometer-bias evolution. The magnetic-bias term remains symbolic because the required long raw-field dataset has not yet been collected.</p>
+      </div>
+
+      <div class="table-wrap" style="margin-top:22px">
+        <table>
+          <thead><tr><th>Process term</th><th>Current sigma</th><th>Evidence status</th><th>Interpretation</th></tr></thead>
+          <tbody>
+            <tr><td>Accelerometer white noise</td><td>\(1.2\times10^{-3}\ \mathrm{m/s^2/\sqrt{Hz}}\)</td><td class="val-good">Measured</td><td>Time residual, Welch floor, Allan region, and datasheet agree in scale</td></tr>
+            <tr><td>Gyroscope white noise</td><td>\(6.8\times10^{-5}\ \mathrm{rad/s/\sqrt{Hz}}\)</td><td class="val-good">Measured</td><td>Conservative value close to the stationary spectral estimate</td></tr>
+            <tr><td>Accelerometer-bias random walk</td><td>\(3.0\times10^{-3}\ \mathrm{m/s^2/\sqrt{s}}\)</td><td class="val-warn">Provisional</td><td>Bounded baseline; not separated reliably from drift</td></tr>
+            <tr><td>Gyroscope-bias random walk</td><td>\(3.0\times10^{-4}\ \mathrm{rad/s/\sqrt{s}}\)</td><td class="val-warn">Provisional</td><td>Requires longer temperature-aware testing and held-out flights</td></tr>
+            <tr><td>Magnetometer-bias random walk</td><td>Not assigned</td><td class="val-warn">Unknown</td><td>Needs a raw RM3100 field dataset for the proposed 19-state extension</td></tr>
+            <tr><td>Barometer-bias random walk</td><td>\(1.0\times10^{-2}\ \mathrm{m/\sqrt{s}}\)</td><td class="val-warn">Provisional</td><td>Operational baseline pending a dedicated pressure/temperature study</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note guard">
+        <span class="note-icon">⚠</span>
+        <p>A smooth trajectory is not evidence that a random-walk value is correct. Excessive bias process noise can absorb real vehicle motion, while insufficient process noise prevents the state from adapting to real drift.</p>
+      </div>
+    </section>
+
+    <section id="r-matrix" class="section-gap reveal">
+      <p class="label">Measurement Noise Identification</p>
+      <h2 class="section-title">Static scatter is a lower bound; flight replay decides operational \(R\)</h2>
+      <p class="section-sub">
+        Measurement covariance includes more than electronic noise. In flight it also absorbs
+        vibration, geometry, timing, tilt compensation, surface texture, lighting, and measurement-model mismatch.
+      </p>
+      <div class="grid-2">
+        <div class="card">
+          <span class="card-label">Measurement update</span>
+          <h3>Innovation covariance and scalar consistency</h3>
+          <div class="eq-block">
+            \[\nu_k=z_k-h(\hat x_k^-),\qquad S_k=H_kP_k^-H_k^T+R_k.\]
+          </div>
+          <div class="eq-block">
+            \[\operatorname{NIS}_k=\frac{\nu_k^2}{S_k}.\]
+          </div>
+          <p>For a statistically consistent scalar update, mean NIS should be near one and approximately 95% of samples should lie below 3.841. A high value can result from underestimated \(R\), underestimated \(Q\), bias, timing, or a wrong measurement model.</p>
+        </div>
+        <div class="card">
+          <span class="card-label">Current operational values</span>
+          <h3>Present-stage legacy measurement covariance</h3>
+          <div class="eq-block">
+            \[R_{\mathrm{legacy}}=\operatorname{diag}\!\left(
+            1.21\times10^{-2},\ 3.6\times10^{-5},\ 2.25\times10^{-2},\ 2.25\times10^{-2},\ 1.0966\times10^{-2}\right).\]
+          </div>
+          <p>The entries correspond to barometric height, downward range, optical-flow North/East velocity, and legacy magnetic heading. The last variance represents a conservative 6° heading sigma in radians.</p>
+        </div>
+      </div>
+
+      <div class="media-grid" style="margin-top:22px">
+        <div class="media-card">
+          <img src="assets/mekf-allan/measurement-noise-diagnostics.png" alt="Stationary residual time histories and distributions for barometer, rangefinder, optical flow, and magnetic heading" />
+          <div class="media-caption">
+            <h3>Stationary measurement floors</h3>
+            <p>These residual distributions establish lower bounds and expose quantization or non-Gaussian structure. They are useful starting evidence, not automatically safe flight covariances.</p>
+          </div>
+        </div>
+        <div class="media-card">
+          <img src="assets/mekf-allan/range-multiflight-selection.png" alt="Four-flight rangefinder intervals showing selected stable segments for covariance analysis" />
+          <div class="media-caption">
+            <h3>Rangefinder evidence across four flights</h3>
+            <p>Quiet signal-domain estimates near 2 mm failed to generalize to the hardest flight. Complete-filter replay selected 6 mm as a defensible fixed value for the tested regime.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:22px">
+        <table>
+          <thead><tr><th>Measurement</th><th>Current sigma</th><th>Confidence</th><th>Reason for the current choice</th></tr></thead>
+          <tbody>
+            <tr><td>Barometric height</td><td>0.11 m</td><td>Medium-high static</td><td>Stationary residual supported; dynamic-pressure study remains</td></tr>
+            <tr><td>Downward range</td><td>0.006 m</td><td class="val-good">High for tested regime</td><td>Selected through multi-flight MEKF replay, NIS, and rejection checks</td></tr>
+            <tr><td>Optical-flow N/E velocity</td><td>0.15 m/s</td><td class="val-warn">Low-medium</td><td>Dynamic allowance; stationary value was unrealistically small for flight</td></tr>
+            <tr><td>Magnetic heading</td><td>6°</td><td class="val-warn">Low</td><td>Conservative legacy fallback pending vector-field validation</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="filter" class="section-gap reveal">
+      <p class="label">Multiplicative Extended Kalman Filter</p>
+      <h2 class="section-title">Quaternion attitude with a small multiplicative error state</h2>
+      <p class="section-sub">
+        The nominal state carries position, velocity, quaternion attitude, accelerometer bias,
+        gyroscope bias, and barometer bias. A 16-dimensional local error state is estimated and injected into the nominal state.
+      </p>
+      <div class="grid-2">
+        <div class="card">
+          <span class="card-label">Nominal and error states</span>
+          <h3>Keep the quaternion normalized without filtering four unconstrained components</h3>
+          <div class="eq-block">
+            \[x=\{p_N,v_N,q_{NB},b_a,b_g,b_h\},\]
+            \[\delta x=[\delta p^T,\delta v^T,\delta\theta^T,\delta b_a^T,\delta b_g^T,\delta b_h]^T.\]
+          </div>
+          <p>The quaternion belongs to the nominal state, while the filter estimates a three-component small-angle error \(\delta\theta\). After correction, that error is converted to a small quaternion and multiplied into the nominal attitude.</p>
+        </div>
+        <div class="card">
+          <span class="card-label">IMU prediction</span>
+          <h3>Propagate navigation states and covariance</h3>
+          <div class="eq-block">
+            \[\dot p_N=v_N,\qquad \dot v_N=R(q_{NB})(a_m-b_a)+g_N,\]
+            \[\dot q_{NB}=\tfrac12\Omega(\omega_m-b_g)q_{NB}.\]
+          </div>
+          <div class="eq-block">
+            \[P_k^-=F_kP_{k-1}^+F_k^T+G_kQ_{d,k}G_k^T.\]
+          </div>
+          <p>Bias states follow random walks. Position uncertainty grows through the transition matrix even though white-noise injection enters velocity, attitude error, and bias blocks.</p>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:22px">
+        <div class="card">
+          <span class="card-label">Measurement correction</span>
+          <h3>Innovation, gain, and error-state injection</h3>
+          <div class="eq-block">
+            \[K_k=P_k^-H_k^TS_k^{-1},\qquad \delta\hat x_k=K_k\nu_k.\]
+          </div>
+          <p>Position, velocity, biases, and barometer offset are corrected additively. Attitude is corrected multiplicatively:</p>
+          <div class="eq-block">
+            \[q_{NB}^+=\delta q(\delta\hat\theta)\otimes q_{NB}^-.\]
+          </div>
+        </div>
+        <div class="card">
+          <span class="card-label">Covariance correction</span>
+          <h3>Joseph form and innovation gating</h3>
+          <div class="eq-block">
+            \[P_k^+=(I-K_kH_k)P_k^-(I-K_kH_k)^T+K_kR_kK_k^T.\]
+          </div>
+          <p>The Joseph form protects covariance symmetry and positive semidefiniteness. A three-sigma scalar gate rejects a measurement when its normalized test ratio exceeds one; the equivalent scalar NIS threshold is nine.</p>
+        </div>
+      </div>
+      <div class="note">
+        <span class="note-icon">ℹ</span>
+        <p>The optical-flow sign convention was verified experimentally. Reversing the body-velocity relation caused catastrophic horizontal divergence, illustrating why coordinate models must be tested before covariance tuning.</p>
+      </div>
+    </section>
+
+    <section id="results" class="section-gap reveal">
+      <p class="label">Flight Validation</p>
+      <h2 class="section-title">Four independent replays with the accepted 6 mm range value</h2>
+      <p class="section-sub">
+        Hover, square, general translation, and altitude-changing flights test different parts of
+        the estimator. EKF2 GPS fusion was not detected in the exported status flags; comparison is performed only after one constant yaw-and-translation alignment per flight.
+      </p>
+      <div class="grid-4">
+        <div class="stat-card"><div class="stat-num">0.006 m</div><div class="stat-label">Accepted downward-range standard deviation</div></div>
+        <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">Flight regimes replayed through the complete MEKF</div></div>
+        <div class="stat-card"><div class="stat-num">0.008–0.014 m</div><div class="stat-label">Down-position agreement RMSE across flights</div></div>
+        <div class="stat-card"><div class="stat-num">1.20</div><div class="stat-label">Range mean NIS on the difficult altitude-changing flight</div></div>
+      </div>
+
+      <div class="media-card" style="margin-top:22px">
+        <img src="assets/mekf-allan/four-flight-trajectories.png" alt="Horizontal MEKF and no-GPS EKF2 trajectories for hover, square, flight 4, and flight 7" />
+        <div class="media-caption">
+          <h3>Trajectory shape and drift across four flight regimes</h3>
+          <p>The vertical channel remains close, while horizontal disagreement grows most in the altitude-changing flight. This is evidence that range \(R\) should not be used to compensate for optical-flow, yaw, or IMU-bias limitations.</p>
+        </div>
+      </div>
+      <div class="media-grid" style="margin-top:22px">
+        <div class="media-card">
+          <img src="assets/mekf-allan/four-flight-rmse-summary.png" alt="Position, velocity, and yaw agreement RMSE for four MEKF flight replays" />
+          <div class="media-caption">
+            <h3>Agreement summarized by state channel</h3>
+            <p>Position, velocity, and yaw are evaluated separately so that one sensor covariance is not blamed for an unrelated state error.</p>
+          </div>
+        </div>
+        <div class="media-card">
+          <img src="assets/mekf-allan/four-flight-velocity.png" alt="NED velocity comparison between MEKF and no-GPS EKF2 for four flights" />
+          <div class="media-caption">
+            <h3>Velocity reveals errors before they integrate into position</h3>
+            <p>These traces are particularly relevant to optical-flow \(R\) and accelerometer-bias process noise, which first affect velocity and only later accumulate into horizontal position drift.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:22px">
+        <table>
+          <thead><tr><th>Flight</th><th>Horizontal position RMSE</th><th>Horizontal velocity RMSE</th><th>Yaw RMSE</th><th>Range mean NIS</th></tr></thead>
+          <tbody>
+            <tr><td>Hover</td><td>0.129 m</td><td>0.0210 m/s</td><td>2.04°</td><td>0.106</td></tr>
+            <tr><td>Square</td><td>0.0691 m</td><td>0.0490 m/s</td><td>3.35°</td><td>0.162</td></tr>
+            <tr><td>Flight 4</td><td>0.133 m</td><td>0.0626 m/s</td><td>3.10°</td><td>0.195</td></tr>
+            <tr><td>Flight 7</td><td>0.354 m</td><td>0.0580 m/s</td><td>3.32°</td><td>1.198</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note guard">
+        <span class="note-icon">⚠</span>
+        <p>These are MEKF-to-EKF2 agreement values after one reported rigid alignment, not errors against motion capture or surveyed ground truth. Absolute accuracy and NEES require an independent reference.</p>
+      </div>
+    </section>
+
+    <section id="conclusion" class="section-gap reveal">
+      <p class="label">Conclusion</p>
+      <h2 class="section-title">A covariance is a physical claim, not merely a tuning knob</h2>
+      <p class="section-sub">
+        The project combines sensor characterization and estimator design because the two cannot be
+        defended separately. The final values are accepted only when their physical origin and filter-level consequences agree.
+      </p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>What was demonstrated</h3>
+          <ul>
+            <li>Allan, Hadamard, spectral, and time-domain tools diagnose different parts of the inertial-noise problem.</li>
+            <li>Measured IMU white noise can be translated into the MEKF process covariance without claiming that every slow bias term was identified.</li>
+            <li>Static measurement scatter is insufficient for dynamic flight; complete-filter replay is required.</li>
+            <li>A 6 mm range sigma produced statistically reasonable behavior on the difficult altitude-changing flight and conservative behavior on calmer flights.</li>
+            <li>NIS, rejection, covariance, trajectory shape, and estimator agreement must be interpreted together.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Remaining work</h3>
+          <ul>
+            <li>Complete a long temperature-aware IMU run to separate bias instability, drift, and random walk more reliably.</li>
+            <li>Identify optical-flow noise using an independent horizontal-velocity reference.</li>
+            <li>Replace the legacy scalar magnetic-heading update with a calibrated vector-field model and magnetometer-bias states.</li>
+            <li>Validate absolute trajectory accuracy using camera/PnP, motion capture, surveyed markers, or another independent reference.</li>
+            <li>Investigate adaptive measurement covariance when fixed \(R\) cannot remain consistent across all regimes.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">© 2026 Omid Arefian · Sensor Characterization and GPS-Denied Drone State Estimation</footer>
+  <script>
+    const items=document.querySelectorAll('.reveal');
+    const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target)}}),{threshold:.07});
+    items.forEach(el=>io.observe(el));
+  </script>
+</body>
+</html>
