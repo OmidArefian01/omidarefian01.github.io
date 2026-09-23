@@ -976,6 +976,23 @@
         covariance increases when the corner measurements become less reliable.
       </p>
 
+      <div class="media-card" style="margin-bottom:22px;">
+        <video controls playsinline preload="metadata">
+          <source src="assets/kfpnp-covariance-light-demo.mp4" type="video/mp4" />
+          Your browser does not support embedded video. Download
+          kfpnp-covariance-light-demo.mp4 to watch the experiment.
+        </video>
+        <div class="media-caption">
+          <h3>Live Validation Under Changing Illumination</h3>
+          <p>
+            This recording shows the complete calibrated pipeline operating in real time while
+            illumination and marker pose are changed by hand. Marker identity remains available,
+            while the estimated corner and pose uncertainty increase as visual conditions become
+            less reliable and decrease again when the observations improve.
+          </p>
+        </div>
+      </div>
+
       <div class="grid-4">
         <div class="stat-card">
           <div class="stat-num">3</div>
@@ -995,7 +1012,7 @@
         </div>
       </div>
 
-      <div class="grid-2" style="margin-top:22px;">
+      <div style="margin-top:22px;">
         <div class="media-card">
           <img
             src="assets/kfpnp-pose-covariance.png"
@@ -1008,22 +1025,6 @@
               propagated pose uncertainty rose and fell in step — consistently across all three
               markers, regardless of their position or orientation on screen — confirming that the
               effect is driven by illumination itself, not by any single marker's geometry.
-            </p>
-          </div>
-        </div>
-
-        <div class="media-card">
-          <video controls playsinline preload="metadata" poster="assets/kfpnp-covariance-light-poster.png">
-            <source src="assets/kfpnp-covariance-light-demo.mp4" type="video/mp4" />
-            Your browser doesn't support embedded video — see kfpnp-covariance-light-demo.mp4.
-          </video>
-          <div class="media-caption">
-            <h3>Watching It Happen Live</h3>
-            <p>
-              Screen capture of the live monitoring view, with a flashlight swept across the
-              markers to make the effect unambiguous: the per-corner and pose uncertainty
-              ellipses visibly widen as the light moves away and tighten again as it returns,
-              with no re-fitting between frames.
             </p>
           </div>
         </div>
