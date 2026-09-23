@@ -538,8 +538,9 @@
         <p class="hero-lead">
           KFPnP strengthens both ends of the ArUco-to-pose pipeline. At the front end, OpenCV
           still localizes candidate quadrilaterals, while a learned classifier recovers marker
-          identity and orientation when blur, sensor noise, glare, or poor illumination makes
-          classical dictionary decoding unreliable. At the pose-estimation end, a live
+          identity and orientation when blur, sensor noise, glare, harsh direct sunlight, deep
+          shadow, or poor indoor illumination makes classical dictionary decoding unreliable —
+          conditions that show up constantly once a marker moves outdoors. At the pose-estimation end, a live
           per-corner covariance tells the weighted MLPnP refinement how strongly each observation
           should influence the solution. The result is a pipeline designed for real camera
           experiments rather than only clean, frontal marker images.
@@ -570,7 +571,7 @@
     <!-- ── OVERVIEW ── -->
     <section id="overview" class="section-gap reveal">
       <p class="label">Overview</p>
-      <h2 class="section-title">Why Real-World ArUco Tracking Needs Two Kinds of Robustness</h2>
+      <h2 class="section-title">Robust ArUco Tracking</h2>
       <p class="section-sub">
         A pose cannot be estimated if the marker identity disappears, and it should not be trusted
         blindly when its corners are poorly observed. KFPnP therefore improves both marker
@@ -584,8 +585,12 @@
             Classical ArUco decoding depends on a clear black border and correctly sampled binary
             cells. Motion blur mixes neighbouring cells, glare erases black regions, low light
             increases sensor noise, and perspective or resizing reduces the number of useful
-            pixels. A candidate can therefore be geometrically visible but fail the dictionary
-            test. Even when it is detected, its four corners do not all have the same precision.
+            pixels. Outdoors, direct sunlight adds a further failure mode on top of these: hard
+            cast shadows cut across the marker, specular highlights wash out entire cells, and the
+            sun's angle changes continuously through the day, so the same physical marker can look
+            very different from one minute to the next. A candidate can therefore be geometrically
+            visible but fail the dictionary test. Even when it is detected, its four corners do
+            not all have the same precision.
           </p>
           <p>
             KFPnP addresses these failures separately: <strong>robust identification</strong>
@@ -622,11 +627,7 @@
           </div>
           <div class="note" style="margin-top:20px;">
             <span class="note-icon">ℹ</span>
-            <p>
-              These stages are related but not interchangeable. Robust identification protects
-              correspondence continuity; light-adaptive covariance controls how strongly each
-              accepted correspondence influences the pose.
-            </p>
+
           </div>
         </div>
       </div>
@@ -657,13 +658,40 @@
         Dictionary-based ArUco decoding remains the fastest first choice in clean conditions.
         The learned stage is added as a recovery path for localized candidates whose borders are
         still usable but whose internal binary pattern has been damaged by blur, noise, glare,
-        low contrast, or limited image resolution.
+        harsh sunlight, deep shadow, low contrast, or limited image resolution. It is built to
+        solve two distinct problems at once — recognizing the marker regardless of how it is
+        rotated, and recognizing it regardless of how it is lit.
       </p>
 
       <div class="stage-contract">
         <div><span>Input</span><strong>OpenCV quadrilateral candidate</strong></div>
-        <div><span>Question answered</span><strong>Which marker is it, and how is it rotated?</strong></div>
+        <div><span>Question answered</span><strong>Which marker is it, how is it rotated, and how confident is that read under the current lighting?</strong></div>
         <div><span>Output</span><strong>ID, rotation, confidence, and canonical corner order</strong></div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:22px;">
+        <div class="card">
+          <span class="card-label">Geometric Robustness</span>
+          <h3>Recovering Marker Rotation</h3>
+          <p>
+            A marker can appear at any of four canonical rotations relative to the camera. The
+            classifier resolves this by predicting a rotation index alongside the ID, so the four
+            detected corners can be reordered into the canonical ArUco order before pose
+            estimation, regardless of how the marker was physically oriented when it was placed.
+          </p>
+        </div>
+        <div class="card">
+          <span class="card-label">Photometric Robustness</span>
+          <h3>Recognizing Markers Across Illumination — Including Direct Sun</h3>
+          <p>
+            The same classifier is trained across a wide sweep of illumination — deep shadow,
+            ordinary indoor lighting, overcast daylight, and harsh, direct sunlight — so
+            identification keeps working outdoors, where sun angle, glare, and shadow contrast
+            change constantly and cannot be controlled the way they can in a lab. This is what
+            actually lets the pipeline operate in real-world scenes rather than only under
+            controlled lighting.
+          </p>
+        </div>
       </div>
 
       <!-- PHOTO 1
@@ -683,11 +711,13 @@
           <h3>Why Robustification Is Needed</h3>
           <p>
             In real experiments, the marker does not remain perfectly frontal, sharp, and evenly
-            illuminated. A short camera or screen movement introduces directional blur; reflections
-            saturate parts of the code; and low light increases pixel noise. Classical decoding can
+            illuminated. A short camera or screen movement introduces directional blur;
+            reflections and direct sunlight saturate parts of the code; a cast shadow can cut a
+            marker cleanly in half; and low light increases pixel noise. Classical decoding can
             reject the complete marker after only a few corrupted cells. Robustification preserves
-            identification continuity so the downstream pose estimator does not lose the marker at
-            exactly the moments when the experiment becomes difficult.
+            identification continuity through both kinds of change — how the marker is rotated and
+            how it is lit — so the downstream pose estimator does not lose the marker at exactly
+            the moments when the experiment, or the weather, becomes difficult.
           </p>
         </div>
       </div>
@@ -727,6 +757,15 @@
           rotation is then used to reorder the four corners into the canonical ArUco order before
           the known marker geometry and image corners are sent to pose estimation.
         </p>
+        <p>
+          Rotation and illumination are learned together but solve different problems. The class
+          index recovers rotation directly, since each of the 200 marker classes is tied to one
+          of the four canonical orientations. Illumination robustness instead comes from how the
+          classifier is trained: every crop, at every rotation, is also exposed to a wide sweep
+          of lighting — from deep shadow to harsh, direct sun — so the network learns to hold its
+          ID and rotation prediction steady while illumination varies, rather than treating a
+          shadowed or sunlit marker as visually different from a well-lit one.
+        </p>
 
         <div class="note" style="margin-top:16px;">
           <span class="note-icon">ℹ</span>
@@ -755,8 +794,11 @@
           <p>
             Training crops are randomly modified with box, Gaussian, and directional motion blur;
             Gaussian read noise, intensity-dependent shot noise, and hot/dead pixels; specular
-            glare; and lighting or contrast changes. The same families of corruption are also
-            applied to background crops so the model cannot learn that “noise means marker.”
+            glare; and a deliberately wide illumination sweep — harsh directional sunlight, hard
+            cast shadows, overcast daylight, and low-contrast indoor lighting — to match what a
+            marker actually looks like outdoors, not just on a lab bench. The same families of
+            corruption are also applied to background crops so the model cannot learn that “noise
+            means marker.”
           </p>
         </div>
         <div class="card">
@@ -789,8 +831,9 @@
           <p>
             The augmentation set is not decoration; it defines the invariances the classifier is
             expected to learn. Marker identity and rotation remain the label while blur, noise,
-            glare, and illumination vary. Background crops receive comparable degradation to
-            teach a genuine marker-versus-non-marker decision.
+            glare, and illumination — including sun-like directional lighting and hard shadow
+            edges — vary underneath. Background crops receive comparable degradation to teach a
+            genuine marker-versus-non-marker decision.
           </p>
         </div>
       </div>
@@ -806,8 +849,9 @@
             <p>
               Use a real camera recording, not a synthetic animation. Display the OpenCV candidate,
               the recovered ID, predicted rotation, softmax confidence, and whether the classical
-              or learned route supplied the identity. Include deliberate blur, glare, low light,
-              and viewpoint change to demonstrate the conditions used to motivate robustification.
+              or learned route supplied the identity. Include deliberate blur, glare, direct
+              sunlight, cast shadow, low light, and viewpoint change to demonstrate the conditions
+              used to motivate robustification.
             </p>
           </div>
         </div>
@@ -1163,8 +1207,8 @@
         <div class="card">
           <h3>Key Findings</h3>
           <ul>
-            <li>A learned recovery stage extends OpenCV candidate localization by classifying degraded quadrilateral crops into marker ID, rotation, or background.</li>
-            <li>Training with blur, sensor noise, glare, lighting variation, and similarly degraded background crops targets the failure modes observed in real camera experiments.</li>
+            <li>A learned recovery stage extends OpenCV candidate localization by classifying degraded quadrilateral crops into marker ID, rotation, or background — recovering both how the marker is oriented and staying reliable across lighting, from deep shadow to direct sun.</li>
+            <li>Training with blur, sensor noise, glare, a full outdoor illumination sweep, and similarly degraded background crops targets the failure modes observed in real camera experiments, indoors and out.</li>
             <li>Per-corner uncertainty that reacts to both sensor conditions and local image structure predicts real measurement scatter far better than a fixed constant.</li>
             <li>Feeding that uncertainty into the pose solver, rather than treating every corner equally, propagates cleanly through to pose covariance without any online re-fitting.</li>
             <li>The live experiment must test both continuity of correct identification and the response of covariance under real blur, glare, low light, motion, and changing viewpoint.</li>
