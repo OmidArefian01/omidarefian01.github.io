@@ -826,27 +826,6 @@
           src="assets/aruco-training-augmentations.png"
           alt="Clean ArUco crop and robust training examples containing blur, sensor noise, glare, and illumination changes"
         />
-        <div class="media-caption">
-          <h3>Training the Failure Modes We Expect to See</h3>
-          <p>
-            The augmentation set is not decoration; it defines the invariances the classifier is
-            expected to learn. Marker identity and rotation remain the label while blur, noise,
-            glare, and illumination — including sun-like directional lighting and hard shadow
-            edges — vary underneath. Background crops receive comparable degradation to teach a
-            genuine marker-versus-non-marker decision.
-          </p>
-        </div>
-      </div>
-
-      <div class="note" style="margin-top:22px;">
-        <span class="note-icon">⚠</span>
-        <p>
-          A confident wrong ID or wrong rotation is more dangerous than a rejected crop because it
-          creates incorrect 3D-to-2D corner correspondences. This is why the background class,
-          confidence threshold, and separate reporting of ID/rotation errors are essential parts
-          of the robust design.
-        </p>
-      </div>
     </section>
 
     <div class="stage-divider reveal" role="separator" aria-label="Transition from robust identification to light-adaptive covariance estimation">
@@ -1074,100 +1053,7 @@
       </div>
     </section>
 
-    <!-- ── RESULTS ── -->
-    <section id="results" class="section-gap reveal">
-      <p class="label">Results</p>
-      <h2 class="section-title">Does the Extra Signal Actually Help?</h2>
-      <p class="section-sub">
-        Robust identification and adaptive uncertainty answer different questions and should be
-        evaluated separately. The classifier is tested on ID, rotation, and background rejection;
-        the covariance model is tested on its prediction of measured corner scatter under held-out
-        imaging conditions.
-      </p>
-
-      <div class="card" style="margin-bottom:22px;">
-        <span class="card-label">Identification Evaluation</span>
-        <h3>What Was Compared for Robust Marker Recovery</h3>
-        <div class="grid-2">
-          <div>
-            <p>
-              The 40 × 40 CNN and 10 × 10 RBF SVM solve the same 201-class problem. Reporting only
-              total accuracy can hide dangerous failure modes, especially when marker classes and
-              background samples are not equally frequent.
-            </p>
-            <ul>
-              <li>Accuracy across the 200 marker-and-rotation classes</li>
-              <li>Background-class accuracy</li>
-              <li>Background crops incorrectly accepted as markers</li>
-              <li>Markers incorrectly rejected as background</li>
-              <li>Wrong marker ID or wrong rotation</li>
-            </ul>
-          </div>
-          <div>
-            <p>
-              The final deployment uses the selected classifier together with a confidence
-              threshold. Real-world reporting should additionally separate clean, blur, noise,
-              glare, and low-light subsets so the improvement is visibly connected to the
-              degradations used during robustification.
-            </p>
-            <div class="note" style="margin-top:14px;">
-              <span class="note-icon">ℹ</span>
-              <p>
-                Insert your measured CNN and SVM values here. Do not invent percentages; export
-                them directly from the evaluation scripts and keep the validation split independent
-                from the training backgrounds.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Adaptive Covariance Candidate Comparison — Held-Out Performance</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Candidate Model</th>
-                <th>Relative Fit Quality</th>
-                <th>Uncertainty Prediction Error</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Fixed, constant uncertainty</td>
-                <td>Baseline</td>
-                <td>Highest</td>
-              </tr>
-              <tr>
-                <td>Sensor-noise only</td>
-                <td>Modest improvement</td>
-                <td>Reduced</td>
-              </tr>
-              <tr>
-                <td>Sensor noise + local structure <em>(selected)</em></td>
-                <td class="val-good">Best held-out fit</td>
-                <td class="val-good">Lowest</td>
-              </tr>
-              <tr>
-                <td>Above + extra unexplained-variance term</td>
-                <td>No meaningful gain over selected model</td>
-                <td>Comparable, added complexity</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="note" style="margin-top:16px;">
-          <span class="note-icon">ℹ</span>
-          <p>
-            Adding local image structure to the sensor-noise term produced the clearest gain in
-            held-out predictive accuracy; a further, more flexible candidate was tested and
-            discarded because it added complexity without a corresponding improvement — the
-            simpler model was preferred.
-          </p>
-        </div>
-      </div>
-    </section>
+  
 
     <!-- ── CONCLUSION ── -->
     <section id="conclusion" class="section-gap reveal">
