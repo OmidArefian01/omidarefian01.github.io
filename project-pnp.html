@@ -385,1179 +385,8 @@
     .card li + li { margin-top: 8px; }
 
     /* ── EQUATION BLOCK ── */
-    .eq-block {
-      background: var(--off-white);
-      border: 1px solid var(--card-border);
-      border-left: 3px solid var(--accent);
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
-      margin: 14px 0;
-      overflow-x: auto;
-      line-height: 1.9;
-    }
-
-    /* ── NOTE ── */
-    .note {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      background: var(--accent-pale);
-      border: 1px solid rgba(29,111,164,0.18);
-      border-radius: var(--radius-md);
-      padding: 13px 16px;
-      margin-top: 14px;
-    }
-    .note-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
-    .note p { font-size: 0.88rem; color: var(--navy-mid); line-height: 1.6; margin: 0 !important; }
-
-    .note.guard {
-      background: var(--amber-pale);
-      border-color: rgba(164,101,29,0.22);
-    }
-    .note.guard p { color: var(--amber); }
-
-    /* ── FLOW DIAGRAM ── */
-    .flow-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 18px;
-    }
-    .flow-step {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--off-white);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 12px 16px;
-      font-size: 0.86rem;
-      font-weight: 600;
-      color: var(--navy);
-      flex: 1 1 180px;
-    }
-    .flow-step.accent { background: var(--accent-pale); border-color: rgba(29,111,164,0.2); }
-    .flow-step.amber { background: var(--amber-pale); border-color: rgba(164,101,29,0.2); }
-    .flow-arrow { color: var(--steel); font-size: 1.1rem; flex: 0 0 auto; }
-
-    /* ── MEDIA CARD ── */
-    .media-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-    .media-card img,
-    .media-card video { width: 100%; height: auto; display: block; border-bottom: 1px solid var(--card-border); background: var(--navy); }
-    .media-caption { padding: 20px 24px 22px; }
-    .media-caption h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 7px; }
-    .media-caption p { font-size: 0.9rem; color: var(--text-soft); line-height: 1.68; }
-
-    /* ── STAT STRIP ── */
-    .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      padding: 20px 22px;
-      box-shadow: var(--shadow-sm);
-    }
-    .stat-card .stat-num {
-      font-family: var(--font-display);
-      font-size: 1.9rem;
-      color: var(--navy);
-      line-height: 1.1;
-      margin-bottom: 6px;
-    }
-    .stat-card .stat-label {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    /* ── RESULTS TABLE ── */
-    .table-wrap { overflow-x: auto; margin-top: 16px; border-radius: var(--radius-md); border: 1px solid var(--card-border); }
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    thead tr { background: var(--navy); }
-    thead th { color: var(--white); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.04em; padding: 12px 16px; text-align: left; }
-    tbody td { padding: 10px 16px; border-bottom: 1px solid var(--line); color: var(--text-soft); }
-    tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover td { background: var(--off-white); }
-    .val-good { color: var(--green); font-weight: 700; }
-
-    /* ── FOOTER ── */
-    .site-footer { padding: 36px 0 40px; text-align: center; font-size: 0.84rem; color: var(--text-muted); border-top: 1px solid var(--line); margin-top: 80px; }
-
-    /* ── REVEAL ── */
-    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
-    .reveal.show { opacity: 1; transform: translateY(0); }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 960px) {
-      .grid-2, .grid-3, .grid-4, .stage-map, .stage-contract { grid-template-columns: 1fr; }
-      .stage-divider { grid-template-columns: 1fr; }
-      .stage-divider-arrow { transform: rotate(90deg); }
-      .hero-img-wrap { height: 300px; }
-    }
-    @media (max-width: 640px) {
-      .hero-img-wrap { height: 220px; }
-      .nav-actions .btn-primary { display: none; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- ── NAVBAR ── -->
-  <nav class="navbar">
-    <div class="nav-inner">
-      <a href="index.html" class="brand">Omid Arefian</a>
-      <div class="nav-actions">
-        <a href="index.html#projects" class="btn-secondary">← All Projects</a>
-        <a href="#validation" class="btn-primary">Jump to Validation</a>
-      </div>
-    </div>
-  </nav>
-
-  <main class="container">
-
-    <!-- ── HERO ── -->
-    <section class="hero">
-      <div class="hero-img-wrap">
-        <img
-          src="assets/kfpnp-cover.png"
-          alt="Three ArUco markers tracked live under changing illumination, with per-corner confidence overlays"
-        />
-        <div class="hero-badge">Robust · Adaptive Pose Estimation · 2026</div>
-      </div>
-
-      <div class="hero-text">
-        <p class="hero-overline">Robust Marker Recovery · Adaptive Uncertainty · Weighted MLPnP</p>
-        <h1 class="hero-title">KFPnP: Robust and Adaptive ArUco Pose Estimation</h1>
-        <p class="hero-lead">
-          KFPnP strengthens both ends of the ArUco-to-pose pipeline. At the front end, OpenCV
-          still localizes candidate quadrilaterals, while a learned classifier recovers marker
-          identity and orientation when blur, sensor noise, glare, or poor illumination makes
-          classical dictionary decoding unreliable. At the pose-estimation end, a live
-          per-corner covariance tells the weighted MLPnP refinement how strongly each observation
-          should influence the solution. The result is a pipeline designed for real camera
-          experiments rather than only clean, frontal marker images.
-        </p>
-
-        <div class="tag-row">
-          <span class="tag">Computer Vision</span>
-          <span class="tag">MLPnP</span>
-          <span class="tag">CNN Classification</span>
-          <span class="tag">Uncertainty Modelling</span>
-          <span class="tag">Camera Calibration</span>
-          <span class="tag">Python</span>
-          <span class="tag">OpenCV</span>
-        </div>
-
-        <div class="anchor-row">
-          <a class="anchor-btn" href="#overview">Overview</a>
-          <a class="anchor-btn" href="#identification">Robust Identification</a>
-          <a class="anchor-btn" href="#noise">Adaptive Noise</a>
-          <a class="anchor-btn" href="#integration">Weighted MLPnP</a>
-          <a class="anchor-btn" href="#validation">Live Validation</a>
-          <a class="anchor-btn" href="#results">Results</a>
-          <a class="anchor-btn" href="#conclusion">Conclusion</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── OVERVIEW ── -->
-    <section id="overview" class="section-gap reveal">
-      <p class="label">Overview</p>
-      <h2 class="section-title">Why Real-World ArUco Tracking Needs Two Kinds of Robustness</h2>
-      <p class="section-sub">
-        A pose cannot be estimated if the marker identity disappears, and it should not be trusted
-        blindly when its corners are poorly observed. KFPnP therefore improves both marker
-        identification and measurement weighting.
-      </p>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3>What Breaks Outside the Laboratory</h3>
-          <p>
-            Classical ArUco decoding depends on a clear black border and correctly sampled binary
-            cells. Motion blur mixes neighbouring cells, glare erases black regions, low light
-            increases sensor noise, and perspective or resizing reduces the number of useful
-            pixels. A candidate can therefore be geometrically visible but fail the dictionary
-            test. Even when it is detected, its four corners do not all have the same precision.
-          </p>
-          <p>
-            KFPnP addresses these failures separately: <strong>robust identification</strong>
-            recovers the ID and rotation of a localized candidate, while <strong>adaptive
-            uncertainty</strong> estimates how accurately each corner was measured. Robustness
-            therefore means both keeping the correct marker in the pipeline and preventing weak
-            corners from dominating its pose.
-          </p>
-        </div>
-
-        <div class="card">
-          <span class="card-label">Pipeline</span>
-          <h3>Two Separate Contributions, One Final Solver</h3>
-          <div class="stage-map">
-            <div class="stage-panel identification">
-              <span class="stage-kicker">Stage 1 · Identification</span>
-              <h3>Which marker is this?</h3>
-              <p>OpenCV localizes the quadrilateral; classical decoding or CNN recovery returns the marker ID, rotation, confidence, and ordered corners.</p>
-              <p><strong>Output:</strong> reliable 3D-to-2D correspondences.</p>
-            </div>
-            <div class="stage-panel covariance">
-              <span class="stage-kicker">Stage 2 · Covariance</span>
-              <h3>How reliable is each corner?</h3>
-              <p>Brightness, gain, and local image gradients produce a new 2 × 2 uncertainty matrix for every detected corner.</p>
-              <p><strong>Output:</strong> per-corner measurement covariance.</p>
-            </div>
-          </div>
-          <div class="flow-row">
-            <div class="flow-step accent">ID + Ordered Corners</div>
-            <span class="flow-arrow">+</span>
-            <div class="flow-step amber">Per-Corner Covariance</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step">Weighted MLPnP → Pose + Covariance</div>
-          </div>
-          <div class="note" style="margin-top:20px;">
-            <span class="note-icon">ℹ</span>
-            <p>
-              These stages are related but not interchangeable. Robust identification protects
-              correspondence continuity; light-adaptive covariance controls how strongly each
-              accepted correspondence influences the pose.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:22px;">
-        <div class="media-card">
-          <img
-            src="assets/kfpnp-pipeline-diagram.png"
-            alt="Two independent KFPnP branches: robust marker identification and light-adaptive corner covariance, merging in weighted MLPnP"
-          />
-          <div class="media-caption">
-            <h3>Two Contributions at a Glance</h3>
-            <p>
-              The identification branch produces the correct marker correspondences. The
-              covariance branch estimates their reliability. Only then are both outputs combined
-              by weighted MLPnP to estimate the pose and its uncertainty.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── ROBUST IDENTIFICATION ── -->
-    <section id="identification" class="section-gap reveal">
-      <p class="label">Stage 1 · Robust Identification</p>
-      <h2 class="section-title">Recovering ID and Orientation Under Real-World Degradation</h2>
-      <p class="section-sub">
-        Dictionary-based ArUco decoding remains the fastest first choice in clean conditions.
-        The learned stage is added as a recovery path for localized candidates whose borders are
-        still usable but whose internal binary pattern has been damaged by blur, noise, glare,
-        low contrast, or limited image resolution.
-      </p>
-
-      <div class="stage-contract">
-        <div><span>Input</span><strong>OpenCV quadrilateral candidate</strong></div>
-        <div><span>Question answered</span><strong>Which marker is it, and how is it rotated?</strong></div>
-        <div><span>Output</span><strong>ID, rotation, confidence, and canonical corner order</strong></div>
-      </div>
-
-      <!-- PHOTO 1
-           File name: assets/aruco-real-world-failures.png
-           Place here: immediately after the Robust Identification introduction.
-           Current supplied asset: illustrative blur, glare, and low-light
-           transformations applied to one real camera capture. It is clearly
-           labelled as illustrative and must not be presented as validation.
-           Replace it later with matched real experiment frames if available.
-           Recommended aspect ratio: 16:7. -->
-      <div class="media-card" style="margin-bottom:22px;">
-        <img
-          src="assets/aruco-real-world-failures.png"
-          alt="The same ArUco marker observed cleanly and under motion blur, glare, and low-light sensor noise"
-        />
-        <div class="media-caption">
-          <h3>Why Robustification Is Needed</h3>
-          <p>
-            In real experiments, the marker does not remain perfectly frontal, sharp, and evenly
-            illuminated. A short camera or screen movement introduces directional blur; reflections
-            saturate parts of the code; and low light increases pixel noise. Classical decoding can
-            reject the complete marker after only a few corrupted cells. Robustification preserves
-            identification continuity so the downstream pose estimator does not lose the marker at
-            exactly the moments when the experiment becomes difficult.
-          </p>
-        </div>
-      </div>
-
-      <div class="card" style="margin-bottom:22px;">
-        <span class="card-label">System Integration</span>
-        <h3>How the Learned Identifier Was Added to OpenCV</h3>
-        <p>
-          OpenCV is still responsible for locating quadrilateral regions that may contain a marker.
-          Candidates that decode normally follow the classical path. A rejected or uncertain
-          candidate can instead be perspective-warped into a canonical 40 × 40 grayscale crop and
-          sent to the learned classifier.
-        </p>
-
-        <div class="flow-row">
-          <div class="flow-step">OpenCV Candidate</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-step">40 × 40 Perspective Warp</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-step accent">CNN: 201 Logits</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-step amber">Confidence + Background Test</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-step">ID, Rotation, Ordered Corners</div>
-        </div>
-
-        <p style="margin-top:18px;">
-          The 201 output classes have a direct meaning. Classes 0–199 represent 50 selected
-          marker IDs under four rotations: 0°, 90°, 180°, and 270°. Class 200 represents
-          background or a non-marker crop. The marker classes use
-          <strong>class = 4 × marker ID + rotation index</strong>. The highest softmax probability
-          becomes the confidence score.
-        </p>
-        <p>
-          A background prediction or a confidence below the chosen threshold rejects the
-          candidate. Otherwise, the predicted class is decoded into marker ID and rotation. The
-          rotation is then used to reorder the four corners into the canonical ArUco order before
-          the known marker geometry and image corners are sent to pose estimation.
-        </p>
-
-        <div class="note" style="margin-top:16px;">
-          <span class="note-icon">ℹ</span>
-          <p>
-            This is robust identification, not unconstrained object detection. If OpenCV cannot
-            produce a usable quadrilateral at all, the classifier has no crop to classify. The
-            learned model complements candidate localization rather than replacing it.
-          </p>
-        </div>
-      </div>
-
-      <div class="grid-3">
-        <div class="card">
-          <span class="card-label">Dataset</span>
-          <h3>200 Marker-Rotation Classes</h3>
-          <p>
-            Fifty marker IDs are rendered in four canonical rotations, producing 200 positive
-            classes. Real image crops without markers form class 200. Training and validation use
-            separate background source images so the classifier cannot succeed by memorizing the
-            same background textures.
-          </p>
-        </div>
-        <div class="card">
-          <span class="card-label">Robustification</span>
-          <h3>Degradations Added During Training</h3>
-          <p>
-            Training crops are randomly modified with box, Gaussian, and directional motion blur;
-            Gaussian read noise, intensity-dependent shot noise, and hot/dead pixels; specular
-            glare; and lighting or contrast changes. The same families of corruption are also
-            applied to background crops so the model cannot learn that “noise means marker.”
-          </p>
-        </div>
-        <div class="card">
-          <span class="card-label">Model Selection</span>
-          <h3>CNN Compared With an RBF SVM</h3>
-          <p>
-            A small CNN operating on 40 × 40 crops and a paper-style RBF SVM operating on 10 × 10
-            inputs are evaluated on the same 201-class task. Selection considers marker accuracy,
-            background rejection, marker-to-background errors, background false positives, and
-            wrong ID or rotation predictions—not only overall accuracy.
-          </p>
-        </div>
-      </div>
-
-      <!-- PHOTO 3
-           File name: assets/aruco-training-augmentations.png
-           Place here: after the Dataset / Robustification / Model Selection cards.
-           Recommended content: a labelled grid with one clean crop followed by
-           box blur, Gaussian blur, motion blur, Gaussian noise, shot noise,
-           hot/dead pixels, glare, dark/low-contrast, plus 2-3 degraded background
-           crops. Use actual generated images from the dataset preview script.
-           Recommended aspect ratio: 16:9. -->
-      <div class="media-card" style="margin-top:22px;">
-        <img
-          src="assets/aruco-training-augmentations.png"
-          alt="Clean ArUco crop and robust training examples containing blur, sensor noise, glare, and illumination changes"
-        />
-        <div class="media-caption">
-          <h3>Training the Failure Modes We Expect to See</h3>
-          <p>
-            The augmentation set is not decoration; it defines the invariances the classifier is
-            expected to learn. Marker identity and rotation remain the label while blur, noise,
-            glare, and illumination vary. Background crops receive comparable degradation to
-            teach a genuine marker-versus-non-marker decision.
-          </p>
-        </div>
-      </div>
-
-      <div class="note" style="margin-top:22px;">
-        <span class="note-icon">⚠</span>
-        <p>
-          A confident wrong ID or wrong rotation is more dangerous than a rejected crop because it
-          creates incorrect 3D-to-2D corner correspondences. This is why the background class,
-          confidence threshold, and separate reporting of ID/rotation errors are essential parts
-          of the robust design.
-        </p>
-      </div>
-    </section>
-
-    <div class="stage-divider reveal" role="separator" aria-label="Transition from robust identification to light-adaptive covariance estimation">
-      <span>Stage 1 ends with ID and ordered corners</span>
-      <span class="stage-divider-arrow">→</span>
-      <span>Stage 2 independently estimates corner uncertainty</span>
-    </div>
-
-    <!-- ── ADAPTIVE NOISE ── -->
-    <section id="noise" class="section-gap reveal" style="padding-top:40px;">
-      <p class="label" style="color:var(--amber);">Stage 2 · Light-Adaptive Pose Covariance</p>
-      <h2 class="section-title">Estimating How Much to Trust Each Detected Corner</h2>
-      <p class="section-sub">
-        This second contribution begins after marker identity and corner ordering are already
-        known. It does not classify the marker. Instead of using one fixed pixel-noise constant,
-        it estimates a fresh measurement uncertainty for every corner in every frame using the
-        current illumination and local image structure.
-      </p>
-
-      <div class="stage-contract">
-        <div><span>Input</span><strong>Ordered corners, local image patches, brightness, and camera gain</strong></div>
-        <div><span>Question answered</span><strong>How reliable is each measured corner right now?</strong></div>
-        <div><span>Output</span><strong>One 2 × 2 image-plane covariance for each corner</strong></div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <span class="card-label">Signal 1</span>
-          <h3>Sensor Noise, Calibrated Offline</h3>
-          <p>
-            A camera's own read noise and photon noise depend on how bright the scene is and how
-            much gain the sensor is applying — a corner observed at low light and high gain is
-            simply noisier than one observed in bright, low-gain conditions. This relationship is
-            characterized once, offline, against the camera itself, and evaluated live using only
-            the current frame's brightness and gain.
-          </p>
-        </div>
-        <div class="card">
-          <span class="card-label">Signal 2</span>
-          <h3>Local Image Structure</h3>
-          <p>
-            A well-defined corner with strong gradients in two directions constrains its own
-            position tightly; a corner that looks more like an edge is poorly constrained along
-            that edge's direction. KFPnP reads this directly from the local gradient structure
-            around each corner, so two corners can receive different uncertainty estimates even
-            under identical lighting.
-          </p>
-        </div>
-      </div>
-
-      <div style="margin-top:22px;">
-        <div class="card">
-          <span class="card-label">Combined</span>
-          <h3>One Covariance, Recomputed Live</h3>
-          <p>
-            The two signals are blended into a single per-corner covariance matrix, evaluated
-            independently for every corner on every frame — never fitted once and reused, and
-            never assumed to be the same across the frame.
-          </p>
-          <div class="flow-row">
-            <div class="flow-step">Sensor Noise Estimate</div>
-            <span class="flow-arrow">+</span>
-            <div class="flow-step">Local Structure Estimate</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-step accent">Per-Corner Covariance</div>
-          </div>
-          <div class="note" style="margin-top:16px;">
-            <span class="note-icon">ℹ</span>
-            <p>
-              Calibrated on the target camera through a dedicated noise-characterization
-              procedure, then evaluated at runtime with no online re-fitting required.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:22px;">
-        <div class="media-card">
-          <img
-            src="assets/kfpnp-noise-overview.png"
-            alt="Sensor conditions and local structure feeding into a per-corner adaptive noise estimate"
-          />
-          <div class="media-caption">
-            <h3>How the Two Signals Combine</h3>
-            <p>
-              A high-level view of how sensor conditions and local corner structure feed a single
-              per-corner covariance — the exact combination is left out of this page.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="note guard" style="margin-top:22px;">
-        <span class="note-icon">⚠</span>
-        <p>
-          The exact functional form, fitted calibration constants, and calibration procedure
-          are intentionally omitted here.
-        </p>
-      </div>
-    </section>
-
-    <!-- ── WEIGHTED MLPnP ── -->
-    <section id="integration" class="section-gap reveal">
-      <p class="label">Stage 3 · Integration</p>
-      <h2 class="section-title">Combining Correspondence and Uncertainty in Weighted MLPnP</h2>
-      <p class="section-sub">
-        Stage 1 supplies the correct marker geometry and ordered 2D corners. Stage 2 supplies a
-        covariance describing the reliability of each corner. Weighted MLPnP consumes both:
-        correspondence tells it what each point means, while covariance tells it how strongly
-        that point should influence the solution.
-      </p>
-
-      <div class="flow-row" style="margin:0 0 22px;">
-        <div class="flow-step accent">Stage 1: ID + Ordered 3D–2D Correspondences</div>
-        <span class="flow-arrow">+</span>
-        <div class="flow-step amber">Stage 2: Per-Corner 2 × 2 Covariances</div>
-        <span class="flow-arrow">→</span>
-        <div class="flow-step">Weighted MLPnP: Pose + 6 × 6 Pose Covariance</div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <span class="card-label">Weighting</span>
-          <h3>Reliability-Weighted Refinement</h3>
-          <p>
-            The camera pose is recovered through an iterative refinement that weights each
-            corner's contribution by the inverse of its estimated uncertainty: a sharp,
-            well-lit corner pulls the solution toward it more strongly than a dim, poorly
-            constrained one, and that balance is free to shift from one frame to the next.
-          </p>
-        </div>
-        <div class="card">
-          <span class="card-label">Output</span>
-          <h3>Pose With Its Own Covariance</h3>
-          <p>
-            The solver's output is not just a position and orientation — it also carries a
-            propagated six-degree-of-freedom pose covariance, giving any downstream filter or
-            controller an honest measure of how much to trust that frame's estimate.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── LIVE VALIDATION ── -->
-    <section id="validation" class="section-gap reveal">
-      <p class="label">Live Validation</p>
-      <h2 class="section-title">Validated Under Real, Dynamic Lighting</h2>
-      <p class="section-sub">
-        The full pipeline — already calibrated, with no online re-fitting — was tested live
-        against three independently tracked markers while illumination and marker pose were
-        varied continuously and by hand. The validation therefore checks both parts of the
-        design: whether identity remains available during degradation and whether the reported
-        covariance increases when the corner measurements become less reliable.
-      </p>
-
-      <div class="media-card" style="margin-bottom:22px;">
-        <video controls playsinline preload="metadata">
-          <source src="assets/kfpnp-identification-demo.mp4" type="video/mp4" />
-          Your browser does not support embedded video. Download
-          kfpnp-identification-demo.mp4 to watch the experiment.
-        </video>
-        <div class="media-caption">
-          <h3>Recording from the camera</h3>
-          <p>
-            Raw camera footage of marker identification under low light, with a flashlight
-            swept across the scene to vary illumination on demand. As the light moves, the
-            per-corner pixel noise and the resulting uncertainty ellipses visibly shrink and
-            grow in response.
-          </p>
-        </div>
-      </div>
-
-      <div class="media-card" style="margin-bottom:22px;">
-        <video controls playsinline preload="metadata">
-          <source src="assets/kfpnp-covariance-light-demo.mp4" type="video/mp4" />
-          Your browser does not support embedded video. Download
-          kfpnp-covariance-light-demo.mp4 to watch the experiment.
-        </video>
-        <div class="media-caption">
-          <h3>Live Validation Under Changing Illumination</h3>
-          <p>
-            This recording shows the complete calibrated pipeline operating in real time while
-            illumination and marker pose are changed by hand. Marker identity remains available,
-            while the estimated corner and pose uncertainty increase as visual conditions become
-            less reliable and decrease again when the observations improve.
-          </p>
-        </div>
-      </div>
-
-      <div class="grid-4">
-        <div class="stat-card">
-          <div class="stat-num">3</div>
-          <div class="stat-label">Independently tracked markers, live</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">~75s</div>
-          <div class="stat-label">Continuous session under dynamic lighting and motion</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">~2.5×</div>
-          <div class="stat-label">Uncertainty rise from brightest to darkest conditions</div>
-        </div>
-        
-      </div>
-
-      <div style="margin-top:22px;">
-        <div class="media-card">
-          <img
-            src="assets/kfpnp-pose-covariance.png"
-            alt="Propagated pose covariance tracking a dimming and re-brightening lighting cycle in real time"
-          />
-          <div class="media-caption">
-            <h3>Uncertainty That Tracks Reality</h3>
-            <p>
-              As the scene was dimmed and re-brightened by hand, the reported per-corner and
-              propagated pose uncertainty rose and fell in step — consistently across all three
-              markers, regardless of their position or orientation on screen — confirming that the
-              effect is driven by illumination itself, not by any single marker's geometry.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── RESULTS ── -->
-    <section id="results" class="section-gap reveal">
-      <p class="label">Results</p>
-      <h2 class="section-title">Does the Extra Signal Actually Help?</h2>
-      <p class="section-sub">
-        Robust identification and adaptive uncertainty answer different questions and should be
-        evaluated separately. The classifier is tested on ID, rotation, and background rejection;
-        the covariance model is tested on its prediction of measured corner scatter under held-out
-        imaging conditions.
-      </p>
-
-      <div class="card" style="margin-bottom:22px;">
-        <span class="card-label">Identification Evaluation</span>
-        <h3>What Was Compared for Robust Marker Recovery</h3>
-        <div class="grid-2">
-          <div>
-            <p>
-              The 40 × 40 CNN and 10 × 10 RBF SVM solve the same 201-class problem. Reporting only
-              total accuracy can hide dangerous failure modes, especially when marker classes and
-              background samples are not equally frequent.
-            </p>
-            <ul>
-              <li>Accuracy across the 200 marker-and-rotation classes</li>
-              <li>Background-class accuracy</li>
-              <li>Background crops incorrectly accepted as markers</li>
-              <li>Markers incorrectly rejected as background</li>
-              <li>Wrong marker ID or wrong rotation</li>
-            </ul>
-          </div>
-          <div>
-            <p>
-              The final deployment uses the selected classifier together with a confidence
-              threshold. Real-world reporting should additionally separate clean, blur, noise,
-              glare, and low-light subsets so the improvement is visibly connected to the
-              degradations used during robustification.
-            </p>
-            <div class="note" style="margin-top:14px;">
-              <span class="note-icon">ℹ</span>
-              <p>
-                Insert your measured CNN and SVM values here. Do not invent percentages; export
-                them directly from the evaluation scripts and keep the validation split independent
-                from the training backgrounds.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FIGURE 5
-           File name: assets/aruco-cnn-svm-comparison.png
-           Place here: after the identification-evaluation card and before the
-           covariance-model table.
-           Recommended content: grouped bars or a compact table exported as a
-           high-resolution figure. Include CNN and SVM marker accuracy,
-           background accuracy, background-to-marker errors, marker-to-background
-           errors, and wrong ID/rotation count. Use real evaluation numbers. -->
-      <div class="media-card" style="margin-bottom:22px;">
-        <img
-          src="assets/aruco-cnn-svm-comparison.png"
-          alt="Comparison of CNN and RBF SVM robust ArUco classification performance on marker and background classes"
-        />
-        <div class="media-caption">
-          <h3>CNN and SVM Under the Same Degraded Test Set</h3>
-          <p>
-            The comparison should make the deployment decision auditable: both models receive the
-            same class definitions and degradation-aware validation set, while the chart separates
-            marker recognition from background rejection and wrong-orientation errors.
-          </p>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Adaptive Covariance Candidate Comparison — Held-Out Performance</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Candidate Model</th>
-                <th>Relative Fit Quality</th>
-                <th>Uncertainty Prediction Error</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Fixed, constant uncertainty</td>
-                <td>Baseline</td>
-                <td>Highest</td>
-              </tr>
-              <tr>
-                <td>Sensor-noise only</td>
-                <td>Modest improvement</td>
-                <td>Reduced</td>
-              </tr>
-              <tr>
-                <td>Sensor noise + local structure <em>(selected)</em></td>
-                <td class="val-good">Best held-out fit</td>
-                <td class="val-good">Lowest</td>
-              </tr>
-              <tr>
-                <td>Above + extra unexplained-variance term</td>
-                <td>No meaningful gain over selected model</td>
-                <td>Comparable, added complexity</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="note" style="margin-top:16px;">
-          <span class="note-icon">ℹ</span>
-          <p>
-            Adding local image structure to the sensor-noise term produced the clearest gain in
-            held-out predictive accuracy; a further, more flexible candidate was tested and
-            discarded because it added complexity without a corresponding improvement — the
-            simpler model was preferred.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── CONCLUSION ── -->
-    <section id="conclusion" class="section-gap reveal">
-      <p class="label">Conclusion</p>
-      <h2 class="section-title">Conclusion</h2>
-      <p class="section-sub">
-        KFPnP shows that a pose pipeline improves the most not by chasing a better point
-        estimate, but by being honest about how much to trust each measurement.
-      </p>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3>Key Findings</h3>
-          <ul>
-            <li>A learned recovery stage extends OpenCV candidate localization by classifying degraded quadrilateral crops into marker ID, rotation, or background.</li>
-            <li>Training with blur, sensor noise, glare, lighting variation, and similarly degraded background crops targets the failure modes observed in real camera experiments.</li>
-            <li>Per-corner uncertainty that reacts to both sensor conditions and local image structure predicts real measurement scatter far better than a fixed constant.</li>
-            <li>Feeding that uncertainty into the pose solver, rather than treating every corner equally, propagates cleanly through to pose covariance without any online re-fitting.</li>
-            <li>The live experiment must test both continuity of correct identification and the response of covariance under real blur, glare, low light, motion, and changing viewpoint.</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>Where This Fits</h3>
-          <p>
-            KFPnP preserves the useful parts of the classical pipeline. OpenCV still proposes
-            quadrilaterals and performs normal dictionary decoding when possible. The CNN adds a
-            confidence-scored recovery path for difficult candidates, and the adaptive covariance
-            adds observation-specific weights for MLPnP-style refinement. Downstream filtering can
-            continue to consume pose and covariance without knowing which identification path was used.
-          </p>
-          <div class="note" style="margin-top:14px;">
-            <span class="note-icon">ℹ</span>
-            <p>
-              The central limitation remains explicit: learned identification requires an OpenCV
-              candidate crop. Severe occlusion or blur that destroys the quadrilateral itself still
-              requires redetection, temporal tracking, or a separate object-detection stage.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="site-footer">
-    © 2026 Omid Arefian · KFPnP — Robust and Adaptive ArUco Pose Estimation
-  </footer>
-
-  <script>
-    const items = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); }
-      }),
-      { threshold: 0.07 }
-    );
-    items.forEach(el => io.observe(el));
-  </script>
-
-</body>
-</html>
-       TOKENS — identical to index.html
-    ───────────────────────────────────────── */
-    :root {
-      --navy:        #0d1b2a;
-      --navy-mid:    #1a2e42;
-      --navy-light:  #243a52;
-      --slate:       #3d5a73;
-      --steel:       #6b8fa8;
-      --fog:         #c8d8e4;
-      --ice:         #e8f0f6;
-      --white:       #ffffff;
-      --off-white:   #f7f9fb;
-      --text:        #0d1b2a;
-      --text-soft:   #445668;
-      --text-muted:  #6b8fa8;
-      --accent:      #1d6fa4;
-      --accent-light:#2587c5;
-      --accent-pale: #ddeef8;
-      --green:       #1a7a5e;
-      --green-pale:  #d4ede7;
-      --amber:       #a4651d;
-      --amber-pale:  #f3e4d4;
-      --line:        #dde6ee;
-      --card-bg:     #ffffff;
-      --card-border: #e2ebf2;
-      --shadow-sm:   0 1px 4px rgba(13,27,42,0.06), 0 4px 12px rgba(13,27,42,0.06);
-      --shadow-md:   0 2px 8px rgba(13,27,42,0.07), 0 8px 24px rgba(13,27,42,0.09);
-      --shadow-lg:   0 4px 16px rgba(13,27,42,0.08), 0 16px 48px rgba(13,27,42,0.12);
-      --radius-sm:   6px;
-      --radius-md:   10px;
-      --radius-lg:   16px;
-      --radius-xl:   22px;
-      --max-width:   1160px;
-      --font-body:   'DM Sans', system-ui, -apple-system, sans-serif;
-      --font-display:'DM Serif Display', Georgia, serif;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; font-size: 16px; }
-
-    body {
-      font-family: var(--font-body);
-      font-weight: 400;
-      background-color: var(--off-white);
-      color: var(--text);
-      line-height: 1.65;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    img { display: block; max-width: 100%; }
-    a   { text-decoration: none; color: inherit; }
-
-    .container {
-      width: min(var(--max-width), calc(100% - 40px));
-      margin: 0 auto;
-    }
-
-    .section-gap { padding: 72px 0 0; }
-
-    /* ── CONTRIBUTION STAGES ── */
-    .stage-map {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 18px;
-    }
-
-    .stage-panel {
-      border: 1px solid var(--card-border);
-      border-top: 4px solid var(--accent);
-      border-radius: var(--radius-md);
-      padding: 18px;
-      background: var(--off-white);
-    }
-
-    .stage-panel.covariance { border-top-color: var(--amber); }
-
-    .stage-kicker {
-      display: block;
-      margin-bottom: 7px;
-      color: var(--accent);
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .stage-panel.covariance .stage-kicker { color: var(--amber); }
-    .stage-panel h3 { margin-bottom: 7px; }
-    .stage-panel p { font-size: 0.87rem; color: var(--text-soft); line-height: 1.58; }
-    .stage-panel p + p { margin-top: 8px; }
-
-    .stage-contract {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      margin: 0 0 22px;
-      overflow: hidden;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      background: var(--card-border);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .stage-contract > div { padding: 17px 20px; background: var(--white); }
-    .stage-contract span {
-      display: block;
-      margin-bottom: 5px;
-      color: var(--text-muted);
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .stage-contract strong { display: block; color: var(--navy); font-size: 0.9rem; line-height: 1.45; }
-
-    .stage-divider {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 18px;
-      margin: 72px 0 0;
-      padding: 18px 22px;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      background: linear-gradient(90deg, var(--accent-pale), var(--white) 49%, var(--amber-pale));
-      box-shadow: var(--shadow-sm);
-      color: var(--navy);
-      font-size: 0.82rem;
-      font-weight: 700;
-      text-align: center;
-    }
-    .stage-divider-arrow { color: var(--steel); font-size: 1.25rem; }
-
-    /* ── SECTION HEADERS ── */
-    .label {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 10px;
-    }
-
-    .section-title {
-      font-family: var(--font-display);
-      font-size: clamp(1.7rem, 3vw, 2.4rem);
-      line-height: 1.15;
-      color: var(--navy);
-      margin-bottom: 8px;
-    }
-
-    .section-sub {
-      font-size: 0.97rem;
-      color: var(--text-muted);
-      max-width: 720px;
-      margin-bottom: 32px;
-      line-height: 1.6;
-    }
-
-    /* ── NAVBAR ── */
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .nav-inner {
-      width: min(var(--max-width), calc(100% - 40px));
-      margin: 0 auto;
-      height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .brand {
-      font-family: var(--font-display);
-      font-size: 1.05rem;
-      color: var(--navy);
-    }
-
-    .nav-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 40px;
-      padding: 0 18px;
-      border-radius: var(--radius-md);
-      background: var(--white);
-      color: var(--navy);
-      font-size: 0.86rem;
-      font-weight: 600;
-      border: 1.5px solid var(--card-border);
-      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-    }
-    .btn-secondary:hover { border-color: var(--steel); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 40px;
-      padding: 0 18px;
-      border-radius: var(--radius-md);
-      background: var(--navy);
-      color: var(--white);
-      font-size: 0.86rem;
-      font-weight: 600;
-      transition: background 0.2s, transform 0.2s;
-    }
-    .btn-primary:hover { background: var(--navy-mid); transform: translateY(-1px); }
-
-    /* ── HERO ── */
-    .hero { padding: 56px 0 0; }
-
-    .hero-img-wrap {
-      position: relative;
-      width: 100%;
-      height: 440px;
-      border-radius: var(--radius-xl);
-      overflow: hidden;
-      background: var(--ice);
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--card-border);
-    }
-    .hero-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
-
-    .hero-badge {
-      position: absolute;
-      left: 20px;
-      top: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      border-radius: var(--radius-md);
-      background: rgba(255,255,255,0.94);
-      border: 1px solid rgba(255,255,255,0.7);
-      color: var(--navy);
-      font-size: 0.82rem;
-      font-weight: 700;
-      box-shadow: var(--shadow-sm);
-      letter-spacing: 0.01em;
-    }
-
-    .hero-text { padding: 36px 0 0; }
-
-    .hero-overline {
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 14px;
-    }
-
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 4.5vw, 3.4rem);
-      line-height: 1.08;
-      letter-spacing: -0.02em;
-      color: var(--navy);
-      margin-bottom: 18px;
-    }
-
-    .hero-lead {
-      font-size: 1.02rem;
-      color: var(--text-soft);
-      line-height: 1.72;
-      max-width: 820px;
-      margin-bottom: 24px;
-    }
-
-    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
-    .tag {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--navy-mid);
-      background: var(--ice);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-sm);
-      padding: 5px 11px;
-    }
-
-    .anchor-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding-bottom: 56px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .anchor-btn {
-      display: inline-flex;
-      align-items: center;
-      height: 36px;
-      padding: 0 14px;
-      border-radius: var(--radius-sm);
-      background: var(--white);
-      color: var(--text-soft);
-      font-size: 0.83rem;
-      font-weight: 500;
-      border: 1.5px solid var(--card-border);
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .anchor-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* ── GRIDS ── */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-
-    /* ── CARDS ── */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      padding: 26px 28px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .card-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: var(--accent-pale);
-      border-radius: var(--radius-sm);
-      padding: 3px 8px;
-      display: inline-block;
-      margin-bottom: 12px;
-    }
-
-    .card h3 { font-size: 1.02rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; line-height: 1.4; }
-    .card p, .card li { font-size: 0.93rem; color: var(--text-soft); line-height: 1.7; }
-    .card p + p { margin-top: 10px; }
-    .card ul { padding-left: 18px; margin-top: 10px; }
-    .card li + li { margin-top: 8px; }
-
-    /* ── EQUATION BLOCK ── */
-    .eq-block {
+    .eq-block,
+    .equation-block {
       background: var(--off-white);
       border: 1px solid var(--card-border);
       border-left: 3px solid var(--accent);
@@ -2362,6 +1191,475 @@
         </div>
       </div>
     </section>
+
+    <!-- ── ONGOING EXTENSION: CAMERA KALMAN FILTER ── -->
+    <section id="ongoing-camera-kf" class="section-gap reveal">
+      <p class="label">Ongoing Work</p>
+      <h2 class="section-title">From Independent KFPnP Poses to Continuous Adaptive-R Tracking</h2>
+      <p class="section-sub">
+        The next stage of the project adds temporal filtering after KFPnP. The existing pipeline
+        already estimates a six-degree-of-freedom pose and its covariance for every accepted
+        frame. The ongoing work uses those outputs inside a camera Kalman filter that estimates
+        position, velocity, and attitude while changing its measurement covariance according to
+        the quality of the current visual observations.
+      </p>
+
+      <div class="stage-contract">
+        <div>
+          <span>Input from KFPnP</span>
+          <strong>6-DoF pose and local 6 × 6 pose covariance</strong>
+        </div>
+        <div>
+          <span>Temporal estimator</span>
+          <strong>9-state constant-velocity Kalman filter</strong>
+        </div>
+        <div>
+          <span>Output</span>
+          <strong>Filtered pose, estimated velocity, and state covariance</strong>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:22px;">
+        <span class="card-label">Motivation</span>
+        <h3>Why Add a Kalman Filter After KFPnP?</h3>
+        <div class="grid-2">
+          <div>
+            <p>
+              KFPnP estimates the rig pose independently in each accepted frame. Even when the
+              pose is correct, frame-to-frame noise can make the trajectory irregular. Short
+              losses of marker visibility also leave gaps in the output, and a single weak pose
+              can create a large jump.
+            </p>
+            <p style="margin-top:12px;">
+              The Kalman filter connects the individual poses over time. It smooths measurement
+              noise, estimates translational velocity, and predicts the state during short periods
+              in which no valid visual update is available.
+            </p>
+          </div>
+          <div>
+            <p>
+              A fixed measurement covariance would assign the same confidence to every KFPnP
+              result. This is unsuitable because visual accuracy changes with illumination,
+              distance, blur, viewing angle, local corner structure, and the number of visible
+              markers. The adaptive-R extension therefore changes camera trust as the observation
+              quality changes.
+            </p>
+            <div class="note" style="margin-top:14px;">
+              <span class="note-icon">ℹ</span>
+              <p>
+                This extension does not replace KFPnP. KFPnP remains the measurement source;
+                the Kalman filter adds temporal consistency and short-term prediction.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:22px;">
+        <div class="card">
+          <span class="card-label">State Definition</span>
+          <h3>Position, Velocity, and Attitude</h3>
+          <p>
+            The camera filter uses a nine-dimensional state. Position and attitude describe the
+            marker-rig centre relative to the fixed camera. Velocity is not measured directly by
+            KFPnP; it is estimated from the sequence of accepted poses.
+          </p>
+          <div class="equation-block">
+            \[
+            \mathbf{x}_k=
+            \begin{bmatrix}
+            x&y&z&v_x&v_y&v_z&\phi&\theta&\psi
+            \end{bmatrix}^{T}
+            \]
+          </div>
+          <p>
+            Here, \([x,y,z]^T\) is position, \([v_x,v_y,v_z]^T\) is velocity, and
+            \([\phi,\theta,\psi]^T\) represents roll, pitch, and yaw.
+          </p>
+        </div>
+
+        <div class="card">
+          <span class="card-label">Motion Model</span>
+          <h3>Constant Velocity Between Camera Frames</h3>
+          <p>
+            During the short interval \(\Delta t\) between two frames, position is propagated
+            using the current velocity. Velocity and attitude are held constant in the nominal
+            prediction:
+          </p>
+          <div class="equation-block">
+            \[
+            \mathbf p_k^- = \mathbf p_{k-1}^+ + \mathbf v_{k-1}^+\Delta t,
+            \qquad
+            \mathbf v_k^- = \mathbf v_{k-1}^+,
+            \qquad
+            \boldsymbol\Theta_k^- = \boldsymbol\Theta_{k-1}^+.
+            \]
+          </div>
+          <div class="equation-block">
+            \[
+            F_k=
+            \begin{bmatrix}
+            I_3&\Delta tI_3&0\\
+            0&I_3&0\\
+            0&0&I_3
+            \end{bmatrix}.
+            \]
+          </div>
+          <p>
+            “Constant velocity” applies only over one short frame interval. Process noise allows
+            the real motion to accelerate or rotate away from this simple prediction.
+          </p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:22px;">
+        <span class="card-label">Process Covariance</span>
+        <h3>How the Initial \(Q_k\) Represents Unmodelled Motion</h3>
+        <div class="grid-2">
+          <div>
+            <p>
+              The filter does not include acceleration as a state. Instead, unknown random
+              acceleration represents motion that the constant-velocity model cannot predict.
+              The same acceleration disturbance changes both position and velocity:
+            </p>
+            <div class="equation-block">
+              \[
+              \delta\mathbf p=\frac{1}{2}\mathbf a\Delta t^2,
+              \qquad
+              \delta\mathbf v=\mathbf a\Delta t.
+              \]
+            </div>
+            <div class="equation-block">
+              \[
+              D_a=\operatorname{diag}(\sigma_{a_x}^2,\sigma_{a_y}^2,\sigma_{a_z}^2),
+              \qquad
+              D_{\Theta}=\operatorname{diag}(q_{\phi},q_{\theta},q_{\psi}).
+              \]
+            </div>
+          </div>
+          <div>
+            <div class="equation-block">
+              \[
+              Q_k=
+              \begin{bmatrix}
+              \frac{\Delta t^4}{4}D_a&\frac{\Delta t^3}{2}D_a&0\\
+              \frac{\Delta t^3}{2}D_a&\Delta t^2D_a&0\\
+              0&0&\Delta tD_{\Theta}
+              \end{bmatrix}.
+              \]
+            </div>
+            <p>
+              The off-diagonal position–velocity terms appear because the same unknown
+              acceleration affects both quantities. Larger \(Q_k\) makes the filter more responsive
+              to manoeuvres but less smooth. Smaller \(Q_k\) produces more smoothing but can cause
+              lag during acceleration or rotation.
+            </p>
+            <div class="note" style="margin-top:14px;">
+              <span class="note-icon">ℹ</span>
+              <p>
+                The current values are initial engineering guesses. Controlled translation,
+                stop–start, and rotation recordings are required before the final \(Q_k\) can be
+                defended experimentally.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:22px;">
+        <div class="card">
+          <span class="card-label">Measurement Model</span>
+          <h3>KFPnP Measures Pose, Not Velocity</h3>
+          <div class="equation-block">
+            \[
+            \mathbf z_k=
+            \begin{bmatrix}
+            x_m&y_m&z_m&\phi_m&\theta_m&\psi_m
+            \end{bmatrix}^{T}
+            \]
+          </div>
+          <div class="equation-block">
+            \[
+            H=
+            \begin{bmatrix}
+            I_3&0&0\\
+            0&0&I_3
+            \end{bmatrix}
+            \in\mathbb R^{6\times9}.
+            \]
+          </div>
+          <p>
+            The first three rows select position and the last three select attitude. The velocity
+            columns are zero because velocity is inferred temporally. The first accepted pose
+            initializes position and attitude, while velocity starts at zero with a larger initial
+            uncertainty in \(P_0\).
+          </p>
+        </div>
+
+        <div class="card">
+          <span class="card-label">Measurement Covariance</span>
+          <h3>Two Levels of Adaptive Visual Uncertainty</h3>
+          <p>
+            The first level already exists inside KFPnP: adaptive corner covariance changes the
+            weight of each image point, and weighted MLPnP propagates it into a local 6 × 6 pose
+            covariance \(R_{\mathrm{MLPnP},k}\).
+          </p>
+          <p style="margin-top:12px;">
+            The ongoing second level uses recent KF innovations to detect pose disagreement not
+            fully represented by the local solver covariance. A numerical floor prevents
+            unrealistically small uncertainty, while upper limits prevent one failure from making
+            the filter permanently insensitive.
+          </p>
+          <div class="equation-block">
+            \[
+            \boldsymbol\nu_k=\mathbf z_k-H\hat{\mathbf x}_k^-.
+            \]
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:22px;">
+        <span class="card-label">Adaptive Measurement Noise</span>
+        <h3>Estimating Pose-Level \(R_k\) From Recent Innovations</h3>
+        <div class="grid-2">
+          <div>
+            <p>
+              The first stationary seconds provide an initial repeatability estimate. Consecutive
+              differences remove the unknown constant pose; if neighbouring samples are independent
+              and have equal covariance, the difference contains twice the original covariance:
+            </p>
+            <div class="equation-block">
+              \[
+              R_0\approx\frac{1}{2}
+              \operatorname{Cov}(\mathbf z_k-\mathbf z_{k-1}).
+              \]
+            </div>
+            <p>
+              During operation, a limited window of innovations estimates the observed residual
+              scatter after subtracting the part predicted by the state uncertainty:
+            </p>
+            <div class="equation-block">
+              \[
+              \hat R_{\mathrm{win}}
+              \approx
+              \operatorname{diag}\!\left(
+              \operatorname{Cov}(\boldsymbol\nu)
+              -\overline{HP^-H^T}
+              \right).
+              \]
+            </div>
+          </div>
+          <div>
+            <p>
+              The next measurement covariance combines the innovation estimate, the current
+              MLPnP covariance, and a minimum floor. Smoothing avoids abrupt frame-to-frame changes:
+            </p>
+            <div class="equation-block">
+              \[
+              R_{k+1}=\alpha R_k+(1-\alpha)
+              \operatorname{clip}\!\left(
+              \max\{\hat R_{\mathrm{win}},R_{\mathrm{MLPnP},k},R_{\mathrm{floor}}\}
+              \right).
+              \]
+            </div>
+            <p>
+              The updated covariance is used on the following accepted pose, avoiding a circular
+              calculation in which the same residual simultaneously determines and tests its own
+              uncertainty. The current implementation begins with a diagonal \(R_k\); retaining
+              reliable cross-axis terms remains a possible later extension.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:22px;">
+        <div class="card">
+          <span class="card-label">Prediction</span>
+          <h3>Propagate State and Uncertainty</h3>
+          <div class="equation-block">
+            \[
+            \hat{\mathbf x}_k^-=F_k\hat{\mathbf x}_{k-1}^+,
+            \qquad
+            P_k^-=F_kP_{k-1}^+F_k^T+Q_k.
+            \]
+          </div>
+          <p>
+            When no visual pose is accepted, only this prediction is available. It can bridge a
+            short observation gap, but covariance and possible drift grow with time. Long marker
+            losses therefore remain a limitation rather than a solved tracking case.
+          </p>
+        </div>
+
+        <div class="card">
+          <span class="card-label">Correction</span>
+          <h3>Balance the Prediction and Camera Pose</h3>
+          <div class="equation-block">
+            \[
+            S_k=HP_k^-H^T+R_k,
+            \qquad
+            K_k=P_k^-H^TS_k^{-1}.
+            \]
+          </div>
+          <div class="equation-block">
+            \[
+            \hat{\mathbf x}_k^+=\hat{\mathbf x}_k^-+K_k\boldsymbol\nu_k.
+            \]
+          </div>
+          <p>
+            A larger \(R_k\) lowers the Kalman gain and protects the trajectory from a weak visual
+            estimate. A smaller \(R_k\) allows a clear pose to correct the prediction more strongly.
+            Angular innovations are wrapped to \([-\pi,\pi]\) before correction.
+          </p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:22px;">
+        <span class="card-label">Numerical Stability and Consistency</span>
+        <h3>Joseph Covariance Update and NIS Monitoring</h3>
+        <div class="grid-2">
+          <div>
+            <p>
+              The Joseph form is used for the covariance correction because it better preserves
+              symmetry and positive semidefiniteness under numerical rounding:
+            </p>
+            <div class="equation-block">
+              \[
+              P_k^+=(I-K_kH)P_k^-(I-K_kH)^T+K_kR_kK_k^T.
+              \]
+            </div>
+          </div>
+          <div>
+            <p>
+              The normalized innovation squared checks whether the measured disagreement is
+              compatible with the uncertainty predicted by the filter:
+            </p>
+            <div class="equation-block">
+              \[
+              \operatorname{NIS}_k=\boldsymbol\nu_k^TS_k^{-1}\boldsymbol\nu_k.
+              \]
+            </div>
+            <p>
+              For a consistent six-dimensional update, the long-run mean is approximately six
+              under the usual Gaussian assumptions. A large NIS can indicate underestimated
+              \(Q\), underestimated \(R\), bias, bad geometry, timing error, angle-convention error,
+              or an incorrect pose; it does not identify a unique cause by itself.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:22px;">
+        <span class="card-label">Why Adaptation Matters</span>
+        <h3>A Fixed \(R\) Cannot Treat Unequal Frames Differently</h3>
+        <div class="grid-3">
+          <div>
+            <h3>Fixed \(R\) Too Small</h3>
+            <p>
+              The filter over-trusts poor poses produced in low light, at long range, during blur,
+              or from weak corner geometry. One bad frame can pull the trajectory away from the
+              real motion.
+            </p>
+          </div>
+          <div>
+            <h3>Fixed \(R\) Too Large</h3>
+            <p>
+              The filter is protected against weak frames but underuses high-quality measurements.
+              Corrections become slower and prediction drift can remain for longer than necessary.
+            </p>
+          </div>
+          <div>
+            <h3>Adaptive \(R_k\)</h3>
+            <p>
+              Camera trust follows observation quality. Clear, geometrically strong poses can
+              correct the state firmly, while uncertain poses have less influence on the track.
+            </p>
+          </div>
+        </div>
+        <div class="note" style="margin-top:16px;">
+          <span class="note-icon">ℹ</span>
+          <p>
+            Adaptive covariance cannot repair an incorrect camera calibration, wrong marker
+            dimensions, corner-order errors, coordinate-frame mistakes, or prolonged missing
+            measurements. These conditions must be checked separately.
+          </p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:22px;">
+        <span class="card-label">Validation Plan</span>
+        <h3>What Must Be Demonstrated Before the Extension Is Considered Complete</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Test</th>
+                <th>Recorded Evidence</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Stationary rig</td>
+                <td>Raw pose scatter, accepted-update rate, NIS, and maximum prediction-only gap</td>
+                <td>Separates visual or geometry faults from motion-model faults</td>
+              </tr>
+              <tr>
+                <td>Distance, angle, and lighting sweep</td>
+                <td>Reference pose, KFPnP covariance, adaptive \(R_k\), and measured error</td>
+                <td>Checks whether reported uncertainty follows actual visual quality</td>
+              </tr>
+              <tr>
+                <td>Controlled translation</td>
+                <td>Slow, fast, constant-speed, acceleration, stop–start, and return trajectories</td>
+                <td>Tunes translational \(Q_k\) and reveals lag or overreaction</td>
+              </tr>
+              <tr>
+                <td>Controlled rotation</td>
+                <td>Separate roll, pitch, and yaw motions with an independent reference</td>
+                <td>Tunes attitude process noise and checks angle wrapping</td>
+              </tr>
+              <tr>
+                <td>Short occlusion</td>
+                <td>Prediction-gap duration, accumulated drift, and reacquisition time</td>
+                <td>Defines how long the constant-velocity prediction remains useful</td>
+              </tr>
+              <tr>
+                <td>Ablation replay</td>
+                <td>Raw KFPnP, fixed-\(R\) KF, and adaptive-\(R\) KF on identical frames</td>
+                <td>Isolates the improvement produced by temporal filtering and adaptation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="card-label">Current Status</span>
+        <h3>Research Prototype Under Experimental Validation</h3>
+        <p>
+          The state model, KFPnP measurement interface, adaptive-R logic, Kalman prediction and
+          correction, covariance propagation, live diagnostics, and post-run plotting have been
+          implemented as a first prototype. Preliminary tests have already shown that accepted
+          camera updates, prediction-only intervals, and NIS must be monitored explicitly.
+        </p>
+        <p style="margin-top:12px;">
+          Final accuracy and consistency claims are intentionally deferred. The next milestone is
+          a controlled dataset with independently measured poses, followed by fixed-R versus
+          adaptive-R replay using identical images. Only after those tests will the initial
+          \(Q_k\), covariance limits, innovation window, smoothing factor, and gating thresholds
+          be finalized.
+        </p>
+        <div class="note" style="margin-top:16px;">
+          <span class="note-icon">ℹ</span>
+          <p>
+            This section is presented as ongoing work so that the portfolio distinguishes the
+            completed KFPnP measurement pipeline from the temporal tracking extension that is
+            currently being validated.
+          </p>
+        </div>
+      </div>
+    </section>
+
 
   </main>
 
