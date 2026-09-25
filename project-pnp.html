@@ -579,7 +579,6 @@
           <a class="anchor-btn" href="#noise">Adaptive Noise</a>
           <a class="anchor-btn" href="#integration">Weighted MLPnP</a>
           <a class="anchor-btn" href="#validation">Live Validation</a>
-          <a class="anchor-btn" href="#results">Results</a>
           <a class="anchor-btn" href="#conclusion">Conclusion</a>
         </div>
       </div>
@@ -644,7 +643,10 @@
           </div>
           <div class="note" style="margin-top:20px;">
             <span class="note-icon">ℹ</span>
-
+            <p>
+              Identification and covariance estimation remain separate until the final solver:
+              one establishes the correspondence, while the other determines its influence.
+            </p>
           </div>
         </div>
       </div>
@@ -762,9 +764,9 @@
         </div>
 
         <p style="margin-top:18px;">
-          The 201 output classes have a direct meaning. Classes 0–199 represent 50 selected
-          marker IDs under four rotations: 0°, 90°, 180°, and 270°. Class 200 represents
-          background or a non-marker crop. The marker classes use
+          The 201 output classes have a direct meaning. Classes 0–199 represent marker IDs 0–49
+          under four rotations: 0°, 90°, 180°, and 270°. Class 200 represents background or a
+          non-marker crop. The marker classes use
           <strong>class = 4 × marker ID + rotation index</strong>. The highest softmax probability
           becomes the confidence score.
         </p>
@@ -843,6 +845,14 @@
           src="assets/aruco-training-augmentations.png"
           alt="Clean ArUco crop and robust training examples containing blur, sensor noise, glare, and illumination changes"
         />
+        <div class="media-caption">
+          <h3>Training-Time Robustification</h3>
+          <p>
+            Representative training crops show how blur, sensor noise, glare, damaged pixels,
+            shadows, and illumination changes are applied to marker and background examples.
+          </p>
+        </div>
+      </div>
     </section>
 
     <div class="stage-divider reveal" role="separator" aria-label="Transition from robust identification to light-adaptive covariance estimation">
@@ -994,11 +1004,9 @@
           <div class="media-caption">
             <h3>Marker Recovery Under Degradation</h3>
             <p>
-              Use a real camera recording, not a synthetic animation. Display the OpenCV candidate,
-              the recovered ID, predicted rotation, softmax confidence, and whether the classical
-              or learned route supplied the identity. Include deliberate blur, glare, direct
-              sunlight, cast shadow, low light, and viewpoint change to demonstrate the conditions
-              used to motivate robustification.
+              The recording shows candidate localization and marker recovery while image quality
+              changes. The overlay reports the recovered ID, predicted rotation, confidence, and
+              whether the classical decoder or learned recovery path supplied the identity.
             </p>
           </div>
         </div>
