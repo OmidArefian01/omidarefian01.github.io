@@ -562,6 +562,24 @@
     }
 
     /* ─────────────────────────────────────────
+       PROSE ALIGNMENT
+    ───────────────────────────────────────── */
+    @media (min-width: 641px) {
+      .hero-lead,
+      .section-sub,
+      .card p,
+      .card li,
+      .media-caption p,
+      .note p {
+        text-align: justify;
+        text-align-last: left;
+        text-justify: inter-word;
+        hyphens: auto;
+        -webkit-hyphens: auto;
+      }
+    }
+
+    /* ─────────────────────────────────────────
        RESPONSIVE
     ───────────────────────────────────────── */
     @media (max-width: 960px) {
