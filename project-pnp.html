@@ -1002,12 +1002,11 @@
             Your browser doesn't support embedded video — see kfpnp-identification-demo.mp4.
           </video>
           <div class="media-caption">
-            <h3>Live Validation of Adaptive Noise Estimation</h3>
+            <h3>Live Validation of Robust Marker Identification</h3>
             <p>
-              During this live test, a flashlight is aimed at the ArUco markers to create abrupt
-              illumination changes and glare. The covariance ellipse expands as the corner
-              measurements become less reliable and contracts when visual conditions improve,
-              showing the adaptive noise model responding in real time.
+              This recording shows the identification stage operating on three ArUco markers in
+              a live camera scene. The experiment demonstrates continuous marker recognition and
+              ordered-corner recovery before the observations are passed to pose estimation.
             </p>
           </div>
         </div>
@@ -1021,12 +1020,12 @@
             kfpnp-covariance-light-demo.mp4 to watch the experiment.
           </video>
           <div class="media-caption">
-            <h3>Live Validation Under Changing Illumination</h3>
+            <h3>Live Validation of Adaptive Noise Estimation</h3>
             <p>
-              This recording shows the complete calibrated pipeline operating in real time while
-              illumination and marker pose are changed by hand. Marker identity remains available,
-              while the estimated corner and pose uncertainty increase as visual conditions become
-              less reliable and decrease again when the observations improve.
+              During this live test, a flashlight is aimed at the ArUco markers to create abrupt
+              illumination changes and glare. The covariance ellipses expand as the corner
+              measurements become less reliable and contract when visual conditions improve,
+              showing the adaptive noise model responding in real time.
             </p>
           </div>
         </div>
@@ -1098,7 +1097,7 @@
             <li>Training with blur, sensor noise, glare, a full outdoor illumination sweep, and similarly degraded background crops targets the failure modes observed in real camera experiments, indoors and out.</li>
             <li>Per-corner uncertainty that reacts to both sensor conditions and local image structure predicts real measurement scatter far better than a fixed constant.</li>
             <li>Feeding that uncertainty into the pose solver, rather than treating every corner equally, propagates cleanly through to pose covariance without any online re-fitting.</li>
-            <li>The live experiment must test both continuity of correct identification and the response of covariance under real blur, glare, low light, motion, and changing viewpoint.</li>
+            <li>The live experiments demonstrate continuous marker identification and a covariance response that changes with illumination, glare, motion, and viewing conditions.</li>
           </ul>
         </div>
 

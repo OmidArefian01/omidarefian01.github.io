@@ -755,10 +755,12 @@
         <h3>Interpretation</h3>
         <p>
           The training curves and architecture comparison together show that the agent responds
-          meaningfully to hyperparameter and network design choices. Higher-capacity networks
-          achieve better final performance but require more episodes to converge. The
-          reward-surface figure complements these results by revealing the underlying structure
-          that the policy implicitly optimises over.
+          meaningfully to hyperparameter and network design choices. The largest tested network,
+          [1024, 512, 256], achieved the best final reward of approximately \(-1.10\times10^6\),
+          while [256, 128, 64] reached \(-1.15\times10^6\) and [512, 256, 128] reached
+          \(-1.33\times10^6\). The result is not monotonic with network size, showing that capacity
+          alone does not determine performance. The reward-surface figure complements these results
+          by revealing the structure that the policy implicitly optimises over.
         </p>
         <p>
           The entropy coefficient \(c_2\) acts as a direct control on the exploration–exploitation
@@ -768,9 +770,10 @@
         <div class="note">
           <span class="note-icon">ℹ</span>
           <p>
-            Replace this paragraph with your exact final conclusion — for example which entropy
-            value and which architecture gave the best trade-off between convergence speed and
-            final reward across all experiments.
+            In these runs, entropy coefficient \(c_2=0.05\) retained more exploration and finished
+            with a less-negative moving-average reward than \(c_2=0.03\). Combined with the
+            architecture comparison, the strongest observed configuration used the
+            [1024, 512, 256] network.
           </p>
         </div>
       </div>
