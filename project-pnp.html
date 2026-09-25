@@ -1508,54 +1508,6 @@
         </div>
       </div>
 
-      <div class="card" style="margin-bottom:22px;">
-        <span class="card-label">Validation Plan</span>
-        <h3>What Must Be Demonstrated Before the Extension Is Considered Complete</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Test</th>
-                <th>Recorded Evidence</th>
-                <th>Purpose</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Stationary rig</td>
-                <td>Raw pose scatter, accepted-update rate, NIS, and maximum prediction-only gap</td>
-                <td>Separates visual or geometry faults from motion-model faults</td>
-              </tr>
-              <tr>
-                <td>Distance, angle, and lighting sweep</td>
-                <td>Reference pose, KFPnP covariance, adaptive \(R_k\), and measured error</td>
-                <td>Checks whether reported uncertainty follows actual visual quality</td>
-              </tr>
-              <tr>
-                <td>Controlled translation</td>
-                <td>Slow, fast, constant-speed, acceleration, stop–start, and return trajectories</td>
-                <td>Tunes translational \(Q_k\) and reveals lag or overreaction</td>
-              </tr>
-              <tr>
-                <td>Controlled rotation</td>
-                <td>Separate roll, pitch, and yaw motions with an independent reference</td>
-                <td>Tunes attitude process noise and checks angle wrapping</td>
-              </tr>
-              <tr>
-                <td>Short occlusion</td>
-                <td>Prediction-gap duration, accumulated drift, and reacquisition time</td>
-                <td>Defines how long the constant-velocity prediction remains useful</td>
-              </tr>
-              <tr>
-                <td>Ablation replay</td>
-                <td>Raw KFPnP, fixed-\(R\) KF, and adaptive-\(R\) KF on identical frames</td>
-                <td>Isolates the improvement produced by temporal filtering and adaptation</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       <div class="card">
         <span class="card-label">Current Status</span>
         <h3>Research Prototype Under Experimental Validation</h3>
