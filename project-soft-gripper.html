@@ -305,7 +305,14 @@
       box-shadow: var(--shadow-sm);
     }
 
-    .media-card img { width: 100%; height: auto; border-bottom: 1px solid var(--card-border); }
+    .media-card img,
+    .media-card video {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: var(--navy);
+      border-bottom: 1px solid var(--card-border);
+    }
     .media-card.photo img { height: 520px; object-fit: contain; background: #edf2f6; }
     .media-caption { padding: 20px 24px 22px; }
     .media-caption h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 7px; }
@@ -803,7 +810,10 @@
 
       <div class="grid-2">
         <article class="media-card">
-          <img loading="lazy" src="assets/soft-gripper-food-test.jpg" alt="Soft gripper approaching an apple during food-handling tests" />
+          <video controls preload="metadata" playsinline aria-label="Soft gripper food-handling test video">
+            <source src="assets/soft-gripper-food-test.mp4" type="video/mp4" />
+            Your browser does not support embedded MP4 video.
+          </video>
           <div class="media-caption">
             <h3>Food-Handling Tests</h3>
             <p>
