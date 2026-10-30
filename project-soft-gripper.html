@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soft Silicone Gripper for Delicate Food Handling | Omid Arefian</title>
+  <meta
+    name="description"
+    content="Design, simulation, multimaterial fabrication, Arduino control, and testing of a tendon-driven three-finger soft silicone gripper for delicate and irregular objects."
+  />
+  <meta property="og:title" content="Soft Silicone Gripper for Delicate Food Handling" />
+  <meta
+    property="og:description"
+    content="A three-finger tendon-driven soft robotic gripper built with Ecoflex, Smooth-Sil, and embedded PLA structures."
+  />
+  <meta property="og:image" content="assets/soft-gripper-final-design.jpg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --navy: #0d1b2a;
+      --navy-mid: #1a2e42;
+      --navy-light: #243a52;
+      --slate: #3d5a73;
+      --steel: #6b8fa8;
+      --fog: #c8d8e4;
+      --ice: #e8f0f6;
+      --white: #ffffff;
+      --off-white: #f7f9fb;
+      --text: #0d1b2a;
+      --text-soft: #445668;
+      --text-muted: #6b8fa8;
+      --accent: #1d6fa4;
+      --accent-light: #2587c5;
+      --accent-pale: #ddeef8;
+      --green: #1a7a5e;
+      --green-pale: #d4ede7;
+      --coral: #d95d45;
+      --coral-pale: #fae6e1;
+      --line: #dde6ee;
+      --card-bg: #ffffff;
+      --card-border: #e2ebf2;
+      --shadow-sm: 0 1px 4px rgba(13,27,42,0.06), 0 4px 12px rgba(13,27,42,0.06);
+      --shadow-md: 0 2px 8px rgba(13,27,42,0.07), 0 8px 24px rgba(13,27,42,0.09);
+      --shadow-lg: 0 4px 16px rgba(13,27,42,0.08), 0 16px 48px rgba(13,27,42,0.12);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      --max-width: 1160px;
+      --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+      --font-display: 'DM Serif Display', Georgia, serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      background: var(--off-white);
+      color: var(--text);
+      line-height: 1.65;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+
+    .container {
+      width: min(var(--max-width), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .section-gap { padding: 72px 0 0; }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-inner {
+      width: min(var(--max-width), calc(100% - 40px));
+      margin: 0 auto;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      color: var(--navy);
+    }
+
+    .nav-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn-secondary,
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.86rem;
+      font-weight: 600;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--navy);
+      border: 1.5px solid var(--card-border);
+    }
+
+    .btn-secondary:hover { border-color: var(--steel); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .btn-primary { background: var(--navy); color: var(--white); }
+    .btn-primary:hover { background: var(--navy-mid); transform: translateY(-1px); }
+
+    .hero { padding: 56px 0 0; }
+
+    .hero-gallery {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      height: 500px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      background: var(--navy);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .hero-gallery figure {
+      min-width: 0;
+      overflow: hidden;
+      background: #eef3f7;
+    }
+
+    .hero-gallery img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .hero-badge {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.95);
+      color: var(--navy);
+      font-size: 0.82rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-text { padding: 36px 0 0; }
+
+    .hero-overline {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 4.8vw, 3.7rem);
+      line-height: 1.06;
+      letter-spacing: -0.02em;
+      color: var(--navy);
+      margin-bottom: 18px;
+      max-width: 900px;
+    }
+
+    .hero-lead {
+      font-size: 1.02rem;
+      color: var(--text-soft);
+      line-height: 1.72;
+      max-width: 860px;
+      margin-bottom: 24px;
+    }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+
+    .tag {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--navy-mid);
+      background: var(--ice);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      padding: 5px 11px;
+    }
+
+    .anchor-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-bottom: 56px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .anchor-btn {
+      display: inline-flex;
+      align-items: center;
+      height: 36px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--text-soft);
+      font-size: 0.83rem;
+      font-weight: 500;
+      border: 1.5px solid var(--card-border);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .anchor-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.7rem, 3vw, 2.4rem);
+      line-height: 1.15;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .section-sub {
+      font-size: 0.97rem;
+      color: var(--text-muted);
+      max-width: 760px;
+      margin-bottom: 32px;
+      line-height: 1.65;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 26px 28px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-label {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-pale);
+      color: var(--accent);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .card h3 { font-size: 1.02rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; line-height: 1.4; }
+    .card p, .card li { font-size: 0.93rem; color: var(--text-soft); line-height: 1.7; }
+    .card p + p { margin-top: 10px; }
+    .card ul { padding-left: 18px; margin-top: 10px; }
+    .card li + li { margin-top: 8px; }
+
+    .media-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .media-card img { width: 100%; height: auto; border-bottom: 1px solid var(--card-border); }
+    .media-card.photo img { height: 520px; object-fit: contain; background: #edf2f6; }
+    .media-caption { padding: 20px 24px 22px; }
+    .media-caption h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 7px; }
+    .media-caption p { font-size: 0.9rem; color: var(--text-soft); line-height: 1.68; }
+
+    .process-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .process-step {
+      position: relative;
+      background: var(--white);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 18px 16px;
+      min-height: 126px;
+    }
+
+    .process-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      margin-bottom: 10px;
+      border-radius: 50%;
+      background: var(--accent-pale);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .process-step h3 { font-size: 0.9rem; color: var(--navy); margin-bottom: 5px; }
+    .process-step p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+
+    .spec-list { list-style: none; padding: 0 !important; margin-top: 14px !important; }
+    .spec-list li { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; border-top: 1px solid var(--line); }
+    .spec-list strong { color: var(--navy); font-weight: 600; text-align: right; }
+
+    .result-callout {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 18px;
+      align-items: center;
+      padding: 24px 26px;
+      margin-top: 22px;
+      border: 1px solid rgba(26,122,94,0.2);
+      border-radius: var(--radius-lg);
+      background: var(--green-pale);
+    }
+
+    .result-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--white);
+      color: var(--green);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .result-callout h3 { color: var(--navy); font-size: 1rem; margin-bottom: 4px; }
+    .result-callout p { color: var(--text-soft); font-size: 0.91rem; line-height: 1.65; }
+
+    .site-footer {
+      padding: 36px 0 40px;
+      text-align: center;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--line);
+      margin-top: 80px;
+    }
+
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+
+    @media (min-width: 641px) {
+      .hero-lead,
+      .section-sub,
+      .card p,
+      .card li,
+      .media-caption p,
+      .result-callout p {
+        text-align: justify;
+        text-align-last: left;
+        text-justify: inter-word;
+        hyphens: auto;
+        -webkit-hyphens: auto;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .process-strip { grid-template-columns: repeat(2, 1fr); }
+      .hero-gallery { height: 420px; }
+      .media-card.photo img { height: 440px; }
+    }
+
+    @media (max-width: 640px) {
+      .container, .nav-inner { width: min(100% - 28px, var(--max-width)); }
+      .hero { padding-top: 32px; }
+      .hero-gallery { height: 280px; }
+      .hero-badge { left: 12px; top: 12px; font-size: 0.7rem; padding: 6px 10px; }
+      .hero-title { font-size: 2.25rem; }
+      .section-gap { padding-top: 56px; }
+      .process-strip { grid-template-columns: 1fr; }
+      .media-card.photo img { height: 360px; }
+      .nav-actions .btn-primary { display: none; }
+      .card { padding: 22px; }
+      .result-callout { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="brand">Omid Arefian</a>
+      <div class="nav-actions">
+        <a href="index.html#projects" class="btn-secondary">← All Projects</a>
+        <a href="#testing" class="btn-primary">Jump to Testing</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <section class="hero">
+      <div class="hero-gallery">
+        <figure>
+          <img src="assets/soft-gripper-open.jpeg" alt="Open three-finger soft silicone gripper prototype" />
+        </figure>
+        <figure>
+          <img src="assets/soft-gripper-closed.jpeg" alt="Closed three-finger soft silicone gripper prototype" />
+        </figure>
+        <div class="hero-badge">Soft Robotics · Team Project · 2026</div>
+      </div>
+
+      <div class="hero-text">
+        <p class="hero-overline">Compliant Design · Multimaterial Casting · Tendon Actuation</p>
+        <h1 class="hero-title">Soft Silicone Gripper for Delicate Food Handling</h1>
+        <p class="hero-lead">
+          A three-finger soft robotic gripper designed to adapt passively to fruits and other
+          irregular objects. The prototype combines compliant silicone contact surfaces, a stiffer
+          structural backbone, embedded 3D-printed flanges, and a compact single-motor tendon drive.
+          The project covered concept development, simulation, mold design, multimaterial casting,
+          assembly, Arduino control, and physical grasp testing.
+        </p>
+
+        <div class="tag-row">
+          <span class="tag">Soft Robotics</span>
+          <span class="tag">Ecoflex 00-35</span>
+          <span class="tag">Smooth-Sil 950</span>
+          <span class="tag">PLA</span>
+          <span class="tag">Tendon Actuation</span>
+          <span class="tag">Arduino Nano R4</span>
+          <span class="tag">3D Printing</span>
+          <span class="tag">Simulation</span>
+        </div>
+
+        <div class="anchor-row">
+          <a class="anchor-btn" href="#overview">Overview</a>
+          <a class="anchor-btn" href="#design">Design</a>
+          <a class="anchor-btn" href="#materials">Materials</a>
+          <a class="anchor-btn" href="#fabrication">Fabrication</a>
+          <a class="anchor-btn" href="#control">Control</a>
+          <a class="anchor-btn" href="#testing">Testing</a>
+          <a class="anchor-btn" href="#next-steps">Next Steps</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="overview" class="section-gap reveal">
+      <p class="label">Overview</p>
+      <h2 class="section-title">Why a Soft Gripper?</h2>
+      <p class="section-sub">
+        Food-handling tasks combine uncertain object geometry with a narrow range of safe contact
+        forces. The design shifts part of that complexity from active control into material
+        compliance and geometry.
+      </p>
+
+      <div class="grid-2">
+        <article class="card">
+          <span class="card-label">The Challenge</span>
+          <h3>Variable Geometry and Bruising Risk</h3>
+          <p>
+            Fruits and other food products differ in size, curvature, surface texture, and
+            stiffness. A rigid gripper must be positioned accurately and regulate force inside a
+            narrow operating range: too much force can damage the object, while too little force
+            can cause a failed grasp.
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="card-label">The Approach</span>
+          <h3>Let the Structure Adapt</h3>
+          <p>
+            Soft fingers conform around an object without requiring every contact point to be
+            commanded. The final concept uses three tendon-driven fingers around a central palm,
+            allowing the compliant layers to absorb alignment errors while the stiffer layers guide
+            the bending shape.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="design" class="section-gap reveal">
+      <p class="label">Mechanical Design</p>
+      <h2 class="section-title">From Finger Geometry to Complete Gripper</h2>
+      <p class="section-sub">
+        The design was refined around controlled curvature, resistance to gravity, and a compact
+        actuation mechanism that pulls all three fingers with one motor.
+      </p>
+
+      <div class="grid-3" style="margin-bottom:22px;">
+        <article class="card">
+          <span class="card-label">Finger</span>
+          <h3>Guided Compliance</h3>
+          <p>
+            Unequal segment geometry and variable thickness guide the finger toward a useful curved
+            grasp instead of allowing uncontrolled deformation.
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="card-label">Contact</span>
+          <h3>Embedded Retention Flanges</h3>
+          <p>
+            Flexible side features increase the available contact envelope and help retain objects
+            as the fingers close around different shapes.
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="card-label">Actuation</span>
+          <h3>Single Pulley, Three Tendons</h3>
+          <p>
+            Three tendons pass through T-shaped guides and connect to one pulley. A standard servo
+            winds the tendons together to produce a coordinated closing motion.
+          </p>
+        </article>
+      </div>
+
+      <div class="grid-2">
+        <article class="media-card">
+          <img loading="lazy" src="assets/soft-gripper-finger-design.jpg" alt="Finger design with Ecoflex, Smooth-Sil, and PLA layers" />
+          <div class="media-caption">
+            <h3>Final Finger Architecture</h3>
+            <p>
+              The compliant contact body, structural silicone layer, and PLA inserts work together
+              to balance adaptability with repeatable bending.
+            </p>
+          </div>
+        </article>
+
+        <article class="media-card">
+          <img loading="lazy" src="assets/soft-gripper-final-design.jpg" alt="CAD views of the complete three-finger soft gripper" />
+          <div class="media-caption">
+            <h3>Complete Gripper Assembly</h3>
+            <p>
+              Three fingers are arranged around the central palm and mounted above the servo-driven
+              tendon mechanism.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <div class="grid-2" style="margin-top:22px;">
+        <article class="media-card">
+          <img loading="lazy" src="assets/soft-gripper-finger-simulation.jpg" alt="Simulated deformation of one soft gripper finger" />
+          <div class="media-caption">
+            <h3>Finger Deformation Study</h3>
+            <p>
+              Simulation was used to inspect the bending shape and identify where deformation
+              concentrates along the segmented finger.
+            </p>
+          </div>
+        </article>
+
+        <article class="media-card">
+          <img loading="lazy" src="assets/soft-gripper-simulation.jpg" alt="Simulated deformation of the assembled three-finger gripper" />
+          <div class="media-caption">
+            <h3>Assembly-Level Simulation</h3>
+            <p>
+              The assembled model was evaluated to check coordinated finger motion and the overall
+              closing configuration before fabrication.
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="materials" class="section-gap reveal">
+      <p class="label">Material Strategy</p>
+      <h2 class="section-title">Three-Layer Multimaterial Construction</h2>
+      <p class="section-sub">
+        Each material has a distinct mechanical role: conform to the object, constrain the bending
+        path, or reinforce the finger and its retention features.
+      </p>
+
+      <div class="grid-3">
+        <article class="card">
+          <span class="card-label">Contact Layer</span>
+          <h3>Ecoflex 00-35</h3>
+          <p>
+            The most compliant layer forms the inner deformable body and adapts to the object
+            surface during contact.
+          </p>
+          <ul class="spec-list">
+            <li><span>Mixing ratio</span><strong>1:1</strong></li>
+            <li><span>Working time</span><strong>2 min</strong></li>
+            <li><span>Cure time</span><strong>5 min</strong></li>
+            <li><span>Volume</span><strong>42 ml</strong></li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="card-label">Backbone</span>
+          <h3>Smooth-Sil 950</h3>
+          <p>
+            A stiffer silicone backbone constrains the deformation path and reduces uncontrolled
+            collapse under tendon load.
+          </p>
+          <ul class="spec-list">
+            <li><span>Mixing ratio</span><strong>10:1</strong></li>
+            <li><span>Working time</span><strong>45 min</strong></li>
+            <li><span>Cure time</span><strong>Approx. 18 h</strong></li>
+            <li><span>Volume</span><strong>13 ml</strong></li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="card-label">Reinforcement</span>
+          <h3>PLA Components</h3>
+          <p>
+            FDM-printed inserts support the flange geometry, add local stiffness, and connect the
+            silicone structure to the rigid mechanism.
+          </p>
+          <ul class="spec-list">
+            <li><span>Process</span><strong>FDM printing</strong></li>
+            <li><span>Finger inserts</span><strong>2 layers</strong></li>
+            <li><span>Additional parts</span><strong>Molds and base</strong></li>
+          </ul>
+        </article>
+      </div>
+
+      <article class="media-card" style="margin-top:22px;">
+        <img loading="lazy" src="assets/soft-gripper-materials.jpg" alt="Ecoflex, Smooth-Sil, and PLA material roles in the soft gripper" />
+        <div class="media-caption">
+          <h3>Material Roles in the Finger</h3>
+          <p>
+            The final stack combines a soft interactive layer, a structural backbone, and rigid
+            embedded features rather than asking one material to provide every function.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <section id="fabrication" class="section-gap reveal">
+      <p class="label">Fabrication</p>
+      <h2 class="section-title">Molding, Printing, and Assembly</h2>
+      <p class="section-sub">
+        The prototype was produced through an iterative workflow that connected finger geometry,
+        negative mold design, sequential casting, rigid-part fabrication, and final integration.
+      </p>
+
+      <div class="process-strip">
+        <article class="process-step">
+          <span class="process-number">01</span>
+          <h3>Design</h3>
+          <p>Define the external geometry and desired bending behaviour.</p>
+        </article>
+        <article class="process-step">
+          <span class="process-number">02</span>
+          <h3>Mold</h3>
+          <p>Create a three-part negative mold for the two silicone layers.</p>
+        </article>
+        <article class="process-step">
+          <span class="process-number">03</span>
+          <h3>Cast</h3>
+          <p>Pour and cure the elastomers while embedding the PLA components.</p>
+        </article>
+        <article class="process-step">
+          <span class="process-number">04</span>
+          <h3>Print</h3>
+          <p>Fabricate the base, inserts, mechanism, and mold components.</p>
+        </article>
+        <article class="process-step">
+          <span class="process-number">05</span>
+          <h3>Assemble</h3>
+          <p>Integrate the fingers, tendons, pulley, guides, and servomotor.</p>
+        </article>
+      </div>
+
+      <div class="grid-2">
+        <article class="media-card">
+          <img loading="lazy" src="assets/soft-gripper-mold-design.jpg" alt="Three-part mold design for casting the soft gripper finger" />
+          <div class="media-caption">
+            <h3>Three-Part Mold</h3>
+            <p>
+              Separate mold components define the Ecoflex body, position the PLA spine and flanges,
+              and close the cavity for the Smooth-Sil layer.
+            </p>
+          </div>
+        </article>
+
+        <article class="media-card">
+          <img loading="lazy" src="assets/soft-gripper-assembly.jpg" alt="Completed soft gripper prototype shown in open and closed configurations" />
+          <div class="media-caption">
+            <h3>Integrated Prototype</h3>
+            <p>
+              The completed assembly combines compliant fingers with the printed frame and compact
+              tendon transmission in one portable unit.
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="control" class="section-gap reveal">
+      <p class="label">Control</p>
+      <h2 class="section-title">Simple Open-Loop Position Command</h2>
+      <p class="section-sub">
+        Material compliance performs much of the physical adaptation, allowing the first prototype
+        to use a compact open-loop control architecture.
+      </p>
+
+      <div class="grid-2">
+        <article class="card">
+          <span class="card-label">Hardware</span>
+          <h3>Arduino and Servo Drive</h3>
+          <ul>
+            <li>An Arduino Nano R4 reads the command potentiometer.</li>
+            <li>A standard servomotor winds the common tendon pulley.</li>
+            <li>A LiPo battery supplies the portable electronics.</li>
+            <li>The command moves all three fingers together.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="card-label">Software</span>
+          <h3>Smoothed 50 Hz Command Pipeline</h3>
+          <ul>
+            <li>An eight-sample moving average reduces ADC noise.</li>
+            <li>The filtered 0-1023 value is mapped and constrained to 0°-180°.</li>
+            <li>The servo command is updated at 50 Hz.</li>
+            <li>Raw input and servo angle are streamed for live debugging.</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="grid-2" style="margin-top:22px;">
+        <article class="media-card">
+          <img loading="lazy" src="assets/soft-gripper-control.jpg" alt="Open-loop control architecture from potentiometer input to tendon-driven gripper pose" />
+          <div class="media-caption">
+            <h3>Control Architecture</h3>
+            <p>
+              The goal pose is converted into a motor command without contact or force feedback in
+              the current prototype.
+            </p>
+          </div>
+        </article>
+
+        <article class="media-card">
+          <img loading="lazy" src="assets/soft-gripper-software.jpg" alt="Arduino command pipeline with moving average, mapping, and servo update" />
+          <div class="media-caption">
+            <h3>Embedded Software Flow</h3>
+            <p>
+              Filtering, mapping, saturation, servo output, and serial diagnostics form the complete
+              real-time loop.
+            </p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="testing" class="section-gap reveal">
+      <p class="label">Results and Testing</p>
+      <h2 class="section-title">Grasping Food and Irregular Objects</h2>
+      <p class="section-sub">
+        Physical tests evaluated whether the shared tendon drive could close the three fingers
+        around objects with different size and geometry while the soft layers conformed to contact.
+      </p>
+
+      <div class="grid-2">
+        <article class="media-card">
+          <img loading="lazy" src="assets/soft-gripper-food-test.jpg" alt="Soft gripper approaching an apple during food-handling tests" />
+          <div class="media-caption">
+            <h3>Food-Handling Tests</h3>
+            <p>
+              The prototype was tested with an apple, carrot, and onions to examine its ability to
+              approach and close around common food geometries.
+            </p>
+          </div>
+        </article>
+
+        <article class="media-card">
+          <img loading="lazy" src="assets/soft-gripper-shapes-test.jpg" alt="Soft gripper conforming around a non-food object with an irregular shape" />
+          <div class="media-caption">
+            <h3>Other Shapes</h3>
+            <p>
+              Additional objects were used to observe how the segmented fingers and flexible side
+              features adapt outside the original food-handling scenario.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <div class="result-callout">
+        <span class="result-icon">✓</span>
+        <div>
+          <h3>End-to-End Prototype Completed</h3>
+          <p>
+            The project progressed from design and simulation to molds, multimaterial fingers,
+            printed hardware, electronics, embedded control, and physical grasp demonstrations.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="next-steps" class="section-gap reveal">
+      <p class="label">Future Development</p>
+      <h2 class="section-title">Closing the Loop</h2>
+      <p class="section-sub">
+        The next iteration can combine the gripper's passive mechanical adaptation with sensing and
+        feedback for more repeatable contact and grasp decisions.
+      </p>
+
+      <div class="grid-3">
+        <article class="card">
+          <span class="card-label">Perception</span>
+          <h3>Proximity Sensing</h3>
+          <p>
+            Detect the object before contact and use distance information to coordinate the closing
+            command.
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="card-label">Feedback</span>
+          <h3>Tactile Sensing</h3>
+          <p>
+            Measure contact distribution and stop or adjust tendon motion when the grasp becomes
+            secure.
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="card-label">Retention</span>
+          <h3>Suction Features</h3>
+          <p>
+            Explore passive or actively controlled suction elements for smoother and more delicate
+            object surfaces.
+          </p>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    © 2026 Omid Arefian · Soft Robotics Project · Politecnico di Milano
+  </footer>
+
+  <script>
+    const items = document.querySelectorAll('.reveal');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reducedMotion || !('IntersectionObserver' in window)) {
+      items.forEach(item => item.classList.add('show'));
+    } else {
+      const observer = new IntersectionObserver(
+        entries => entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+            observer.unobserve(entry.target);
+          }
+        }),
+        { threshold: 0.08 }
+      );
+      items.forEach(item => observer.observe(item));
+    }
+  </script>
+</body>
+</html>
